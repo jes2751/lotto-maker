@@ -32,9 +32,10 @@ test("draw detail page renders the requested round", async () => {
 });
 
 test("stats page renders both frequency sections", async () => {
-  const html = renderToStaticMarkup(await StatsPage());
+  const html = renderToStaticMarkup(await StatsPage({ searchParams: {} }));
 
-  assert.match(html, /All Draws/);
-  assert.match(html, /Recent 10/);
+  assert.match(html, /전체 회차/);
+  assert.match(html, /최근 10회/);
   assert.match(html, /기본 빈도 통계/);
+  assert.match(html, /상위 15개/);
 });

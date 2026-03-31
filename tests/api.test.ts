@@ -64,10 +64,12 @@ test("generate api returns requested set count", async () => {
 });
 
 test("stats api returns top level metadata", async () => {
-  const response = await getFrequencyStats(new Request("http://localhost/api/v1/stats/frequency?period=recent_10&type=main"));
+  const response = await getFrequencyStats(new Request("http://localhost/api/v1/stats/frequency?period=recent_10&type=main&limit=5"));
   const payload = await response.json();
 
   assert.equal(response.status, 200);
   assert.equal(payload.success, true);
   assert.equal(payload.data.period, "recent_10");
+  assert.equal(payload.data.limit, 5);
+  assert.equal(payload.data.stats.length, 5);
 });
