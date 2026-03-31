@@ -1,5 +1,13 @@
 # History
 
+## 2026-03-31 22:11 KST
+
+* 작업: v1 UI 2차 정리로 홈, 추천기, 회차 조회, 통계 화면의 정보 밀도와 사용자 노출 문구를 개선
+* 변경: `src/app/page.tsx`, `src/app/generate/page.tsx`, `src/app/draws/page.tsx`, `src/app/stats/page.tsx`를 재작성해 요약 카드, 보조 설명, 회차/통계 하이라이트를 추가
+* 변경: `src/components/layout/site-header.tsx`, `src/components/layout/site-footer.tsx`, `src/components/lotto/generator-panel.tsx`, `src/lib/lotto/generation.ts`를 정리해 깨진 텍스트를 정상화하고 추천 이유 문구를 읽기 쉽게 수정
+* 검증: `npm test` 통과, `npm run build` 통과
+* 다음: 실제 브라우저 기준으로 여백, 카드 밀도, 모바일 배치감을 확인하면서 시각 완성도를 더 높일 것
+
 ## 2026-03-31 22:03 KST
 
 * 작업: v1 개발 시작 기준으로 앱 빌드 안정화, 테스트 경로 정리, 주간 당첨번호 동기화 초안 추가

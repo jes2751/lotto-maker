@@ -68,7 +68,7 @@ function createReason(strategy: GenerateNumbersInput["strategy"]): string {
     return "시드 회차에서 자주 나온 번호에 가중치를 둬 조합했습니다.";
   }
 
-  return "빈도 가중치와 랜덤 조합을 섞어 균형 있게 구성했습니다.";
+  return "빈도 가중치와 랜덤 조합을 함께 섞어 균형 있게 구성했습니다.";
 }
 
 function createNumbers(strategy: GenerateNumbersInput["strategy"], draws: Draw[]): number[] {

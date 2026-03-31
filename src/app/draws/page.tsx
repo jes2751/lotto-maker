@@ -3,14 +3,30 @@ import { drawRepository } from "@/lib/lotto";
 
 export default async function DrawsPage() {
   const { draws } = await drawRepository.list({ limit: 12, offset: 0 });
+  const latest = draws[0] ?? null;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
-      <div className="mb-8">
-        <p className="eyebrow">Draws</p>
-        <h1 className="mt-4 text-4xl font-semibold text-white">최근 회차 조회</h1>
-        <p className="mt-3 text-slate-300">정적 시드 데이터 기준 최신 12개 회차를 표시합니다.</p>
-      </div>
+    <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
+      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="panel">
+          <p className="eyebrow">Draws</p>
+          <h1 className="mt-4 text-4xl font-semibold text-white">최근 회차 조회</h1>
+          <p className="mt-3 text-slate-300">정적 시드 데이터 기준 최신 12개 회차를 우선 보여줍니다.</p>
+        </div>
+        <div className="panel">
+          <p className="eyebrow">Snapshot</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">최신 회차</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{latest ? `${latest.round}회` : "-"}</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">목록 개수</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{draws.length}개</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4">
         {draws.map((draw) => (
@@ -24,6 +40,14 @@ export default async function DrawsPage() {
             </div>
             <div className="mt-5">
               <NumberSet numbers={draw.numbers} bonus={draw.bonus} />
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                총 판매금: {draw.totalPrize ? `${Math.round(draw.totalPrize / 100000000)}억 원` : "정보 없음"}
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                1등 당첨금: {draw.firstPrize ? `${Math.round(draw.firstPrize / 100000000)}억 원` : "정보 없음"}
+              </div>
             </div>
           </article>
         ))}

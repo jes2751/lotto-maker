@@ -59,6 +59,11 @@ export function GeneratorPanel() {
       <section className="panel">
         <p className="eyebrow">Generator</p>
         <h2 className="mt-3 text-2xl font-semibold text-white">지난 당첨 흐름을 참고해 바로 추천</h2>
+        <p className="mt-3 text-sm leading-7 text-slate-400">
+          전략을 고르고 세트 수를 정하면 바로 추천 결과를 생성합니다. 기본 전략은 `mixed`이며, 필요하면 `frequency` 또는 `random`과 비교할
+          수 있습니다.
+        </p>
+
         <div className="mt-6 space-y-4">
           {strategies.map((item) => (
             <button
@@ -106,18 +111,28 @@ export function GeneratorPanel() {
         </div>
 
         <button type="button" onClick={() => void generate()} className="cta-button mt-6 w-full" disabled={loading}>
-              {loading ? "추천 중..." : "추천 번호 다시 받기"}
-            </button>
+          {loading ? "추천 중..." : "추천 번호 다시 받기"}
+        </button>
       </section>
 
       <section className="panel">
         <p className="eyebrow">Result</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">이번 추천 조합</h2>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="mt-3 text-2xl font-semibold text-white">이번 추천 조합</h2>
+            <p className="mt-2 text-sm text-slate-400">마지막 결과는 유지하고, 새 요청이 성공하면 목록을 교체합니다.</p>
+          </div>
+          <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-400">
+            {sets.length} set
+          </span>
+        </div>
+
         {error ? (
           <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
             {error}
           </div>
         ) : null}
+
         <div className="mt-6 space-y-4">
           {sets.map((set) => (
             <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
@@ -133,6 +148,11 @@ export function GeneratorPanel() {
               <p className="mt-4 text-sm text-slate-400">{set.reason}</p>
             </article>
           ))}
+          {!error && sets.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
+              아직 생성된 추천 조합이 없습니다. 전략을 선택하고 추천을 실행해 주세요.
+            </div>
+          ) : null}
         </div>
       </section>
     </div>
