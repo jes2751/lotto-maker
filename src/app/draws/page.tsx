@@ -1,5 +1,15 @@
+import Link from "next/link";
+
 import { NumberSet } from "@/components/lotto/number-set";
 import { drawRepository } from "@/lib/lotto";
+
+function formatWonAmount(value?: number | null) {
+  if (!value) {
+    return "정보 없음";
+  }
+
+  return `${Math.round(value / 100000000)}억 원`;
+}
 
 export default async function DrawsPage() {
   const { draws } = await drawRepository.list({ limit: 12, offset: 0 });
@@ -36,17 +46,25 @@ export default async function DrawsPage() {
                 <p className="text-2xl font-semibold text-white">{draw.round}회</p>
                 <p className="mt-1 text-sm text-slate-400">{draw.drawDate}</p>
               </div>
-              <div className="text-sm text-slate-400">1등 당첨자 {draw.winnerCount ?? 0}명</div>
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-slate-400">1등 당첨자 {draw.winnerCount ?? 0}명</div>
+                <Link
+                  href={`/draws/${draw.round}`}
+                  className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                >
+                  Detail
+                </Link>
+              </div>
             </div>
             <div className="mt-5">
               <NumberSet numbers={draw.numbers} bonus={draw.bonus} />
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
-                총 판매금: {draw.totalPrize ? `${Math.round(draw.totalPrize / 100000000)}억 원` : "정보 없음"}
+                총 판매금: {formatWonAmount(draw.totalPrize)}
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
-                1등 당첨금: {draw.firstPrize ? `${Math.round(draw.firstPrize / 100000000)}억 원` : "정보 없음"}
+                1등 당첨금: {formatWonAmount(draw.firstPrize)}
               </div>
             </div>
           </article>

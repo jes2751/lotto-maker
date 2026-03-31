@@ -1,3 +1,4 @@
+import { FrequencyChart } from "@/components/lotto/frequency-chart";
 import { computeFrequencyStats, drawRepository } from "@/lib/lotto";
 
 function FrequencyCard({
@@ -56,6 +57,11 @@ export default async function StatsPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <FrequencyChart title="전체 회차 상위 번호 분포" stats={overall} color="rgba(255, 143, 0, 0.72)" />
+        <FrequencyChart title="최근 10회 상위 번호 분포" stats={recent} color="rgba(45, 212, 191, 0.72)" />
       </section>
 
       <section className="grid gap-10 lg:grid-cols-2">

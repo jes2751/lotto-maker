@@ -62,8 +62,8 @@ export default async function HomePage() {
                   <p className="text-3xl font-semibold text-white">{latest.round}회</p>
                   <p className="mt-1 text-sm text-slate-400">{latest.drawDate}</p>
                 </div>
-                <Link href="/draws" className="text-sm text-teal transition hover:text-white">
-                  전체 회차 보기
+                <Link href={`/draws/${latest.round}`} className="text-sm text-teal transition hover:text-white">
+                  상세 보기
                 </Link>
               </div>
               <div className="mt-6">

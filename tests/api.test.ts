@@ -26,6 +26,17 @@ test("draw by round api returns 404 for unknown rounds", async () => {
   assert.equal(payload.error.code, "NOT_FOUND");
 });
 
+test("draw by round api returns success for known rounds", async () => {
+  const response = await getDrawByRound(new Request("http://localhost/api/v1/draws/1169"), {
+    params: { round: "1169" }
+  });
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(payload.success, true);
+  assert.equal(payload.data.round, 1169);
+});
+
 test("generate api validates invalid strategy", async () => {
   const response = await postGenerate(
     new Request("http://localhost/api/v1/generate", {

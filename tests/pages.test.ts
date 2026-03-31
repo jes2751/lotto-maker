@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import HomePage from "../src/app/page";
 import DrawsPage from "../src/app/draws/page";
+import DrawDetailPage from "../src/app/draws/[round]/page";
 import StatsPage from "../src/app/stats/page";
 
 test("home page renders the hero and latest draw sections", async () => {
@@ -17,7 +18,14 @@ test("draws page renders draw cards", async () => {
   const html = renderToStaticMarkup(await DrawsPage());
 
   assert.match(html, /Draws/);
-  assert.match(html, /BONUS/);
+  assert.match(html, /Detail/);
+});
+
+test("draw detail page renders the requested round", async () => {
+  const html = renderToStaticMarkup(await DrawDetailPage({ params: { round: "1169" } }));
+
+  assert.match(html, /1169/);
+  assert.match(html, /Winning Numbers/);
 });
 
 test("stats page renders both frequency sections", async () => {

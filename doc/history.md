@@ -1,5 +1,14 @@
 # History
 
+## 2026-03-31 22:18 KST
+
+* 작업: 회차 상세 페이지와 통계 시각화 추가로 v1 탐색 경험 보강
+* 변경: `src/app/draws/[round]/page.tsx`를 추가해 회차별 상세 화면을 만들고, `src/app/draws/page.tsx`, `src/app/page.tsx`에서 상세 페이지로 이동할 수 있게 링크 흐름을 정리
+* 변경: `src/components/lotto/frequency-chart.tsx`, `src/app/stats/page.tsx`를 추가/수정해 전체 기준과 최근 10회 기준의 빈도 차트를 붙이고 통계 화면을 시각화
+* 변경: `tests/api.test.ts`, `tests/pages.test.ts`를 보강해 회차 상세 API 성공 케이스와 회차 상세 페이지 렌더링을 검증
+* 검증: `npm test` 통과, `npm run build` 통과, 빌드 전 `.next` 생성 캐시를 정리해 Windows/OneDrive 환경의 캐시 오류를 해소
+* 다음: 모바일에서 카드 높이와 차트 가독성을 점검하고, 필요하면 회차 상세와 통계에 필터/보조 설명을 더할 것
+
 ## 2026-03-31 22:11 KST
 
 * 작업: v1 UI 2차 정리로 홈, 추천기, 회차 조회, 통계 화면의 정보 밀도와 사용자 노출 문구를 개선
