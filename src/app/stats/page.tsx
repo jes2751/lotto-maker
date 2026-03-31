@@ -157,7 +157,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
         <FrequencyChart title={`${getPeriodLabel(comparisonPeriod)} 상위 번호 분포`} stats={comparisonStats} color="rgba(45, 212, 191, 0.72)" />
       </section>
 
-      <AdSlot label="Statistics Sponsored" className="max-w-4xl self-center" />
+      <AdSlot className="max-w-4xl self-center" />
 
       <section className="grid gap-10 lg:grid-cols-2">
         <div className="panel">

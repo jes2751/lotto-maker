@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const navigation = [
   { href: "/", label: "홈" },
-  { href: "/generate", label: "번호 생성기" },
+  { href: "/generate", label: "번호 추천" },
   { href: "/draws", label: "회차 조회" },
   { href: "/stats", label: "통계" }
 ];

@@ -1,5 +1,15 @@
 # History
 
+## 2026-04-01 00:46 KST
+
+* 작업: Google AdSense 정책 기준으로 광고 표시 방식과 안내 구조를 보수적으로 정리
+* 변경: `src/components/ads/ad-slot.tsx`를 수정해 광고 라벨을 `광고`로 고정하고 콘텐츠와 분리된 광고 영역이라는 안내를 추가
+* 변경: `src/app/generate/page.tsx`에서 생성기 본문 앞 광고를 제거해 핵심 상호작용과 광고가 섞이지 않도록 조정
+* 변경: `src/app/policies/ads/page.tsx`를 추가하고 `src/components/layout/site-footer.tsx`에 광고 안내 링크를 연결
+* 변경: `src/app/layout.tsx`, `src/components/layout/site-header.tsx` 문구를 정리해 서비스 설명과 광고 운영 원칙을 더 명확하게 반영
+* 검증: 다음 단계에서 `npm test`, `npm run build`로 페이지/라우트 추가와 레이아웃 변경을 확인
+* 다음: 테스트와 빌드가 통과하면 커밋 후 원격에 푸시
+
 ## 2026-04-01 00:27 KST
 
 * 작업: Cloudflare Workers 배포 실패 원인인 미래 `compatibility_date` 수정

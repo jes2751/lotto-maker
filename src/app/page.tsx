@@ -91,7 +91,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <AdSlot label="Sponsored" className="max-w-4xl self-center" />
+      <AdSlot className="max-w-4xl self-center" />
 
       <section className="grid gap-6 md:grid-cols-3">
         {[

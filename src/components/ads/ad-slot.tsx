@@ -20,7 +20,7 @@ const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 export function AdSlot({
   slot,
   format = "auto",
-  label = "Advertisement",
+  label = "광고",
   className = ""
 }: AdSlotProps) {
   const adSlot = slot ?? process.env.NEXT_PUBLIC_ADSENSE_SLOT_INLINE;
@@ -43,8 +43,15 @@ export function AdSlot({
   }
 
   return (
-    <div className={`rounded-[28px] border border-white/10 bg-white/[0.03] p-5 ${className}`}>
-      <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">{label}</p>
+    <aside
+      role="complementary"
+      aria-label="광고 영역"
+      className={`rounded-[28px] border border-white/10 bg-white/[0.03] p-5 ${className}`}
+    >
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-slate-400">{label}</p>
+        <p className="text-[11px] text-slate-500">콘텐츠와 분리된 광고</p>
+      </div>
       <ins
         className="adsbygoogle mt-4 block overflow-hidden rounded-2xl bg-slate-950/50"
         style={{ display: "block", minHeight: "120px" }}
@@ -53,6 +60,6 @@ export function AdSlot({
         data-ad-format={format}
         data-full-width-responsive="true"
       />
-    </div>
+    </aside>
   );
 }
