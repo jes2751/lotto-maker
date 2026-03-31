@@ -11,6 +11,12 @@ const strategies: Array<{ value: GenerationStrategy; label: string; description:
   { value: "random", label: "랜덤 비교", description: "데이터 기반 추천과 비교하기 위한 완전 랜덤 옵션입니다." }
 ];
 
+function formatCopyText(set: GeneratedSet) {
+  const numbers = set.numbers.join(", ");
+  const bonus = typeof set.bonus === "number" ? ` | 보너스 ${set.bonus}` : "";
+  return `${set.strategy}: ${numbers}${bonus}`;
+}
+
 export function GeneratorPanel() {
   const [strategy, setStrategy] = useState<GenerationStrategy>("mixed");
   const [count, setCount] = useState(2);
@@ -18,6 +24,7 @@ export function GeneratorPanel() {
   const [sets, setSets] = useState<GeneratedSet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   async function generate() {
     setLoading(true);
@@ -43,10 +50,26 @@ export function GeneratorPanel() {
       }
 
       setSets(payload.data.sets);
+      setCopiedId(null);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function copySet(set: GeneratedSet) {
+    const text = formatCopyText(set);
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      }
+
+      setCopiedId(set.id);
+      setTimeout(() => setCopiedId((current) => (current === set.id ? null : current)), 1600);
+    } catch {
+      setError("추천 조합을 복사하지 못했습니다.");
     }
   }
 
@@ -140,7 +163,16 @@ export function GeneratorPanel() {
                 <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
                   {set.strategy}
                 </span>
-                <span className="text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</span>
+                  <button
+                    type="button"
+                    onClick={() => void copySet(set)}
+                    className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                  >
+                    {copiedId === set.id ? "Copied" : "Copy"}
+                  </button>
+                </div>
               </div>
               <div className="mt-4">
                 <NumberSet numbers={set.numbers} bonus={set.bonus} />

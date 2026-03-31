@@ -25,12 +25,19 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
     notFound();
   }
 
-  const [draw, latest] = await Promise.all([drawRepository.getByRound(round), drawRepository.getLatest()]);
+  const [draw, latest, allDraws] = await Promise.all([
+    drawRepository.getByRound(round),
+    drawRepository.getLatest(),
+    drawRepository.getAll()
+  ]);
 
   if (!draw) {
     notFound();
   }
 
+  const currentIndex = allDraws.findIndex((item) => item.round === draw.round);
+  const newerDraw = currentIndex > 0 ? allDraws[currentIndex - 1] : null;
+  const olderDraw = currentIndex >= 0 && currentIndex < allDraws.length - 1 ? allDraws[currentIndex + 1] : null;
   const isLatest = latest?.round === draw.round;
 
   return (
@@ -41,9 +48,17 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
           <h1 className="mt-4 text-4xl font-semibold text-white">{draw.round}회 당첨번호 상세</h1>
           <p className="mt-3 text-slate-300">{draw.drawDate} 추첨 결과와 기본 정보를 한 화면에서 정리했습니다.</p>
         </div>
-        <Link href="/draws" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-          목록으로 돌아가기
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/draws"
+            className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
+          >
+            목록으로 돌아가기
+          </Link>
+          <Link href="/generate" className="cta-button">
+            추천기로 이동
+          </Link>
+        </div>
       </div>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -72,6 +87,32 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
               <p className="text-xs uppercase tracking-[0.22em] text-slate-500">1등 당첨자</p>
               <p className="mt-2 text-2xl font-semibold text-white">{draw.winnerCount ?? 0}명</p>
             </div>
+          </div>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <Link
+              href={newerDraw ? `/draws/${newerDraw.round}` : "#"}
+              aria-disabled={!newerDraw}
+              className={[
+                "rounded-2xl border px-4 py-4 text-sm transition",
+                newerDraw
+                  ? "border-white/10 bg-slate-950/40 text-slate-200 hover:border-white/30"
+                  : "cursor-not-allowed border-white/5 bg-slate-950/20 text-slate-600"
+              ].join(" ")}
+            >
+              {newerDraw ? `${newerDraw.round}회로 이동` : "더 최신 회차 없음"}
+            </Link>
+            <Link
+              href={olderDraw ? `/draws/${olderDraw.round}` : "#"}
+              aria-disabled={!olderDraw}
+              className={[
+                "rounded-2xl border px-4 py-4 text-sm transition",
+                olderDraw
+                  ? "border-white/10 bg-slate-950/40 text-slate-200 hover:border-white/30"
+                  : "cursor-not-allowed border-white/5 bg-slate-950/20 text-slate-600"
+              ].join(" ")}
+            >
+              {olderDraw ? `${olderDraw.round}회로 이동` : "더 이전 회차 없음"}
+            </Link>
           </div>
         </div>
 

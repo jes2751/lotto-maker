@@ -26,6 +26,7 @@ test("draw detail page renders the requested round", async () => {
 
   assert.match(html, /1169/);
   assert.match(html, /Winning Numbers/);
+  assert.match(html, /추천기로 이동/);
 });
 
 test("stats page renders both frequency sections", async () => {
