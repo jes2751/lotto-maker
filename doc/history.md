@@ -1,5 +1,15 @@
 # History
 
+## 2026-04-01 00:20 KST
+
+* 작업: Cloudflare Workers/OpenNext 배포용 설정 파일과 스크립트 정리
+* 변경: `package.json`에 `preview`, `deploy`, `cf-typegen` 스크립트와 `@opennextjs/cloudflare`, `wrangler` 의존성을 추가
+* 변경: `.gitignore`에 `.open-next`, `.wrangler`, `cloudflare-env.d.ts`를 추가
+* 변경: `wrangler.jsonc`, `open-next.config.ts`를 새로 추가해 Cloudflare Workers 배포 기준을 반영
+* 검증: `npm install`로 `package-lock.json`까지 갱신했고, `npm test`, `npm run build`는 통과했다.
+* 검증: `npx opennextjs-cloudflare build`는 Windows 환경에서 `spawn EPERM`으로 실패했다. OpenNext도 Windows보다 WSL 사용을 권장했다.
+* 다음: 실제 Cloudflare Workers 배포 검증은 WSL 또는 CI 환경에서 `npm run preview` 또는 `npm run deploy`로 이어간다.
+
 ## 2026-04-01 00:16 KST
 
 * 작업: `plan.md` 기준에 맞춰 하위 문서의 범위와 우선순위를 정렬

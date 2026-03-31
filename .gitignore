@@ -5,3 +5,6 @@ coverage
 .env.local
 dist
 *.log
+.open-next
+.wrangler
+cloudflare-env.d.ts
