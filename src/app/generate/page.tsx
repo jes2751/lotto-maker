@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
+
 import { GeneratorPanel } from "@/components/lotto/generator-panel";
+
+export const metadata: Metadata = {
+  title: "로또 번호 생성기 | 과거 당첨 데이터 기반 추천",
+  description: "mixed, frequency, random 전략으로 로또 번호 조합을 생성하고 과거 당첨 데이터 흐름을 함께 확인할 수 있습니다."
+};
 
 export default function GeneratePage() {
   return (

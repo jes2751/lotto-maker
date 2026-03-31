@@ -5,3 +5,4 @@ import "./generation.test";
 import "./stats.test";
 import "./pages.test";
 import "./draw-sync.test";
+import "./seo.test";

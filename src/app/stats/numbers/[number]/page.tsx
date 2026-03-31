@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -9,6 +10,22 @@ import { findDrawsContainingNumber, getNumberFrequency } from "@/lib/lotto/stats
 interface NumberDetailPageProps {
   params: {
     number: string;
+  };
+}
+
+export async function generateMetadata({ params }: NumberDetailPageProps): Promise<Metadata> {
+  const number = Number.parseInt(params.number, 10);
+
+  if (!Number.isInteger(number) || number < 1 || number > 45) {
+    return {
+      title: "번호 상세 통계",
+      description: "특정 번호의 전체 회차 기준 등장 빈도와 최근 흐름을 확인하는 페이지입니다."
+    };
+  }
+
+  return {
+    title: `${number}번 로또 통계`,
+    description: `${number}번 번호가 전체 회차와 최근 10회에서 얼마나 자주 등장했는지 확인할 수 있습니다.`
   };
 }
 

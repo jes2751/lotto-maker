@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { NumberSet } from "@/components/lotto/number-set";
 import { drawRepository } from "@/lib/lotto";
+
+export const metadata: Metadata = {
+  title: "로또 회차 조회 | 최신 결과와 전체 회차 검색",
+  description: "전체 로또 회차를 최신순으로 조회하고 회차 번호 또는 포함 번호로 원하는 결과를 빠르게 찾을 수 있습니다."
+};
 
 interface DrawsPageProps {
   searchParams?: {

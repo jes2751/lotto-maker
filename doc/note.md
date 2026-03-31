@@ -1,89 +1,99 @@
-# 실행 방법 노트
+# Note
 
 ## 1. 로컬 실행
 
-프로젝트 루트에서 아래 순서대로 실행한다.
+프로젝트 루트에서 아래 순서로 실행합니다.
 
 ```bash
 npm install
 npm run dev
 ```
 
-개발 서버가 뜨면 브라우저에서 아래 주소로 접속한다.
+브라우저 주소:
 
 ```text
 http://localhost:3000
 ```
 
-포트가 이미 사용 중이면 Next.js가 다른 포트로 실행될 수 있으니 터미널에 표시된 주소를 확인한다.
-
-## 2. 주요 화면 주소
+## 2. 주요 화면
 
 * 홈: `http://localhost:3000/`
-* 추천기: `http://localhost:3000/generate`
+* 번호 생성기: `http://localhost:3000/generate`
 * 회차 조회: `http://localhost:3000/draws`
 * 회차 상세 예시: `http://localhost:3000/draws/1169`
+* 회차 분석 예시: `http://localhost:3000/draw-analysis/1169`
 * 통계: `http://localhost:3000/stats`
+* 최신 결과 랜딩: `http://localhost:3000/latest-lotto-results`
+* 최근 10회 분석: `http://localhost:3000/recent-10-draw-analysis`
 
-## 3. 실행 전 확인
-
-아래 항목이 준비되어 있어야 한다.
-
-* Node.js 설치
-* `npm` 사용 가능
-* 프로젝트 루트 위치: `c:\Users\jes27\OneDrive\code\lotto_v2`
-
-## 4. 기본 검증
-
-실행 전에 아래 명령으로 테스트와 빌드를 확인할 수 있다.
+## 3. 기본 검증
 
 ```bash
 npm test
 npm run build
 ```
 
-## 5. 자주 막히는 경우
+## 4. 자주 막히는 경우
 
-### `npm` 명령이 안 될 때
-
-* Node.js가 설치되어 있는지 확인한다.
-* 새 터미널을 다시 열어 PATH 반영 상태를 확인한다.
-
-### 페이지가 안 열릴 때
-
-* `npm run dev`가 실제로 실행 중인지 확인한다.
-* 터미널에 표시된 포트 번호를 확인한다.
-
-### 빌드가 실패할 때
-
-`.next` 캐시 문제일 수 있으므로 아래처럼 한 번 지우고 다시 시도한다.
+* `npm`이 안 되면 Node.js 설치와 PATH를 확인
+* `npm run dev` 후 포트가 바뀌면 터미널에 표시된 실제 주소 확인
+* `.next` 캐시가 꼬이면 아래 실행
 
 ```powershell
 Remove-Item -LiteralPath .next -Recurse -Force
 npm run build
 ```
 
-## 6. 배포 초입
+## 5. AdSense 준비
 
-현재 v1은 정적 시드 데이터 기반이라 환경변수 없이도 기본 배포가 가능하다.
-
-권장 순서:
-
-1. GitHub 저장소 최신 상태 확인
-2. Vercel에서 저장소 연결
-3. Next.js 프로젝트로 배포
-4. 발급된 URL에서 홈, 추천기, 회차 조회, 통계 화면 확인
-
-## 7. AdSense 준비
-
-광고를 붙일 때는 아래 환경변수를 추가한다.
+실제 광고를 붙일 때만 `.env`에 아래 값을 넣습니다.
 
 ```bash
 NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-xxxxxxxxxxxxxxxx
 NEXT_PUBLIC_ADSENSE_SLOT_INLINE=1234567890
 ```
 
-주의:
+광고를 아직 설정하지 않으면 광고 슬롯은 화면에 노출되지 않습니다.
 
-* 환경변수가 없으면 광고는 페이지에 노출되지 않는다.
-* 배포 전에는 실제 퍼블리셔 ID 기준으로 `ads.txt`도 준비해야 한다.
+## 6. Search Console 제출 체크
+
+배포 도메인:
+
+```text
+https://lotto-maker.cloud
+```
+
+먼저 확인할 주소:
+
+* `https://lotto-maker.cloud/robots.txt`
+* `https://lotto-maker.cloud/sitemap.xml`
+* `https://lotto-maker.cloud/latest-lotto-results`
+* `https://lotto-maker.cloud/lotto-number-generator`
+* `https://lotto-maker.cloud/lotto-statistics`
+* `https://lotto-maker.cloud/hot-numbers`
+* `https://lotto-maker.cloud/cold-numbers`
+* `https://lotto-maker.cloud/odd-even-pattern`
+* `https://lotto-maker.cloud/sum-pattern`
+* `https://lotto-maker.cloud/recent-10-draw-analysis`
+* `https://lotto-maker.cloud/draw-analysis/1169`
+
+Search Console 메타 검증 코드를 쓸 경우 `.env`에 아래 값을 추가합니다.
+
+```bash
+GOOGLE_SITE_VERIFICATION=your_verification_token
+```
+
+제출 순서:
+
+1. Search Console에 도메인 또는 URL prefix 속성 추가
+2. `sitemap.xml` 제출
+3. 홈과 주요 랜딩 페이지 색인 요청
+4. 커버리지와 색인 상태 확인
+
+## 7. Cloudflare 배포 메모
+
+현재 프로젝트는 `Cloudflare Workers + OpenNext` 기준입니다.
+
+* `pages.dev`가 아니라 Workers 배포 URL 기준으로 확인
+* `wrangler.jsonc`의 `compatibility_date`는 미래 날짜로 두면 안 됨
+* 배포 전 로컬에서 `npm test`, `npm run build` 확인 권장

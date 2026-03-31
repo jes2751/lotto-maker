@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -7,6 +8,23 @@ import { drawRepository } from "@/lib/lotto";
 interface DrawDetailPageProps {
   params: {
     round: string;
+  };
+}
+
+export async function generateMetadata({ params }: DrawDetailPageProps): Promise<Metadata> {
+  const round = Number.parseInt(params.round, 10);
+  const draw = Number.isInteger(round) ? await drawRepository.getByRound(round) : null;
+
+  if (!draw) {
+    return {
+      title: "로또 회차 상세",
+      description: "특정 회차의 로또 당첨번호와 기본 통계를 확인하는 페이지입니다."
+    };
+  }
+
+  return {
+    title: `${draw.round}회 로또 당첨번호`,
+    description: `${draw.round}회 로또 당첨번호와 추첨일, 보너스 번호, 기본 통계를 확인할 수 있습니다.`
   };
 }
 

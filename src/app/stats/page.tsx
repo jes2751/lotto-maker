@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdSlot } from "@/components/ads/ad-slot";
@@ -5,6 +6,11 @@ import { FrequencyChart } from "@/components/lotto/frequency-chart";
 import { computeFrequencyStats, drawRepository } from "@/lib/lotto";
 import { clamp } from "@/lib/lotto/shared";
 import type { StatsPeriod } from "@/types/lotto";
+
+export const metadata: Metadata = {
+  title: "로또 통계 | 자주 나온 번호와 최근 흐름 분석",
+  description: "전체 회차와 최근 10회 기준으로 자주 나온 번호를 비교하고, 번호별 상세 통계로 이어질 수 있는 로또 통계 페이지입니다."
+};
 
 interface StatsPageProps {
   searchParams?: {

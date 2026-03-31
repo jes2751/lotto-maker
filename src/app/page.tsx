@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdSlot } from "@/components/ads/ad-slot";
 import { NumberSet } from "@/components/lotto/number-set";
 import { drawRepository } from "@/lib/lotto";
+import { siteConfig } from "@/lib/site";
 import { computeFrequencyStats } from "@/lib/lotto/stats";
+
+export const metadata: Metadata = {
+  title: "로또 번호 생성기 | 과거 당첨 데이터 기반 추천",
+  description: "최신 로또 당첨번호, 자주 나온 번호, 데이터 기반 추천 전략을 한 화면에서 확인할 수 있는 무료 로또 번호 생성기입니다."
+};
 
 export default async function HomePage() {
   const [latest, draws] = await Promise.all([drawRepository.getLatest(), drawRepository.getAll()]);
@@ -110,6 +117,29 @@ export default async function HomePage() {
       <section className="panel">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
+            <p className="eyebrow">Search Entry</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">자주 찾는 분석과 결과 페이지</h2>
+          </div>
+          <p className="text-sm text-slate-400">{siteConfig.name} 검색 유입용 핵심 랜딩 페이지</p>
+        </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            ["/latest-lotto-results", "최신 로또 결과", "가장 최근 회차 결과와 바로 확인할 수 있는 링크"],
+            ["/hot-numbers", "자주 나온 번호", "전체 회차 기준으로 자주 등장한 번호 정리"],
+            ["/cold-numbers", "적게 나온 번호", "등장 빈도가 낮은 번호를 빠르게 확인"],
+            ["/recent-10-draw-analysis", "최근 10회 분석", "최근 흐름과 자주 나온 번호를 요약"]
+          ].map(([href, title, description]) => (
+            <Link key={href} href={href} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
+              <p className="text-lg font-semibold text-white">{title}</p>
+              <p className="mt-2 text-sm leading-7 text-slate-400">{description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
             <p className="eyebrow">Hot Numbers</p>
             <h2 className="mt-3 text-2xl font-semibold text-white">전체 회차 기준 자주 나온 번호</h2>
           </div>
@@ -126,6 +156,40 @@ export default async function HomePage() {
               <p className="mt-2 text-xs text-slate-500">회차 대비 {item.percentage}%</p>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="eyebrow">Analysis Entry</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">Search-first analysis pages</h2>
+          </div>
+          {latest ? (
+            <Link href={`/draw-analysis/${latest.round}`} className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
+              Latest round analysis
+            </Link>
+          ) : null}
+        </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <Link href="/odd-even-pattern" className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
+            <p className="text-lg font-semibold text-white">Odd-even pattern</p>
+            <p className="mt-2 text-sm leading-7 text-slate-400">Review which odd-even splits appear most often across the full draw history.</p>
+          </Link>
+          <Link href="/sum-pattern" className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
+            <p className="text-lg font-semibold text-white">Sum pattern</p>
+            <p className="mt-2 text-sm leading-7 text-slate-400">Compare the most common number-sum ranges and use them as a quick reference.</p>
+          </Link>
+          {latest ? (
+            <Link href={`/draw-analysis/${latest.round}`} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
+              <p className="text-lg font-semibold text-white">Round {latest.round} analysis</p>
+              <p className="mt-2 text-sm leading-7 text-slate-400">Open an article-style breakdown of the latest winning-number combination.</p>
+            </Link>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
+              Round-analysis pages will appear as soon as draw data is available.
+            </div>
+          )}
         </div>
       </section>
     </div>
