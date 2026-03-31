@@ -17,14 +17,14 @@ body {
     radial-gradient(circle at bottom right, rgba(65, 201, 192, 0.12), transparent 30%),
     #08111f;
   color: #e5eef8;
-  font-family: var(--font-body), sans-serif;
+  font-family: "Segoe UI", "Noto Sans KR", sans-serif;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-heading), sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI", "Noto Sans KR", sans-serif;
 }
 
 @layer components {

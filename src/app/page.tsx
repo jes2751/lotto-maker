@@ -12,17 +12,17 @@ export default async function HomePage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-12">
       <section className="grid gap-8 lg:grid-cols-[1.3fr_0.9fr]">
         <div className="panel overflow-hidden">
-          <p className="eyebrow">Hybrid v1</p>
+          <p className="eyebrow">Historical Recommendation</p>
           <h1 className="mt-4 max-w-2xl text-5xl font-semibold tracking-tight text-white">
-            패턴을 참고하되, 결과는 가볍고 빠르게.
+            지난 당첨 흐름을 바탕으로, 추천은 더 설득력 있게.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-            LOTTO LAB은 최근 회차 흐름을 참고해 번호를 조합하는 재미 중심 서비스입니다. v1은 정적 시드
-            데이터로 즉시 실행되고, 생성기 경험을 가장 앞에 둡니다.
+            LOTTO LAB은 기존 당첨 데이터 패턴을 바탕으로 번호를 추천하는 웹 서비스입니다. 홈에서는 지난 회차
+            당첨번호를 먼저 보여주고, 생성기에서는 그 흐름을 참고한 추천 조합을 바로 확인할 수 있습니다.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/generate" className="cta-button">
-              번호 생성하러 가기
+              추천 번호 보러 가기
             </Link>
             <Link
               href="/stats"
@@ -58,9 +58,9 @@ export default async function HomePage() {
 
       <section className="grid gap-6 md:grid-cols-3">
         {[
-          ["혼합형", "빈도와 랜덤을 섞어 첫 화면의 기본 경험으로 제공합니다."],
-          ["회차 조회", "시드 데이터 기반의 최신 회차 목록을 바로 확인할 수 있습니다."],
-          ["기본 통계", "자주 나온 번호를 간단한 빈도 기준으로 빠르게 볼 수 있습니다."]
+          ["혼합형 추천", "기존 당첨 흐름과 무작위 요소를 함께 반영하는 기본 추천 전략입니다."],
+          ["지난 회차 확인", "가장 최근 당첨번호를 홈 첫 화면에서 바로 확인할 수 있습니다."],
+          ["기본 통계", "자주 나온 번호를 빈도 기준으로 빠르게 확인할 수 있습니다."]
         ].map(([title, description]) => (
           <article key={title} className="panel">
             <p className="eyebrow">{title}</p>

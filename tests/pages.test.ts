@@ -6,17 +6,23 @@ import HomePage from "../src/app/page";
 import DrawsPage from "../src/app/draws/page";
 import StatsPage from "../src/app/stats/page";
 
-test("home page renders hero copy", async () => {
+test("home page renders the hero and latest draw sections", async () => {
   const html = renderToStaticMarkup(await HomePage());
-  assert.match(html, /LOTTO LAB|패턴을 참고하되/);
+
+  assert.match(html, /Historical Recommendation/);
+  assert.match(html, /Latest Draw/);
 });
 
-test("draws page renders round cards", async () => {
+test("draws page renders draw cards", async () => {
   const html = renderToStaticMarkup(await DrawsPage());
-  assert.match(html, /최근 회차 조회/);
+
+  assert.match(html, /Draws/);
+  assert.match(html, /BONUS/);
 });
 
-test("stats page renders frequency sections", async () => {
+test("stats page renders both frequency sections", async () => {
   const html = renderToStaticMarkup(await StatsPage());
-  assert.match(html, /기본 빈도 통계/);
+
+  assert.match(html, /All Draws/);
+  assert.match(html, /Recent 10/);
 });

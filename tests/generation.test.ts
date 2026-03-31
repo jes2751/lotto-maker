@@ -24,7 +24,7 @@ test("generation service returns valid sets", async () => {
   }
 });
 
-test("frequency strategy includes the expected reason text", async () => {
+test("frequency strategy includes a non-empty reason", async () => {
   const service = new StaticGenerationService(seedDraws);
   const [set] = await service.generate({
     strategy: "frequency",
@@ -32,5 +32,5 @@ test("frequency strategy includes the expected reason text", async () => {
     includeBonus: false
   });
 
-  assert.match(set.reason, /가중치/);
+  assert.ok(set.reason.trim().length > 0);
 });

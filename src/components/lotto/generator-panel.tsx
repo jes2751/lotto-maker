@@ -6,9 +6,9 @@ import { NumberSet } from "@/components/lotto/number-set";
 import type { GeneratedSet, GenerationStrategy } from "@/types/lotto";
 
 const strategies: Array<{ value: GenerationStrategy; label: string; description: string }> = [
-  { value: "mixed", label: "혼합형", description: "빈도 가중치와 랜덤을 절반씩 섞습니다." },
-  { value: "frequency", label: "빈도형", description: "자주 나온 번호에 비중을 둡니다." },
-  { value: "random", label: "랜덤형", description: "가중치 없이 완전 랜덤으로 생성합니다." }
+  { value: "mixed", label: "혼합형 추천", description: "기존 당첨 데이터 흐름에 무작위 요소를 섞어 기본 추천으로 제공합니다." },
+  { value: "frequency", label: "빈도형 추천", description: "기존 당첨 데이터에서 자주 나온 번호에 비중을 둡니다." },
+  { value: "random", label: "랜덤 비교", description: "데이터 기반 추천과 비교하기 위한 완전 랜덤 옵션입니다." }
 ];
 
 export function GeneratorPanel() {
@@ -58,7 +58,7 @@ export function GeneratorPanel() {
     <div className="grid gap-8 lg:grid-cols-[1.1fr_1.4fr]">
       <section className="panel">
         <p className="eyebrow">Generator</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">전략을 고르고 바로 생성</h2>
+        <h2 className="mt-3 text-2xl font-semibold text-white">지난 당첨 흐름을 참고해 바로 추천</h2>
         <div className="mt-6 space-y-4">
           {strategies.map((item) => (
             <button
@@ -106,13 +106,13 @@ export function GeneratorPanel() {
         </div>
 
         <button type="button" onClick={() => void generate()} className="cta-button mt-6 w-full" disabled={loading}>
-          {loading ? "생성 중..." : "번호 다시 생성"}
-        </button>
+              {loading ? "추천 중..." : "추천 번호 다시 받기"}
+            </button>
       </section>
 
       <section className="panel">
         <p className="eyebrow">Result</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">이번 조합</h2>
+        <h2 className="mt-3 text-2xl font-semibold text-white">이번 추천 조합</h2>
         {error ? (
           <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
             {error}

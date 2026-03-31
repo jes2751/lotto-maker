@@ -1,5 +1,13 @@
 # History
 
+## 2026-03-31 22:03 KST
+
+* 작업: v1 개발 시작 기준으로 앱 빌드 안정화, 테스트 경로 정리, 주간 당첨번호 동기화 초안 추가
+* 변경: `package.json` 테스트/동기화 스크립트 정리, `tsconfig.test.json` 추가, 홈/생성기 카피를 데이터 기반 추천 방향으로 조정, `src/lib/data/draw-sync.ts`와 `scripts/sync-draws.ts`로 일요일 주간 반영 로직 초안 구현
+* 변경: `tests/pages.test.ts`, `tests/generation.test.ts`, `tests/draw-sync.test.ts`, `tests/all.test.ts`를 정리해 페이지 렌더링과 동기화 예외 케이스까지 검증하도록 보강
+* 검증: `npm test` 통과, `npm run build` 통과, `npm run sync:draws:check` 실행 결과 현재 기준 신규 회차 없음 확인
+* 다음: 실제 v1 화면 구현을 이어가면서 홈, 생성기, 회차 조회, 통계 화면의 UI 완성도와 API 연결 품질을 높일 것
+
 ## 2026-03-31 19:55 KST
 
 * 작업: 개발 전 마지막 기획 체크 항목을 문서에 고정

@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --import tsx --test tests/api.test.ts tests/generation.test.ts tests/stats.test.ts tests/pages.test.ts",
+    "test": "tsx --tsconfig tsconfig.test.json --test tests/all.test.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "sync:draws": "tsx scripts/sync-draws.ts",
+    "sync:draws:check": "tsx scripts/sync-draws.ts --dry-run"
   },
   "dependencies": {
     "next": "^14.0.0",
