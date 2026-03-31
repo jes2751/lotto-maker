@@ -24,7 +24,7 @@ function FrequencyCard({
   percentage: number;
 }) {
   return (
-    <article className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+    <Link href={`/stats/numbers/${value}`} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
       <p className="text-xs uppercase tracking-[0.26em] text-slate-500">{label}</p>
       <p className="mt-4 text-4xl font-semibold text-white">{value}</p>
       <p className="mt-2 text-sm text-slate-400">등장 {frequency}회</p>
@@ -32,7 +32,7 @@ function FrequencyCard({
         <div className="h-2 rounded-full bg-accent" style={{ width: `${percentage}%` }} />
       </div>
       <p className="mt-2 text-xs text-slate-500">회차 대비 {percentage}%</p>
-    </article>
+    </Link>
   );
 }
 
@@ -53,7 +53,7 @@ function buildStatsHref(period: StatsPeriod, top: number) {
 
 export default async function StatsPage({ searchParams }: StatsPageProps) {
   const draws = await drawRepository.getAll();
-  const selectedPeriod: StatsPeriod = isValidPeriod(searchParams?.period) ? searchParams!.period : "all";
+  const selectedPeriod: StatsPeriod = isValidPeriod(searchParams?.period) ? searchParams.period : "all";
   const comparisonPeriod: StatsPeriod = selectedPeriod === "all" ? "recent_10" : "all";
   const top = clamp(Number.parseInt(searchParams?.top ?? "10", 10) || 10, 5, 15);
 
@@ -69,7 +69,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           <p className="eyebrow">Stats</p>
           <h1 className="mt-4 text-4xl font-semibold text-white">기본 빈도 통계</h1>
           <p className="mt-3 max-w-3xl text-slate-300">
-            메인 번호 기준의 단순 빈도 통계입니다. 전체 회차와 최근 10회 흐름을 비교하면서 상위 번호를 확인할 수 있습니다.
+            메인 번호 기준의 단순 빈도 통계입니다. 전체 회차와 최근 10회를 나란히 비교하면서 상위 번호를 확인할 수 있습니다.
           </p>
         </div>
         <div className="panel">
@@ -133,9 +133,10 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
             </div>
           </div>
           <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-7 text-slate-400">
-            현재는 `{getPeriodLabel(selectedPeriod)}` 기준 상위 번호를 중심으로 보여주고, 오른쪽 영역에서 비교 기준도 함께 확인합니다.
+            현재는 `{getPeriodLabel(selectedPeriod)}` 기준 상위 번호를 중심으로 보여주고, 비교 기준 결과를 함께 확인할 수 있습니다.
           </div>
         </div>
+
         <div className="panel">
           <p className="eyebrow">Comparison</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -146,7 +147,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
               <p className="text-xs uppercase tracking-[0.22em] text-slate-500">전체 회차 수</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{draws.length}회</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{draws.length}개</p>
               <p className="mt-1 text-sm text-slate-400">데이터셋 기준</p>
             </div>
           </div>

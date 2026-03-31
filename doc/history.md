@@ -1,5 +1,15 @@
 # History
 
+## 2026-03-31 23:08 KST
+
+* 작업: 통계 번호 드릴다운과 회차 숫자 필터를 연결해 탐색 흐름을 확장
+* 변경: `src/app/stats/numbers/[number]/page.tsx`, `src/lib/lotto/stats.ts`를 추가/확장해 번호별 상세 통계와 해당 번호가 포함된 최근 회차 목록을 제공하고, 통계 카드에서 번호 상세 페이지로 이동할 수 있게 구성
+* 변경: `src/app/draws/page.tsx`에 번호 포함 회차 검색 필터를 추가해 전체 회차 중 특정 번호가 나온 회차만 페이지 단위로 탐색할 수 있게 수정
+* 변경: `src/app/stats/page.tsx`, `src/components/lotto/frequency-chart.tsx`의 깨진 문구를 정리하고, `tests/pages.test.ts`를 보강해 번호 필터와 번호 상세 화면 렌더링을 검증
+* 검증: `npm test` 통과, `npm run build` 통과
+* 검증: OneDrive 환경에서 `.next` 캐시 readlink 오류가 발생해 임시 빌드 폴더를 정리한 뒤 빌드를 다시 확인
+* 다음: 번호 상세 통계에서 더 긴 회차 히스토리나 번호 조합 패턴 분석으로 확장할 수 있음
+
 ## 2026-03-31 22:50 KST
 
 * 작업: 통계 화면에 기간 선택과 상위 표시 개수 조절 기능을 추가

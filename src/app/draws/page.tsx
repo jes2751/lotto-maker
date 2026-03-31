@@ -6,6 +6,7 @@ import { drawRepository } from "@/lib/lotto";
 interface DrawsPageProps {
   searchParams?: {
     round?: string;
+    number?: string;
     offset?: string;
     limit?: string;
   };
@@ -31,7 +32,24 @@ function parsePositiveInteger(value: string | undefined, fallback: number) {
   return parsed;
 }
 
-function buildDrawsHref(params: { offset?: number; limit: number; round?: string }) {
+function parseNumberFilter(value: string | undefined) {
+  const raw = value?.trim() ?? "";
+
+  if (!raw) {
+    return { raw: "", value: null as number | null, isValid: true };
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  const isValid = Number.isInteger(parsed) && parsed >= 1 && parsed <= 45;
+
+  return {
+    raw,
+    value: isValid ? parsed : null,
+    isValid
+  };
+}
+
+function buildDrawsHref(params: { offset?: number; limit: number; round?: string; number?: string }) {
   const searchParams = new URLSearchParams();
 
   if (typeof params.offset === "number" && params.offset > 0) {
@@ -46,6 +64,10 @@ function buildDrawsHref(params: { offset?: number; limit: number; round?: string
     searchParams.set("round", params.round);
   }
 
+  if (params.number) {
+    searchParams.set("number", params.number);
+  }
+
   const query = searchParams.toString();
   return query ? `/draws?${query}` : "/draws";
 }
@@ -53,12 +75,18 @@ function buildDrawsHref(params: { offset?: number; limit: number; round?: string
 export default async function DrawsPage({ searchParams }: DrawsPageProps) {
   const limit = Math.min(Math.max(parsePositiveInteger(searchParams?.limit, DEFAULT_LIMIT), 1), 20);
   const offset = parsePositiveInteger(searchParams?.offset, 0);
-  const { draws, total, hasMore } = await drawRepository.list({ limit, offset });
-  const latest = await drawRepository.getLatest();
+  const allDraws = await drawRepository.getAll();
+  const latest = allDraws[0] ?? null;
   const roundQuery = searchParams?.round?.trim() ?? "";
+  const numberFilter = parseNumberFilter(searchParams?.number);
+  const selectedNumber = numberFilter.value;
   const requestedRound = Number.parseInt(roundQuery, 10);
   const searchedDraw =
     roundQuery && Number.isInteger(requestedRound) && requestedRound > 0 ? await drawRepository.getByRound(requestedRound) : null;
+  const filteredDraws = selectedNumber === null ? allDraws : allDraws.filter((draw) => draw.numbers.includes(selectedNumber));
+  const draws = filteredDraws.slice(offset, offset + limit);
+  const total = filteredDraws.length;
+  const hasMore = offset + limit < total;
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.max(Math.ceil(total / limit), 1);
   const previousOffset = Math.max(offset - limit, 0);
@@ -74,20 +102,39 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         </div>
         <div className="panel">
           <p className="eyebrow">Find Round</p>
-          <form action="/draws" className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <input type="hidden" name="limit" value={String(limit)} />
-            <input
-              type="number"
-              min="1"
-              name="round"
-              defaultValue={roundQuery}
-              placeholder="예: 1169"
-              className="flex-1 rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
-            />
-            <button type="submit" className="cta-button">
-              회차 찾기
-            </button>
-          </form>
+          <div className="mt-4 grid gap-3">
+            <form action="/draws" className="flex flex-col gap-3 sm:flex-row">
+              <input type="hidden" name="limit" value={String(limit)} />
+              {numberFilter.raw ? <input type="hidden" name="number" value={numberFilter.raw} /> : null}
+              <input
+                type="number"
+                min="1"
+                name="round"
+                defaultValue={roundQuery}
+                placeholder="예: 1169"
+                className="flex-1 rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
+              />
+              <button type="submit" className="cta-button">
+                회차 찾기
+              </button>
+            </form>
+            <form action="/draws" className="flex flex-col gap-3 sm:flex-row">
+              <input type="hidden" name="limit" value={String(limit)} />
+              {roundQuery ? <input type="hidden" name="round" value={roundQuery} /> : null}
+              <input
+                type="number"
+                min="1"
+                max="45"
+                name="number"
+                defaultValue={numberFilter.raw}
+                placeholder="포함 번호 예: 7"
+                className="flex-1 rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
+              />
+              <button type="submit" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
+                번호 포함 회차 찾기
+              </button>
+            </form>
+          </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
               <p className="text-xs uppercase tracking-[0.22em] text-slate-500">최신 회차</p>
@@ -136,11 +183,38 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         </section>
       ) : null}
 
+      {numberFilter.raw ? (
+        <section className="panel">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="eyebrow">Number Filter</p>
+              <h2 className="mt-3 text-2xl font-semibold text-white">
+                {selectedNumber ? `${selectedNumber}번 번호 포함 회차` : "번호 필터 확인 필요"}
+              </h2>
+            </div>
+            {selectedNumber ? (
+              <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">{total}개 회차</div>
+            ) : null}
+          </div>
+          {selectedNumber ? (
+            <p className="mt-4 text-sm text-slate-400">
+              메인 번호 6개 안에 {selectedNumber}번이 포함된 회차만 목록과 페이지 수에 반영합니다.
+            </p>
+          ) : (
+            <div className="mt-5 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
+              번호 필터는 1부터 45 사이 값만 사용할 수 있습니다.
+            </div>
+          )}
+        </section>
+      ) : null}
+
       <section className="panel">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="eyebrow">Paging</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">회차 목록 페이지</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              {selectedNumber ? `${selectedNumber}번 기준 회차 목록` : "회차 목록 페이지"}
+            </h2>
           </div>
           <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">
             {currentPage} / {totalPages} 페이지
@@ -148,7 +222,12 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
-            href={buildDrawsHref({ offset: previousOffset, limit, round: roundQuery || undefined })}
+            href={buildDrawsHref({
+              offset: previousOffset,
+              limit,
+              round: roundQuery || undefined,
+              number: numberFilter.raw || undefined
+            })}
             aria-disabled={offset === 0}
             className={[
               "rounded-full border px-5 py-3 text-sm transition",
@@ -160,7 +239,12 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
             이전 페이지
           </Link>
           <Link
-            href={buildDrawsHref({ offset: nextOffset, limit, round: roundQuery || undefined })}
+            href={buildDrawsHref({
+              offset: nextOffset,
+              limit,
+              round: roundQuery || undefined,
+              number: numberFilter.raw || undefined
+            })}
             aria-disabled={!hasMore}
             className={[
               "rounded-full border px-5 py-3 text-sm transition",

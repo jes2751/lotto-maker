@@ -38,3 +38,12 @@ export function computeFrequencyStats(draws: Draw[], period: StatsPeriod = "all"
       return right.frequency - left.frequency;
     });
 }
+
+export function getNumberFrequency(draws: Draw[], number: number, period: StatsPeriod = "all"): FrequencyStat {
+  const stats = computeFrequencyStats(draws, period);
+  return stats.find((item) => item.number === number) ?? { number, frequency: 0, percentage: 0 };
+}
+
+export function findDrawsContainingNumber(draws: Draw[], number: number, period: StatsPeriod = "all"): Draw[] {
+  return selectDrawsByPeriod(draws, period).filter((draw) => draw.numbers.includes(number));
+}

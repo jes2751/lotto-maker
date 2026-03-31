@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import HomePage from "../src/app/page";
 import DrawsPage from "../src/app/draws/page";
 import DrawDetailPage from "../src/app/draws/[round]/page";
+import NumberDetailPage from "../src/app/stats/numbers/[number]/page";
 import StatsPage from "../src/app/stats/page";
 
 test("home page renders the hero and latest draw sections", async () => {
@@ -20,7 +21,15 @@ test("draws page renders draw cards", async () => {
   assert.match(html, /Draws/);
   assert.match(html, /Detail/);
   assert.match(html, /회차 찾기/);
+  assert.match(html, /번호 포함 회차 찾기/);
   assert.match(html, /다음 페이지/);
+});
+
+test("draws page filters by selected number", async () => {
+  const html = renderToStaticMarkup(await DrawsPage({ searchParams: { number: "3" } }));
+
+  assert.match(html, /3번 번호 포함 회차/);
+  assert.match(html, /3번 기준 회차 목록/);
 });
 
 test("draw detail page renders the requested round", async () => {
@@ -38,4 +47,13 @@ test("stats page renders both frequency sections", async () => {
   assert.match(html, /최근 10회/);
   assert.match(html, /기본 빈도 통계/);
   assert.match(html, /상위 15개/);
+});
+
+test("number detail page renders number stats", async () => {
+  const html = renderToStaticMarkup(await NumberDetailPage({ params: { number: "3" } }));
+
+  assert.match(html, /3번 상세 통계/);
+  assert.match(html, /최근 회차/);
+  assert.match(html, /이 번호가 나온 회차 보기/);
+  assert.match(html, /통계로 돌아가기/);
 });
