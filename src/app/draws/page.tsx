@@ -6,8 +6,12 @@ import { drawRepository } from "@/lib/lotto";
 interface DrawsPageProps {
   searchParams?: {
     round?: string;
+    offset?: string;
+    limit?: string;
   };
 }
+
+const DEFAULT_LIMIT = 12;
 
 function formatWonAmount(value?: number | null) {
   if (!value) {
@@ -17,25 +21,61 @@ function formatWonAmount(value?: number | null) {
   return `${Math.round(value / 100000000)}억 원`;
 }
 
+function parsePositiveInteger(value: string | undefined, fallback: number) {
+  const parsed = Number.parseInt(value ?? "", 10);
+
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
+function buildDrawsHref(params: { offset?: number; limit: number; round?: string }) {
+  const searchParams = new URLSearchParams();
+
+  if (typeof params.offset === "number" && params.offset > 0) {
+    searchParams.set("offset", String(params.offset));
+  }
+
+  if (params.limit !== DEFAULT_LIMIT) {
+    searchParams.set("limit", String(params.limit));
+  }
+
+  if (params.round) {
+    searchParams.set("round", params.round);
+  }
+
+  const query = searchParams.toString();
+  return query ? `/draws?${query}` : "/draws";
+}
+
 export default async function DrawsPage({ searchParams }: DrawsPageProps) {
-  const { draws } = await drawRepository.list({ limit: 12, offset: 0 });
-  const latest = draws[0] ?? null;
+  const limit = Math.min(Math.max(parsePositiveInteger(searchParams?.limit, DEFAULT_LIMIT), 1), 20);
+  const offset = parsePositiveInteger(searchParams?.offset, 0);
+  const { draws, total, hasMore } = await drawRepository.list({ limit, offset });
+  const latest = await drawRepository.getLatest();
   const roundQuery = searchParams?.round?.trim() ?? "";
   const requestedRound = Number.parseInt(roundQuery, 10);
   const searchedDraw =
     roundQuery && Number.isInteger(requestedRound) && requestedRound > 0 ? await drawRepository.getByRound(requestedRound) : null;
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.max(Math.ceil(total / limit), 1);
+  const previousOffset = Math.max(offset - limit, 0);
+  const nextOffset = offset + limit;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="panel">
           <p className="eyebrow">Draws</p>
-          <h1 className="mt-4 text-4xl font-semibold text-white">최근 회차 조회</h1>
-          <p className="mt-3 text-slate-300">정적 시드 데이터 기준 최신 12개 회차를 우선 보여줍니다.</p>
+          <h1 className="mt-4 text-4xl font-semibold text-white">전체 회차 조회</h1>
+          <p className="mt-3 text-slate-300">전체 회차 데이터를 기준으로 최신부터 페이지 단위로 탐색할 수 있습니다.</p>
         </div>
         <div className="panel">
           <p className="eyebrow">Find Round</p>
           <form action="/draws" className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <input type="hidden" name="limit" value={String(limit)} />
             <input
               type="number"
               min="1"
@@ -54,8 +94,8 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
               <p className="mt-2 text-2xl font-semibold text-white">{latest ? `${latest.round}회` : "-"}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">목록 개수</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{draws.length}개</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">전체 회차 수</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{total}개</p>
             </div>
           </div>
         </div>
@@ -69,7 +109,10 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
               <h2 className="mt-3 text-2xl font-semibold text-white">회차 바로 찾기 결과</h2>
             </div>
             {searchedDraw ? (
-              <Link href={`/draws/${searchedDraw.round}`} className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30">
+              <Link
+                href={`/draws/${searchedDraw.round}`}
+                className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+              >
                 상세 보기
               </Link>
             ) : null}
@@ -87,11 +130,49 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
             </div>
           ) : (
             <div className="mt-5 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              입력한 회차를 찾지 못했습니다. 현재 시드 데이터 범위 안의 회차를 다시 확인해 주세요.
+              입력한 회차를 찾지 못했습니다. 전체 회차 범위 안의 번호를 다시 확인해 주세요.
             </div>
           )}
         </section>
       ) : null}
+
+      <section className="panel">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="eyebrow">Paging</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">회차 목록 페이지</h2>
+          </div>
+          <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">
+            {currentPage} / {totalPages} 페이지
+          </div>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link
+            href={buildDrawsHref({ offset: previousOffset, limit, round: roundQuery || undefined })}
+            aria-disabled={offset === 0}
+            className={[
+              "rounded-full border px-5 py-3 text-sm transition",
+              offset === 0
+                ? "pointer-events-none border-white/5 bg-slate-950/20 text-slate-600"
+                : "border-white/10 text-slate-200 hover:border-white/30"
+            ].join(" ")}
+          >
+            이전 페이지
+          </Link>
+          <Link
+            href={buildDrawsHref({ offset: nextOffset, limit, round: roundQuery || undefined })}
+            aria-disabled={!hasMore}
+            className={[
+              "rounded-full border px-5 py-3 text-sm transition",
+              !hasMore
+                ? "pointer-events-none border-white/5 bg-slate-950/20 text-slate-600"
+                : "border-white/10 text-slate-200 hover:border-white/30"
+            ].join(" ")}
+          >
+            다음 페이지
+          </Link>
+        </div>
+      </section>
 
       <div className="grid gap-4">
         {draws.map((draw) => (

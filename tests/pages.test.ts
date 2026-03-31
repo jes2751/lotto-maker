@@ -20,6 +20,7 @@ test("draws page renders draw cards", async () => {
   assert.match(html, /Draws/);
   assert.match(html, /Detail/);
   assert.match(html, /회차 찾기/);
+  assert.match(html, /다음 페이지/);
 });
 
 test("draw detail page renders the requested round", async () => {
