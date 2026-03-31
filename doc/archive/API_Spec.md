@@ -1,6 +1,6 @@
 # API 명세 v1
 
-이 문서는 v1 API의 요약 명세다. 필드 타입, validation, 에러 계약, 예시 payload는 `API_Contract_Detail.md`를 기준으로 한다.
+이 문서는 v1 API의 요약 명세다. 필드 타입, validation, 에러 계약, 예시 payload는 `../API_Contract_Detail.md`를 기준으로 한다.
 
 ## 1. 공통
 

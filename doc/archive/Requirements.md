@@ -6,11 +6,11 @@
 
 ## 1.1 세부 기준 문서
 
-* 생성 로직 상세: `Generation_Logic_Spec.md`
-* API 상세 계약: `API_Contract_Detail.md`
-* 데이터 수집 및 검증: `Data_Pipeline_and_Validation.md`
-* 화면 상태 상세: `UI_State_Spec.md`
-* 배포 및 운영 체크: `Deployment_and_Operations_Checklist.md`
+* 생성 로직 상세: `../Generation_Logic_Spec.md`
+* API 상세 계약: `../API_Contract_Detail.md`
+* 데이터 수집 및 검증: `../Data_Pipeline_and_Validation.md`
+* 화면 상태 상세: `../UI_State_Spec.md`
+* 배포 및 운영 체크: `../Deployment_and_Operations_Checklist.md`
 
 ## 2. 기능 요구사항
 

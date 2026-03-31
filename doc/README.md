@@ -29,6 +29,9 @@ cmd /c npm test
 * 작업 규칙 문서: `WORKFLOW.md`
 * 작업 기록 파일: `history.md`
 * 범위 기준 문서: `plan.md`
+* 제품 기획 문서: `Product_Spec.md`
+* 디자인 기준 문서: `Design_Guide.md`
+* 기술 기준 문서: `Technical_Spec.md`
 
 기본 흐름은 다음과 같다.
 
@@ -45,3 +48,13 @@ cmd /c npm test
 * `src/types`: 도메인 타입
 * `prisma`: 스키마
 * `tests`: 단위 및 API 테스트
+
+## 문서 구조
+
+* `plan.md`: 최상위 범위와 우선순위
+* `Product_Spec.md`: 사용자, 기능, 화면, 상태 기획
+* `Design_Guide.md`: UI, 반응형, 상태 표현 기준
+* `Technical_Spec.md`: 생성 로직, API, 데이터, 테스트 기준
+* `WORKFLOW.md`: 역할, 작업 순서, 기록, 커밋/푸시 규칙
+* `history.md`: 실제 작업 로그
+* `archive/`: 통합 전 상세 문서 보관
