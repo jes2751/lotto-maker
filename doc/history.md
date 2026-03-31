@@ -1,5 +1,12 @@
 # History
 
+## 2026-04-01 03:08 KST
+
+* 작업: Google Analytics 측정 ID를 교체했다.
+* 변경: `layout.tsx`와 `.env.example`의 기본/예시 GA4 measurement id를 `G-ZV2SQ4LW4X`로 변경했다.
+* 검증: 설정값 교체 작업이라 별도 테스트는 생략했다.
+* 다음: 배포 환경의 실제 Realtime 수집 여부를 확인한다.
+
 ## 2026-04-01 02:50 KST
 
 * 작업: Google Analytics 태그를 앱 공통 layout에 추가했다.

@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const siteUrl = getSiteUrl();
-  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-YC5TTWMVKM";
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-ZV2SQ4LW4X";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
