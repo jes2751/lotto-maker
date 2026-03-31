@@ -39,12 +39,7 @@ export function AdSlot({
   }, [adSlot]);
 
   if (!clientId || !adSlot) {
-    return (
-      <div className={`rounded-[28px] border border-dashed border-white/10 bg-white/[0.03] p-5 ${className}`}>
-        <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">{label}</p>
-        <p className="mt-3 text-sm text-slate-400">광고 슬롯 준비 영역입니다. AdSense 환경변수가 설정되면 실제 광고가 여기에 표시됩니다.</p>
-      </div>
-    );
+    return null;
   }
 
   return (
