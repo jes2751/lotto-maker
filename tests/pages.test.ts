@@ -15,10 +15,11 @@ test("home page renders the hero and latest draw sections", async () => {
 });
 
 test("draws page renders draw cards", async () => {
-  const html = renderToStaticMarkup(await DrawsPage());
+  const html = renderToStaticMarkup(await DrawsPage({ searchParams: {} }));
 
   assert.match(html, /Draws/);
   assert.match(html, /Detail/);
+  assert.match(html, /회차 찾기/);
 });
 
 test("draw detail page renders the requested round", async () => {

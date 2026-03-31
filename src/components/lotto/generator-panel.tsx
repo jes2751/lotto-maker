@@ -170,7 +170,7 @@ export function GeneratorPanel() {
                     onClick={() => void copySet(set)}
                     className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
                   >
-                    {copiedId === set.id ? "Copied" : "Copy"}
+                    {copiedId === set.id ? "복사 완료" : "복사"}
                   </button>
                 </div>
               </div>

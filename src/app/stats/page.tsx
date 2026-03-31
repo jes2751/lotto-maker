@@ -56,6 +56,9 @@ export default async function StatsPage() {
               <p className="mt-1 text-sm text-slate-400">등장 {recentTop?.frequency ?? 0}회</p>
             </div>
           </div>
+          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-7 text-slate-400">
+            전체 기준은 시드 전체 회차를 기준으로 보고, 최근 10회 기준은 최신 흐름을 빠르게 확인할 때 사용합니다.
+          </div>
         </div>
       </section>
 
