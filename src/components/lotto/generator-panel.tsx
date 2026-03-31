@@ -146,8 +146,7 @@ export function GeneratorPanel() {
         <p className="eyebrow">Generator</p>
         <h2 className="mt-3 text-2xl font-semibold text-white">기존 당첨 데이터를 참고한 추천</h2>
         <p className="mt-3 text-sm leading-7 text-slate-400">
-          전략을 고르고 세트 수를 정하면 바로 추천 결과를 생성합니다. 기본 전략은 `mixed`이며, 필요하면 `frequency` 또는
-          `random`과 비교할 수 있습니다.
+          전략을 고르고 세트 수를 정하면 바로 추천 결과를 생성합니다. 기본 전략은 `mixed`이며, 필요하면 `frequency` 또는 `random`과 비교할 수 있습니다.
         </p>
 
         <div className="mt-6 space-y-4">
@@ -216,9 +215,7 @@ export function GeneratorPanel() {
         </div>
 
         {error ? (
-          <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
-            {error}
-          </div>
+          <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">{error}</div>
         ) : null}
 
         <div className="mt-6 space-y-4">

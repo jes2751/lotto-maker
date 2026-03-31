@@ -1,5 +1,24 @@
 # History
 
+## 2026-03-31 23:56 KST
+
+* 작업: v1 마감 단계에서 추천기와 상세 화면의 잔여 카피를 정리하고 AdSense 배포 준비 파일을 추가
+* 변경: `src/components/lotto/generator-panel.tsx`를 다시 정리해 깨진 한글 문구를 모두 교체하고 추천 결과/저장 조합 UX를 읽기 쉬운 한국어 기준으로 맞춤
+* 변경: `src/app/draws/[round]/page.tsx`, `src/app/stats/numbers/[number]/page.tsx`를 보강해 번호 상세 통계 이동 흐름과 상세 화면 설명 문구를 정리
+* 변경: `public/ads.txt` 플레이스홀더를 추가해 AdSense 실운영 전 교체 지점을 명확히 함
+* 검증: `npm test` 통과, `npm run build` 통과
+* 다음: 실제 배포 URL에서 모바일 기준 광고 밀도와 CTA 우선순위를 마지막으로 확인하면 v1 공개 마감에 더 가까워짐
+
+## 2026-03-31 23:47 KST
+
+* 작업: v1 마감 품질을 높이기 위해 광고 준비 구조와 핵심 화면 문구를 정리
+* 변경: `src/components/ads/adsense-script.tsx`, `src/components/ads/ad-slot.tsx`, `.env.example`를 추가/갱신해 AdSense 환경변수 기반 스크립트 로딩과 광고 슬롯 플레이스홀더 구조를 마련
+* 변경: `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/generate/page.tsx`, `src/app/draws/page.tsx`, `src/app/stats/page.tsx`, `src/components/layout/site-header.tsx`, `src/components/layout/site-footer.tsx`, `src/components/lotto/frequency-chart.tsx`를 정리해 깨진 문구와 메타데이터를 수정하고 홈/생성기/통계에 광고 슬롯 위치를 반영
+* 변경: `doc/Product_Spec.md`, `doc/Design_Guide.md`, `doc/Technical_Spec.md`, `doc/note.md`를 보강해 광고 운영 원칙, 배치 규칙, 환경변수, 배포 준비 기준을 문서화
+* 변경: `tests/pages.test.ts`를 갱신해 주요 화면 렌더링 문구를 최신 상태에 맞춰 검증
+* 검증: `npm test` 통과, `npm run build` 통과
+* 다음: 남은 상세 화면의 한글 카피와 광고 배치 밀도를 실제 브라우저 기준으로 한 번 더 점검하면 v1 마감도는 더 올라감
+
 ## 2026-03-31 23:27 KST
 
 * 작업: 서비스 운영 방향에서 유료/회원 전용 요소를 제거

@@ -73,3 +73,17 @@ npm run build
 2. Vercel에서 저장소 연결
 3. Next.js 프로젝트로 배포
 4. 발급된 URL에서 홈, 추천기, 회차 조회, 통계 화면 확인
+
+## 7. AdSense 준비
+
+광고를 붙일 때는 아래 환경변수를 추가한다.
+
+```bash
+NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-xxxxxxxxxxxxxxxx
+NEXT_PUBLIC_ADSENSE_SLOT_INLINE=1234567890
+```
+
+주의:
+
+* 환경변수가 없으면 광고 대신 플레이스홀더 카드만 보인다.
+* 배포 전에는 실제 퍼블리셔 ID 기준으로 `ads.txt`도 준비해야 한다.

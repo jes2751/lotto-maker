@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AdSlot } from "@/components/ads/ad-slot";
 import { FrequencyChart } from "@/components/lotto/frequency-chart";
 import { computeFrequencyStats, drawRepository } from "@/lib/lotto";
 import { clamp } from "@/lib/lotto/shared";
@@ -69,7 +70,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           <p className="eyebrow">Stats</p>
           <h1 className="mt-4 text-4xl font-semibold text-white">기본 빈도 통계</h1>
           <p className="mt-3 max-w-3xl text-slate-300">
-            메인 번호 기준의 단순 빈도 통계입니다. 전체 회차와 최근 10회를 나란히 비교하면서 상위 번호를 확인할 수 있습니다.
+            메인 번호 기준의 단순 빈도 통계입니다. 전체 회차와 최근 10회를 나란히 비교하면서 자주 나온 번호 흐름을 빠르게 확인할 수 있습니다.
           </p>
         </div>
         <div className="panel">
@@ -127,13 +128,10 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
               <p className="mt-1 text-sm text-slate-400">등장 {selectedTop?.frequency ?? 0}회</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">표시 개수</p>
-              <p className="mt-2 text-2xl font-semibold text-white">상위 {top}개</p>
-              <p className="mt-1 text-sm text-slate-400">{getPeriodLabel(selectedPeriod)} 기준</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">전체 회차 수</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{draws.length}개</p>
+              <p className="mt-1 text-sm text-slate-400">현재 데이터셋 기준</p>
             </div>
-          </div>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-7 text-slate-400">
-            현재는 `{getPeriodLabel(selectedPeriod)}` 기준 상위 번호를 중심으로 보여주고, 비교 기준 결과를 함께 확인할 수 있습니다.
           </div>
         </div>
 
@@ -146,26 +144,20 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
               <p className="mt-1 text-sm text-slate-400">등장 {comparisonTop?.frequency ?? 0}회</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">전체 회차 수</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{draws.length}개</p>
-              <p className="mt-1 text-sm text-slate-400">데이터셋 기준</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">현재 보기</p>
+              <p className="mt-2 text-2xl font-semibold text-white">상위 {top}개</p>
+              <p className="mt-1 text-sm text-slate-400">{getPeriodLabel(selectedPeriod)} 기준</p>
             </div>
           </div>
         </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <FrequencyChart
-          title={`${getPeriodLabel(selectedPeriod)} 상위 번호 분포`}
-          stats={selectedStats}
-          color="rgba(255, 143, 0, 0.72)"
-        />
-        <FrequencyChart
-          title={`${getPeriodLabel(comparisonPeriod)} 상위 번호 분포`}
-          stats={comparisonStats}
-          color="rgba(45, 212, 191, 0.72)"
-        />
+        <FrequencyChart title={`${getPeriodLabel(selectedPeriod)} 상위 번호 분포`} stats={selectedStats} color="rgba(255, 143, 0, 0.72)" />
+        <FrequencyChart title={`${getPeriodLabel(comparisonPeriod)} 상위 번호 분포`} stats={comparisonStats} color="rgba(45, 212, 191, 0.72)" />
       </section>
+
+      <AdSlot label="Statistics Sponsored" className="max-w-4xl self-center" />
 
       <section className="grid gap-10 lg:grid-cols-2">
         <div className="panel">
@@ -178,13 +170,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {selectedStats.map((item, index) => (
-              <FrequencyCard
-                key={`selected-${item.number}`}
-                label={`Rank ${index + 1}`}
-                value={item.number}
-                frequency={item.frequency}
-                percentage={item.percentage}
-              />
+              <FrequencyCard key={`selected-${item.number}`} label={`Rank ${index + 1}`} value={item.number} frequency={item.frequency} percentage={item.percentage} />
             ))}
           </div>
         </div>
@@ -199,13 +185,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {comparisonStats.map((item, index) => (
-              <FrequencyCard
-                key={`comparison-${item.number}`}
-                label={`Rank ${index + 1}`}
-                value={item.number}
-                frequency={item.frequency}
-                percentage={item.percentage}
-              />
+              <FrequencyCard key={`comparison-${item.number}`} label={`Rank ${index + 1}`} value={item.number} frequency={item.frequency} percentage={item.percentage} />
             ))}
           </div>
         </div>

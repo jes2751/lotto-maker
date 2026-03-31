@@ -14,6 +14,7 @@ test("home page renders the hero and latest draw sections", async () => {
 
   assert.match(html, /Historical Recommendation/);
   assert.match(html, /Latest Draw/);
+  assert.match(html, /추천 번호 보러 가기/);
 });
 
 test("generate page renders the generator guide", async () => {

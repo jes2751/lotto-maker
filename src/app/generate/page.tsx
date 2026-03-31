@@ -1,3 +1,4 @@
+import { AdSlot } from "@/components/ads/ad-slot";
 import { GeneratorPanel } from "@/components/lotto/generator-panel";
 
 export default function GeneratePage() {
@@ -8,8 +9,7 @@ export default function GeneratePage() {
           <p className="eyebrow">Generate</p>
           <h1 className="mt-4 text-4xl font-semibold text-white">데이터 기반 번호 추천기</h1>
           <p className="mt-3 max-w-3xl text-slate-300">
-            v1에서는 과거 당첨 데이터를 기반으로 한 `mixed`, `frequency` 전략과 비교용 `random` 전략을 제공합니다. 결과는
-            참고용이며 당첨을 보장하지 않습니다.
+            v1에서는 과거 당첨 데이터를 바탕으로 `mixed`, `frequency`, `random` 전략을 제공합니다. 결과는 참고용이며 당첨을 보장하지 않습니다.
           </p>
         </div>
         <div className="panel">
@@ -21,6 +21,9 @@ export default function GeneratePage() {
           </ul>
         </div>
       </section>
+
+      <AdSlot label="Generate Sponsored" className="max-w-4xl self-center" />
+
       <GeneratorPanel />
     </div>
   );

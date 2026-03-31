@@ -67,12 +67,12 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
             <p className="eyebrow">Winning Numbers</p>
             {isLatest ? (
               <span className="rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
-                Latest
+                최신 회차
               </span>
             ) : null}
           </div>
           <div className="mt-6">
-            <NumberSet numbers={draw.numbers} bonus={draw.bonus} />
+            <NumberSet numbers={draw.numbers} bonus={draw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
@@ -128,7 +128,7 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
               <p className="mt-2 text-2xl font-semibold text-white">{formatWonAmount(draw.totalPrize)}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-7 text-slate-400">
-              이 화면은 회차별 당첨번호, 보너스 번호, 당첨금 정보를 빠르게 확인하기 위한 v1 상세 페이지입니다.
+              번호 볼을 누르면 해당 번호의 상세 통계로 이동합니다. 회차 흐름과 번호 흐름을 함께 보려는 사용자를 위한 상세 화면입니다.
             </div>
           </div>
         </div>

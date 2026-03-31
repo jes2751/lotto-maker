@@ -97,11 +97,11 @@ export default async function NumberDetailPage({ params }: NumberDetailPageProps
                   <p className="mt-1 text-sm text-slate-400">{draw.drawDate}</p>
                 </div>
                 <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
-                  Draw Detail
+                  회차 상세
                 </span>
               </div>
               <div className="mt-4">
-                <NumberSet numbers={draw.numbers} bonus={draw.bonus} />
+                <NumberSet numbers={draw.numbers} bonus={draw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
               </div>
             </Link>
           ))}

@@ -36,7 +36,7 @@ function parseNumberFilter(value: string | undefined) {
   const raw = value?.trim() ?? "";
 
   if (!raw) {
-    return { raw: "", value: null as number | null, isValid: true };
+    return { raw: "", value: null as number | null };
   }
 
   const parsed = Number.parseInt(raw, 10);
@@ -44,8 +44,7 @@ function parseNumberFilter(value: string | undefined) {
 
   return {
     raw,
-    value: isValid ? parsed : null,
-    isValid
+    value: isValid ? parsed : null
   };
 }
 
@@ -172,7 +171,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
                 <p className="mt-4 text-sm text-slate-300">1등 당첨자 {searchedDraw.winnerCount ?? 0}명</p>
               </div>
               <div>
-                <NumberSet numbers={searchedDraw.numbers} bonus={searchedDraw.bonus} />
+                <NumberSet numbers={searchedDraw.numbers} bonus={searchedDraw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
               </div>
             </div>
           ) : (
@@ -192,14 +191,10 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
                 {selectedNumber ? `${selectedNumber}번 번호 포함 회차` : "번호 필터 확인 필요"}
               </h2>
             </div>
-            {selectedNumber ? (
-              <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">{total}개 회차</div>
-            ) : null}
+            {selectedNumber ? <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">{total}개 회차</div> : null}
           </div>
           {selectedNumber ? (
-            <p className="mt-4 text-sm text-slate-400">
-              메인 번호 6개 안에 {selectedNumber}번이 포함된 회차만 목록과 페이지 수에 반영합니다.
-            </p>
+            <p className="mt-4 text-sm text-slate-400">메인 번호 6개 안에 {selectedNumber}번이 포함된 회차만 목록과 페이지 수에 반영합니다.</p>
           ) : (
             <div className="mt-5 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
               번호 필터는 1부터 45 사이 값만 사용할 수 있습니다.
@@ -212,9 +207,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="eyebrow">Paging</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">
-              {selectedNumber ? `${selectedNumber}번 기준 회차 목록` : "회차 목록 페이지"}
-            </h2>
+            <h2 className="mt-3 text-2xl font-semibold text-white">{selectedNumber ? `${selectedNumber}번 기준 회차 목록` : "회차 목록 페이지"}</h2>
           </div>
           <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">
             {currentPage} / {totalPages} 페이지
@@ -222,12 +215,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
-            href={buildDrawsHref({
-              offset: previousOffset,
-              limit,
-              round: roundQuery || undefined,
-              number: numberFilter.raw || undefined
-            })}
+            href={buildDrawsHref({ offset: previousOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
             aria-disabled={offset === 0}
             className={[
               "rounded-full border px-5 py-3 text-sm transition",
@@ -239,12 +227,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
             이전 페이지
           </Link>
           <Link
-            href={buildDrawsHref({
-              offset: nextOffset,
-              limit,
-              round: roundQuery || undefined,
-              number: numberFilter.raw || undefined
-            })}
+            href={buildDrawsHref({ offset: nextOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
             aria-disabled={!hasMore}
             className={[
               "rounded-full border px-5 py-3 text-sm transition",
@@ -277,15 +260,11 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
               </div>
             </div>
             <div className="mt-5">
-              <NumberSet numbers={draw.numbers} bonus={draw.bonus} />
+              <NumberSet numbers={draw.numbers} bonus={draw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
-                총 판매금: {formatWonAmount(draw.totalPrize)}
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
-                1등 당첨금: {formatWonAmount(draw.firstPrize)}
-              </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">총 판매금: {formatWonAmount(draw.totalPrize)}</div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">1등 당첨금: {formatWonAmount(draw.firstPrize)}</div>
             </div>
           </article>
         ))}
