@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(255, 143, 0, 0.18), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(65, 201, 192, 0.12), transparent 30%),
+    #08111f;
+  color: #e5eef8;
+  font-family: var(--font-body), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading), sans-serif;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/20;
+  }
+
+  .eyebrow {
+    @apply text-xs uppercase tracking-[0.32em] text-teal;
+  }
+
+  .cta-button {
+    @apply rounded-full bg-accent px-5 py-3 font-medium text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+}
