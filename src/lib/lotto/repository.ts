@@ -1,17 +1,25 @@
-import { seedDraws } from "@/lib/data/seed-draws";
+import { getAllAvailableDraws } from "@/lib/data/remote-draws";
 import type { Draw, DrawListResult, DrawRepository, ListDrawsOptions } from "@/types/lotto";
 
 function sortByLatest(draws: Draw[]): Draw[] {
   return [...draws].sort((left, right) => right.round - left.round);
 }
 
-export class StaticDrawRepository implements DrawRepository {
-  constructor(private readonly draws: Draw[]) {}
+export class HybridDrawRepository implements DrawRepository {
+  private drawsPromise: Promise<Draw[]> | null = null;
+
+  private async loadDraws(): Promise<Draw[]> {
+    if (!this.drawsPromise) {
+      this.drawsPromise = getAllAvailableDraws();
+    }
+
+    return this.drawsPromise;
+  }
 
   async list(options: ListDrawsOptions = {}): Promise<DrawListResult> {
     const limit = options.limit ?? 10;
     const offset = options.offset ?? 0;
-    const ordered = sortByLatest(this.draws);
+    const ordered = sortByLatest(await this.loadDraws());
 
     return {
       draws: ordered.slice(offset, offset + limit),
@@ -21,16 +29,17 @@ export class StaticDrawRepository implements DrawRepository {
   }
 
   async getByRound(round: number): Promise<Draw | null> {
-    return this.draws.find((draw) => draw.round === round) ?? null;
+    const draws = await this.loadDraws();
+    return draws.find((draw) => draw.round === round) ?? null;
   }
 
   async getLatest(): Promise<Draw | null> {
-    return sortByLatest(this.draws)[0] ?? null;
+    return (await this.loadDraws())[0] ?? null;
   }
 
   async getAll(): Promise<Draw[]> {
-    return sortByLatest(this.draws);
+    return sortByLatest(await this.loadDraws());
   }
 }
 
-export const drawRepository: DrawRepository = new StaticDrawRepository(seedDraws);
+export const drawRepository: DrawRepository = new HybridDrawRepository();

@@ -35,4 +35,5 @@ test("stats page renders both frequency sections", async () => {
 
   assert.match(html, /All Draws/);
   assert.match(html, /Recent 10/);
+  assert.match(html, /기본 빈도 통계/);
 });

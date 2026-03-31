@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { NumberSet } from "@/components/lotto/number-set";
 import type { GeneratedSet, GenerationStrategy } from "@/types/lotto";
 
+const STORAGE_KEY = "lotto-lab-saved-sets";
+
 const strategies: Array<{ value: GenerationStrategy; label: string; description: string }> = [
   { value: "mixed", label: "혼합형 추천", description: "기존 당첨 데이터 흐름에 무작위 요소를 섞어 기본 추천으로 제공합니다." },
   { value: "frequency", label: "빈도형 추천", description: "기존 당첨 데이터에서 자주 나온 번호에 비중을 둡니다." },
@@ -17,14 +19,42 @@ function formatCopyText(set: GeneratedSet) {
   return `${set.strategy}: ${numbers}${bonus}`;
 }
 
+function loadSavedSets(): GeneratedSet[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw) as GeneratedSet[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistSavedSets(nextSavedSets: GeneratedSet[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSavedSets));
+}
+
 export function GeneratorPanel() {
   const [strategy, setStrategy] = useState<GenerationStrategy>("mixed");
   const [count, setCount] = useState(2);
   const [includeBonus, setIncludeBonus] = useState(true);
   const [sets, setSets] = useState<GeneratedSet[]>([]);
+  const [savedSets, setSavedSets] = useState<GeneratedSet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   async function generate() {
     setLoading(true);
@@ -51,6 +81,7 @@ export function GeneratorPanel() {
 
       setSets(payload.data.sets);
       setCopiedId(null);
+      setSavedId(null);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
@@ -73,12 +104,27 @@ export function GeneratorPanel() {
     }
   }
 
+  function saveSet(set: GeneratedSet) {
+    const nextSavedSets = [set, ...savedSets.filter((item) => item.id !== set.id)].slice(0, 8);
+    setSavedSets(nextSavedSets);
+    persistSavedSets(nextSavedSets);
+    setSavedId(set.id);
+    setTimeout(() => setSavedId((current) => (current === set.id ? null : current)), 1600);
+  }
+
+  function removeSavedSet(id: string) {
+    const nextSavedSets = savedSets.filter((item) => item.id !== id);
+    setSavedSets(nextSavedSets);
+    persistSavedSets(nextSavedSets);
+  }
+
   useEffect(() => {
+    setSavedSets(loadSavedSets());
     void generate();
   }, []);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.1fr_1.4fr]">
+    <div className="grid gap-8 xl:grid-cols-[0.95fr_1.1fr_0.95fr]">
       <section className="panel">
         <p className="eyebrow">Generator</p>
         <h2 className="mt-3 text-2xl font-semibold text-white">지난 당첨 흐름을 참고해 바로 추천</h2>
@@ -106,7 +152,7 @@ export function GeneratorPanel() {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <label className="space-y-2 text-sm text-slate-300">
             <span>세트 수</span>
             <select
@@ -172,6 +218,13 @@ export function GeneratorPanel() {
                   >
                     {copiedId === set.id ? "복사 완료" : "복사"}
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => saveSet(set)}
+                    className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                  >
+                    {savedId === set.id ? "저장 완료" : "저장"}
+                  </button>
                 </div>
               </div>
               <div className="mt-4">
@@ -183,6 +236,39 @@ export function GeneratorPanel() {
           {!error && sets.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
               아직 생성된 추천 조합이 없습니다. 전략을 선택하고 추천을 실행해 주세요.
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="panel">
+        <p className="eyebrow">Saved</p>
+        <h2 className="mt-3 text-2xl font-semibold text-white">저장한 추천 조합</h2>
+        <p className="mt-2 text-sm text-slate-400">브라우저에 최근 저장한 추천 조합을 최대 8개까지 유지합니다.</p>
+        <div className="mt-6 space-y-4">
+          {savedSets.map((set) => (
+            <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
+                  {set.strategy}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeSavedSet(set.id)}
+                  className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                >
+                  삭제
+                </button>
+              </div>
+              <div className="mt-4">
+                <NumberSet numbers={set.numbers} bonus={set.bonus} />
+              </div>
+              <p className="mt-4 text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</p>
+            </article>
+          ))}
+          {savedSets.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
+              저장한 추천 조합이 없습니다. 결과 카드에서 `저장`을 눌러 나중에 다시 확인할 수 있습니다.
             </div>
           ) : null}
         </div>
