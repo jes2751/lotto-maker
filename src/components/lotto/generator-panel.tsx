@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { NumberSet } from "@/components/lotto/number-set";
@@ -8,9 +9,21 @@ import type { GeneratedSet, GenerationStrategy } from "@/types/lotto";
 const STORAGE_KEY = "lotto-lab-saved-sets";
 
 const strategies: Array<{ value: GenerationStrategy; label: string; description: string }> = [
-  { value: "mixed", label: "혼합형 추천", description: "기존 당첨 데이터 흐름에 무작위 요소를 섞어 기본 추천으로 제공합니다." },
-  { value: "frequency", label: "빈도형 추천", description: "기존 당첨 데이터에서 자주 나온 번호에 비중을 둡니다." },
-  { value: "random", label: "랜덤 비교", description: "데이터 기반 추천과 비교하기 위한 완전 랜덤 옵션입니다." }
+  {
+    value: "mixed",
+    label: "혼합형 추천",
+    description: "과거 당첨 데이터 기반 빈도와 무작위 요소를 함께 반영한 기본 추천입니다."
+  },
+  {
+    value: "frequency",
+    label: "빈도형 추천",
+    description: "과거 당첨 데이터에서 자주 나온 번호에 더 높은 비중을 두는 추천입니다."
+  },
+  {
+    value: "random",
+    label: "랜덤 비교",
+    description: "데이터 기반 전략과 비교해 볼 수 있는 완전 무작위 조합입니다."
+  }
 ];
 
 function formatCopyText(set: GeneratedSet) {
@@ -43,6 +56,10 @@ function persistSavedSets(nextSavedSets: GeneratedSet[]) {
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSavedSets));
+}
+
+function buildStatsHref(value: number) {
+  return `/stats/numbers/${value}`;
 }
 
 export function GeneratorPanel() {
@@ -127,10 +144,10 @@ export function GeneratorPanel() {
     <div className="grid gap-8 xl:grid-cols-[0.95fr_1.1fr_0.95fr]">
       <section className="panel">
         <p className="eyebrow">Generator</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">지난 당첨 흐름을 참고해 바로 추천</h2>
+        <h2 className="mt-3 text-2xl font-semibold text-white">기존 당첨 데이터를 참고한 추천</h2>
         <p className="mt-3 text-sm leading-7 text-slate-400">
-          전략을 고르고 세트 수를 정하면 바로 추천 결과를 생성합니다. 기본 전략은 `mixed`이며, 필요하면 `frequency` 또는 `random`과 비교할
-          수 있습니다.
+          전략을 고르고 세트 수를 정하면 바로 추천 결과를 생성합니다. 기본 전략은 `mixed`이며, 필요하면 `frequency` 또는
+          `random`과 비교할 수 있습니다.
         </p>
 
         <div className="mt-6 space-y-4">
@@ -180,7 +197,7 @@ export function GeneratorPanel() {
         </div>
 
         <button type="button" onClick={() => void generate()} className="cta-button mt-6 w-full" disabled={loading}>
-          {loading ? "추천 중..." : "추천 번호 다시 받기"}
+          {loading ? "추천 생성 중..." : "추천 번호 다시 받기"}
         </button>
       </section>
 
@@ -189,7 +206,9 @@ export function GeneratorPanel() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="mt-3 text-2xl font-semibold text-white">이번 추천 조합</h2>
-            <p className="mt-2 text-sm text-slate-400">마지막 결과는 유지하고, 새 요청이 성공하면 목록을 교체합니다.</p>
+            <p className="mt-2 text-sm text-slate-400">
+              마지막 생성 결과를 유지합니다. 번호를 누르면 해당 번호의 상세 통계로 바로 이동합니다.
+            </p>
           </div>
           <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-400">
             {sets.length} set
@@ -228,14 +247,28 @@ export function GeneratorPanel() {
                 </div>
               </div>
               <div className="mt-4">
-                <NumberSet numbers={set.numbers} bonus={set.bonus} />
+                <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={(value) => buildStatsHref(value)} />
               </div>
               <p className="mt-4 text-sm text-slate-400">{set.reason}</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  href={`/draws?number=${set.numbers[0]}`}
+                  className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                >
+                  첫 번호 회차 보기
+                </Link>
+                <Link
+                  href={`/stats/numbers/${set.numbers[0]}`}
+                  className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                >
+                  첫 번호 통계 보기
+                </Link>
+              </div>
             </article>
           ))}
           {!error && sets.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              아직 생성된 추천 조합이 없습니다. 전략을 선택하고 추천을 실행해 주세요.
+              아직 생성된 추천 조합이 없습니다. 전략을 고르고 추천을 실행해 주세요.
             </div>
           ) : null}
         </div>
@@ -261,14 +294,14 @@ export function GeneratorPanel() {
                 </button>
               </div>
               <div className="mt-4">
-                <NumberSet numbers={set.numbers} bonus={set.bonus} />
+                <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={(value) => buildStatsHref(value)} />
               </div>
               <p className="mt-4 text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</p>
             </article>
           ))}
           {savedSets.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              저장한 추천 조합이 없습니다. 결과 카드에서 `저장`을 눌러 나중에 다시 확인할 수 있습니다.
+              저장한 추천 조합이 없습니다. 결과 카드에서 `저장`을 누르면 다시 확인할 수 있습니다.
             </div>
           ) : null}
         </div>

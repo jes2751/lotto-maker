@@ -2,17 +2,26 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import HomePage from "../src/app/page";
-import DrawsPage from "../src/app/draws/page";
 import DrawDetailPage from "../src/app/draws/[round]/page";
-import NumberDetailPage from "../src/app/stats/numbers/[number]/page";
+import DrawsPage from "../src/app/draws/page";
+import GeneratePage from "../src/app/generate/page";
+import HomePage from "../src/app/page";
 import StatsPage from "../src/app/stats/page";
+import NumberDetailPage from "../src/app/stats/numbers/[number]/page";
 
 test("home page renders the hero and latest draw sections", async () => {
   const html = renderToStaticMarkup(await HomePage());
 
   assert.match(html, /Historical Recommendation/);
   assert.match(html, /Latest Draw/);
+});
+
+test("generate page renders the generator guide", async () => {
+  const html = renderToStaticMarkup(await GeneratePage());
+
+  assert.match(html, /데이터 기반 번호 추천기/);
+  assert.match(html, /혼합형 추천/);
+  assert.match(html, /결과 카드에서 번호를 누르면/);
 });
 
 test("draws page renders draw cards", async () => {
