@@ -5,6 +5,12 @@
 * 이 문서는 v1 릴리스 범위의 최상위 기준이다.
 * `doc/Requirements.md`는 구현 백로그와 세부 요구사항을 다룬다.
 * `doc/IA_and_Screens.md`, `doc/API_Spec.md`, `doc/DB_Schema.md`는 이 문서를 따른 파생 문서다.
+* 상세 구현 기준은 아래 문서로 고정한다.
+  * `Generation_Logic_Spec.md`
+  * `API_Contract_Detail.md`
+  * `Data_Pipeline_and_Validation.md`
+  * `UI_State_Spec.md`
+  * `Deployment_and_Operations_Checklist.md`
 
 ## 2. 서비스 방향
 
