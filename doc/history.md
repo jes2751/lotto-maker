@@ -1,5 +1,12 @@
 # History
 
+## 2026-04-01 00:27 KST
+
+* 작업: Cloudflare Workers 배포 실패 원인인 미래 `compatibility_date` 수정
+* 변경: `wrangler.jsonc`의 `compatibility_date`를 `2026-04-01`에서 `2025-12-01`로 낮춰 Cloudflare API가 허용하는 유효 날짜로 조정
+* 검증: 배포 로그 기준으로 OpenNext 빌드와 asset 업로드는 정상 완료됐고, 실패 원인은 미래 날짜 검증 오류 하나였다.
+* 다음: 같은 설정으로 Cloudflare Workers 배포를 다시 실행하면 된다.
+
 ## 2026-04-01 00:20 KST
 
 * 작업: Cloudflare Workers/OpenNext 배포용 설정 파일과 스크립트 정리
