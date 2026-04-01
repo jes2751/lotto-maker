@@ -1,26 +1,29 @@
 import type { Metadata } from "next";
 
+import { siteConfig } from "@/lib/site";
+
 export const metadata: Metadata = {
-  title: "광고 안내 | LOTTO LAB",
-  description: "LOTTO LAB의 광고 표시 원칙과 Google AdSense 운영 기준을 안내합니다."
+  title: `광고 정책 | ${siteConfig.name}`,
+  description: `${siteConfig.name}의 광고 노출 원칙, Google AdSense 사용 기준, 광고와 콘텐츠 분리 원칙을 안내합니다.`
 };
 
 const principles = [
-  "광고는 '광고' 라벨과 함께 콘텐츠와 분리된 영역에만 노출합니다.",
-  "광고 클릭이나 조회를 유도하는 문구, 보상, 그래픽 요소를 사용하지 않습니다.",
-  "추천 결과, 지난 회차 카드, 통계 핵심 정보처럼 사용자가 집중해야 하는 영역 안에는 광고를 넣지 않습니다.",
-  "광고가 설정되지 않은 환경에서는 광고 슬롯을 렌더링하지 않습니다."
+  "광고 영역은 항상 '광고'로 표시하고, 일반 콘텐츠와 명확히 구분합니다.",
+  "광고를 클릭하도록 유도하는 문구, 버튼, 오해를 줄 수 있는 인터페이스는 사용하지 않습니다.",
+  "추천 결과, 통계 데이터, 회차 조회 같은 핵심 기능 앞을 광고로 막지 않습니다.",
+  "Google AdSense가 실제로 설정되기 전까지 광고 영역은 화면에 노출하지 않습니다."
 ];
 
 export default function AdsPolicyPage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-12">
       <section className="panel">
-        <p className="eyebrow">Ad Policy</p>
-        <h1 className="mt-4 text-4xl font-semibold text-white">광고 안내</h1>
+        <p className="eyebrow">Ads Policy</p>
+        <h1 className="mt-4 text-4xl font-semibold text-white">광고 정책</h1>
         <p className="mt-4 leading-8 text-slate-300">
-          LOTTO LAB은 Google AdSense 운영 시 광고와 콘텐츠를 명확히 구분하고, 광고 클릭 또는 조회를 유도하지 않는
-          방향으로 페이지를 구성합니다.
+          {siteConfig.name}은 Google AdSense 운영 정책과 사용자 경험을 함께 고려해 광고를
+          배치합니다. 광고는 콘텐츠를 방해하지 않는 범위에서만 노출하며, 추천 결과나 통계
+          기능보다 앞세우지 않습니다.
         </p>
       </section>
 
@@ -34,11 +37,11 @@ export default function AdsPolicyPage() {
       </section>
 
       <section className="panel">
-        <h2 className="text-2xl font-semibold text-white">서비스 안내</h2>
+        <h2 className="text-2xl font-semibold text-white">현재 상태</h2>
         <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
-          <li>- 추천 결과는 과거 당첨 데이터를 참고한 정보이며 당첨을 보장하지 않습니다.</li>
-          <li>- 광고는 LOTTO LAB의 추천 결과와 무관하게 표시됩니다.</li>
-          <li>- 광고 관련 설정은 Google AdSense 정책과 Cloudflare 배포 환경 기준에 맞춰 별도로 관리합니다.</li>
+          <li>- 광고 컴포넌트와 `ads.txt` 준비는 완료되어 있습니다.</li>
+          <li>- 실제 AdSense 퍼블리셔 ID와 슬롯 ID가 설정되기 전까지 광고는 비노출 상태입니다.</li>
+          <li>- 광고 운영 방식이 바뀌면 이 페이지와 개인정보처리방침을 함께 갱신합니다.</li>
         </ul>
       </section>
     </div>

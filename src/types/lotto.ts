@@ -1,5 +1,15 @@
-export type GenerationStrategy = "random" | "frequency" | "mixed";
+export type GenerationStrategy = "random" | "frequency" | "mixed" | "filter";
 export type StatsPeriod = "all" | "recent_10";
+export type OddEvenFilter = "any" | "balanced" | "odd-heavy" | "even-heavy";
+
+export interface GenerationFilters {
+  fixedNumbers?: number[];
+  excludedNumbers?: number[];
+  oddEven?: OddEvenFilter;
+  sumMin?: number | null;
+  sumMax?: number | null;
+  allowConsecutive?: boolean;
+}
 
 export interface Draw {
   id: number;
@@ -49,6 +59,7 @@ export interface GenerateNumbersInput {
   strategy: GenerationStrategy;
   count: number;
   includeBonus: boolean;
+  filters?: GenerationFilters;
 }
 
 export interface GenerationService {

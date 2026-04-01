@@ -63,6 +63,55 @@ test("generate api returns requested set count", async () => {
   assert.equal(payload.data.sets.length, 2);
 });
 
+test("generate api validates overlapping fixed and excluded numbers", async () => {
+  const response = await postGenerate(
+    new Request("http://localhost/api/v1/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        strategy: "filter",
+        count: 1,
+        include_bonus: true,
+        filters: {
+          fixed_numbers: [3, 7],
+          excluded_numbers: [7, 12]
+        }
+      })
+    })
+  );
+
+  assert.equal(response.status, 400);
+});
+
+test("generate api returns filtered sets", async () => {
+  const response = await postGenerate(
+    new Request("http://localhost/api/v1/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        strategy: "filter",
+        count: 1,
+        include_bonus: false,
+        filters: {
+          fixed_numbers: [3, 11],
+          excluded_numbers: [1, 2, 45],
+          odd_even: "balanced",
+          allow_consecutive: false
+        }
+      })
+    })
+  );
+  const payload = await response.json();
+  const [set] = payload.data.sets;
+
+  assert.equal(response.status, 200);
+  assert.ok(set.numbers.includes(3));
+  assert.ok(set.numbers.includes(11));
+  assert.ok(!set.numbers.includes(1));
+  assert.ok(!set.numbers.includes(2));
+  assert.ok(!set.numbers.includes(45));
+});
+
 test("stats api returns top level metadata", async () => {
   const response = await getFrequencyStats(new Request("http://localhost/api/v1/stats/frequency?period=recent_10&type=main&limit=5"));
   const payload = await response.json();

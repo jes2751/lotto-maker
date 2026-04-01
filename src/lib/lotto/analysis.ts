@@ -126,26 +126,26 @@ export function computeSumRangeStats(draws: Draw[]): SumRangeStat[] {
 export function buildDrawAnalysisSummary(analysis: DrawAnalysis): DrawAnalysisSummary {
   const oddEvenSummary =
     analysis.oddCount === analysis.evenCount
-      ? "The set is evenly balanced between odd and even numbers."
+      ? "홀짝 비율이 3:3으로 균형을 이룬 회차입니다."
       : analysis.oddCount > analysis.evenCount
-        ? `The set leans odd with ${analysis.oddCount} odd numbers versus ${analysis.evenCount} even numbers.`
-        : `The set leans even with ${analysis.evenCount} even numbers versus ${analysis.oddCount} odd numbers.`;
+        ? `홀수가 ${analysis.oddCount}개로 짝수 ${analysis.evenCount}개보다 많은 회차입니다.`
+        : `짝수가 ${analysis.evenCount}개로 홀수 ${analysis.oddCount}개보다 많은 회차입니다.`;
 
   const sumSummary =
     analysis.sum < 100
-      ? `The total sum is ${analysis.sum}, which falls into a relatively low band for a six-number draw.`
+      ? `번호 합계 ${analysis.sum}는 비교적 낮은 구간에 속합니다.`
       : analysis.sum <= 160
-        ? `The total sum is ${analysis.sum}, which sits in the middle band where many rounds cluster.`
-        : `The total sum is ${analysis.sum}, which places this round in a relatively high sum band.`;
+        ? `번호 합계 ${analysis.sum}는 가장 자주 보이는 중간 구간에 가깝습니다.`
+        : `번호 합계 ${analysis.sum}는 비교적 높은 구간에 속합니다.`;
 
   const trendSummary =
     analysis.hotMatches.length >= 3
-      ? `This round overlaps heavily with current hot numbers: ${analysis.hotMatches.join(", ")}.`
+      ? `자주 나온 번호와의 겹침이 많은 편입니다: ${analysis.hotMatches.join(", ")}.`
       : analysis.coldMatches.length >= 2
-        ? `This round includes several quieter numbers: ${analysis.coldMatches.join(", ")}.`
+        ? `적게 나온 번호가 두 개 이상 포함돼 있습니다: ${analysis.coldMatches.join(", ")}.`
         : analysis.consecutivePairs.length > 0
-          ? `A visible consecutive pattern appears in ${analysis.consecutivePairs.map((pair) => pair.join("-")).join(", ")}.`
-          : "This round is relatively balanced without a single dominant pattern.";
+          ? `연속번호 조합이 보입니다: ${analysis.consecutivePairs.map((pair) => pair.join("-")).join(", ")}.`
+          : "큰 치우침보다는 비교적 고르게 퍼진 조합에 가까운 회차입니다.";
 
   return {
     oddEvenSummary,

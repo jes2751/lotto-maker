@@ -6,7 +6,7 @@ import { NumberSet } from "@/components/lotto/number-set";
 import { JsonLd } from "@/components/seo/json-ld";
 import { drawRepository } from "@/lib/lotto";
 import { analyzeDraw, buildDrawAnalysisSummary } from "@/lib/lotto/analysis";
-import { getSiteUrl, siteConfig } from "@/lib/site";
+import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
 
 interface DrawAnalysisPageProps {
   params: {
@@ -14,27 +14,37 @@ interface DrawAnalysisPageProps {
   };
 }
 
-export async function generateMetadata({ params }: DrawAnalysisPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params
+}: DrawAnalysisPageProps): Promise<Metadata> {
   const round = Number.parseInt(params.round, 10);
   const draw = Number.isInteger(round) ? await drawRepository.getByRound(round) : null;
 
   if (!draw) {
-    return {
-      title: "Draw analysis",
-      description: "Round-based Lotto analysis page with number patterns and trend summary."
-    };
+    return createPageMetadata({
+      locale: "ko",
+      path: "/latest-lotto-results",
+      titleKo: "회차 분석",
+      titleEn: "Draw Analysis",
+      descriptionKo:
+        "회차별 로또 번호 패턴과 통계 흐름을 읽는 분석 페이지입니다.",
+      descriptionEn: "Round-based Lotto analysis page with number patterns and trend summary."
+    });
   }
 
-  return {
-    title: `${draw.round} draw analysis`,
-    description: `Round ${draw.round} Lotto analysis with winning numbers, odd-even pattern, sum pattern, and data-based comparison.`,
-    alternates: {
-      canonical: `/draw-analysis/${draw.round}`
-    }
-  };
+  return createPageMetadata({
+    locale: "ko",
+    path: `/draw-analysis/${draw.round}`,
+    titleKo: `${draw.round}회 회차 분석`,
+    titleEn: `Round ${draw.round} Draw Analysis`,
+    descriptionKo: `${draw.round}회 당첨번호의 홀짝, 합계, 저고 분포, 자주 나온 번호 겹침 정도를 정리한 회차 분석 페이지입니다.`,
+    descriptionEn: `Round ${draw.round} Lotto analysis with winning numbers, odd-even pattern, sum pattern, and data-based comparison.`
+  });
 }
 
-export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps) {
+export default async function DrawAnalysisPage({
+  params
+}: DrawAnalysisPageProps) {
   const round = Number.parseInt(params.round, 10);
 
   if (!Number.isInteger(round) || round < 1) {
@@ -53,6 +63,9 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
   const index = draws.findIndex((item) => item.round === draw.round);
   const newer = index > 0 ? draws[index - 1] : null;
   const older = index >= 0 && index < draws.length - 1 ? draws[index + 1] : null;
+  const relatedRounds = draws
+    .filter((item) => item.round !== draw.round)
+    .slice(0, 3);
   const siteUrl = getSiteUrl();
   const pageUrl = `${siteUrl}/draw-analysis/${draw.round}`;
 
@@ -110,27 +123,34 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
         <p className="eyebrow">Round Analysis</p>
         <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-semibold text-white">{draw.round} draw analysis</h1>
+            <h1 className="text-4xl font-semibold text-white">
+              {draw.round}회 로또 회차 분석
+            </h1>
             <p className="mt-3 max-w-3xl text-base leading-8 text-slate-300">
-              This analysis page summarizes the winning number combination for round {draw.round}, highlights the odd-even
-              split, reviews the sum pattern, and compares the set against overall historical trends.
+              이 페이지는 {draw.round}회 당첨번호 조합을 기준으로 홀짝 비율, 번호 합계,
+              저고 비율, 연속번호 여부, 자주 나온 번호와의 겹침 정도를 빠르게 읽을 수 있게
+              정리한 분석 페이지입니다.
             </p>
             <p className="mt-3 text-sm text-slate-400">{draw.drawDate}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href={`/draws/${draw.round}`} className="cta-button">
-              Open round detail
+              회차 상세 보기
             </Link>
             <Link
               href="/latest-lotto-results"
               className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
             >
-              Latest results
+              최신 결과 허브
             </Link>
           </div>
         </div>
         <div className="mt-6">
-          <NumberSet numbers={draw.numbers} bonus={draw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
+          <NumberSet
+            numbers={draw.numbers}
+            bonus={draw.bonus}
+            hrefBuilder={(value) => `/stats/numbers/${value}`}
+          />
         </div>
       </section>
 
@@ -154,8 +174,7 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
           <p className="eyebrow">Sum</p>
           <p className="mt-3 text-4xl font-semibold text-white">{analysis.sum}</p>
           <p className="mt-2 text-sm leading-7 text-slate-400">
-            The six main numbers add up to {analysis.sum}. This is useful for comparing the round with sum-pattern pages and
-            recent trend summaries.
+            번호 6개의 합계로, 합계 패턴 페이지와 비교할 때 가장 먼저 참고할 수 있는 값입니다.
           </p>
         </article>
         <article className="panel">
@@ -164,7 +183,7 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
             {analysis.oddCount}:{analysis.evenCount}
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-400">
-            The set contains {analysis.oddCount} odd numbers and {analysis.evenCount} even numbers.
+            홀수 {analysis.oddCount}개, 짝수 {analysis.evenCount}개 조합입니다.
           </p>
         </article>
         <article className="panel">
@@ -173,17 +192,18 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
             {analysis.lowCount}:{analysis.highCount}
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-400">
-            Numbers 1-22 are treated as low and 23-45 as high to show whether the combination leaned low or high.
+            1~22를 저구간, 23~45를 고구간으로 나눠 본 비율입니다.
           </p>
         </article>
         <article className="panel">
           <p className="eyebrow">Consecutive</p>
-          <p className="mt-3 text-4xl font-semibold text-white">{analysis.consecutivePairs.length}</p>
+          <p className="mt-3 text-4xl font-semibold text-white">
+            {analysis.consecutivePairs.length}
+          </p>
           <p className="mt-2 text-sm leading-7 text-slate-400">
-            Consecutive pairs in this round:{" "}
             {analysis.consecutivePairs.length > 0
-              ? analysis.consecutivePairs.map((pair) => pair.join("-")).join(", ")
-              : "none"}.
+              ? `연속번호: ${analysis.consecutivePairs.map((pair) => pair.join("-")).join(", ")}`
+              : "연속번호는 보이지 않는 회차입니다."}
           </p>
         </article>
       </section>
@@ -191,34 +211,54 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
       <section className="grid gap-6 lg:grid-cols-2">
         <article className="panel">
           <p className="eyebrow">Hot Matches</p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">Numbers that also belong to the current hot-number group</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-white">
+            자주 나온 번호와 겹친 숫자
+          </h2>
           <p className="mt-3 text-sm leading-7 text-slate-400">
-            Based on full-history frequency, this round includes{" "}
-            {analysis.hotMatches.length > 0 ? analysis.hotMatches.join(", ") : "no top-frequency numbers"}.
+            전체 회차 기준 상위 빈도 그룹과 비교했을 때{" "}
+            {analysis.hotMatches.length > 0
+              ? `${analysis.hotMatches.join(", ")}가 함께 포함되었습니다.`
+              : "겹치는 번호가 많지 않은 회차입니다."}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/hot-numbers" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-              View hot numbers
+            <Link
+              href="/hot-numbers"
+              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
+            >
+              자주 나온 번호 보기
             </Link>
-            <Link href="/lotto-statistics" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-              Open statistics hub
+            <Link
+              href="/stats"
+              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
+            >
+              통계 대시보드 보기
             </Link>
           </div>
         </article>
 
         <article className="panel">
           <p className="eyebrow">Cold Matches</p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">Numbers that were relatively quiet before this round</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-white">
+            적게 나온 번호와 겹친 숫자
+          </h2>
           <p className="mt-3 text-sm leading-7 text-slate-400">
-            Based on full-history frequency, this round includes{" "}
-            {analysis.coldMatches.length > 0 ? analysis.coldMatches.join(", ") : "no low-frequency numbers"}.
+            전체 회차 기준 하위 빈도 그룹과 비교했을 때{" "}
+            {analysis.coldMatches.length > 0
+              ? `${analysis.coldMatches.join(", ")}가 포함되었습니다.`
+              : "낮은 빈도 그룹과 겹치는 번호는 크지 않습니다."}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/cold-numbers" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-              View cold numbers
+            <Link
+              href="/cold-numbers"
+              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
+            >
+              적게 나온 번호 보기
             </Link>
-            <Link href="/recent-10-draw-analysis" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-              Recent 10 draw analysis
+            <Link
+              href="/recent-10-draw-analysis"
+              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
+            >
+              최근 10회 분석 보기
             </Link>
           </div>
         </article>
@@ -227,28 +267,65 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
       <section className="panel">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="eyebrow">Next Step</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">Continue exploring this round from multiple angles</h2>
+            <p className="eyebrow">Related Analysis</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              비슷한 흐름으로 이어서 보기 좋은 페이지
+            </h2>
           </div>
         </div>
+
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Link href={`/draws/${draw.round}`} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
-            <p className="text-lg font-semibold text-white">Round detail</p>
-            <p className="mt-2 text-sm leading-7 text-slate-400">Check prize, winner count, and the raw winning-number page.</p>
+          <Link
+            href={`/draws/${draw.round}`}
+            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
+          >
+            <p className="text-lg font-semibold text-white">회차 상세</p>
+            <p className="mt-2 text-sm leading-7 text-slate-400">
+              당첨금, 당첨자 수, 원시 회차 정보를 다시 확인합니다.
+            </p>
           </Link>
-          <Link href="/odd-even-pattern" className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
-            <p className="text-lg font-semibold text-white">Odd-even pattern</p>
-            <p className="mt-2 text-sm leading-7 text-slate-400">Compare this round with the most common odd-even splits.</p>
+          <Link
+            href="/odd-even-pattern"
+            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
+          >
+            <p className="text-lg font-semibold text-white">홀짝 패턴</p>
+            <p className="mt-2 text-sm leading-7 text-slate-400">
+              이번 회차의 홀짝 비율이 전체 흐름에서 어떤 위치인지 비교합니다.
+            </p>
           </Link>
-          <Link href="/sum-pattern" className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
-            <p className="text-lg font-semibold text-white">Sum pattern</p>
-            <p className="mt-2 text-sm leading-7 text-slate-400">See which sum ranges appear most often across all rounds.</p>
+          <Link
+            href="/sum-pattern"
+            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
+          >
+            <p className="text-lg font-semibold text-white">합계 패턴</p>
+            <p className="mt-2 text-sm leading-7 text-slate-400">
+              이번 회차의 합계가 자주 나오는 구간인지 비교합니다.
+            </p>
           </Link>
-          <Link href="/lotto-number-generator" className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
-            <p className="text-lg font-semibold text-white">Number generator</p>
-            <p className="mt-2 text-sm leading-7 text-slate-400">Generate a new set after reviewing the pattern of this round.</p>
+          <Link
+            href="/lotto-number-generator"
+            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
+          >
+            <p className="text-lg font-semibold text-white">추천기 랜딩</p>
+            <p className="mt-2 text-sm leading-7 text-slate-400">
+              회차를 본 뒤 바로 추천 전략을 다시 고를 수 있습니다.
+            </p>
           </Link>
         </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {relatedRounds.map((item) => (
+            <Link
+              key={item.round}
+              href={`/draw-analysis/${item.round}`}
+              className="rounded-3xl border border-white/10 bg-slate-900/60 p-5 transition hover:border-white/30"
+            >
+              <p className="text-lg font-semibold text-white">{item.round}회 분석</p>
+              <p className="mt-2 text-sm leading-7 text-slate-400">{item.drawDate}</p>
+            </Link>
+          ))}
+        </div>
+
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Link
             href={newer ? `/draw-analysis/${newer.round}` : "#"}
@@ -260,7 +337,7 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
                 : "cursor-not-allowed border-white/5 bg-slate-950/20 text-slate-600"
             ].join(" ")}
           >
-            {newer ? `Newer analysis: round ${newer.round}` : "No newer analysis"}
+            {newer ? `더 최신 분석: ${newer.round}회` : "더 최신 분석 없음"}
           </Link>
           <Link
             href={older ? `/draw-analysis/${older.round}` : "#"}
@@ -272,7 +349,7 @@ export default async function DrawAnalysisPage({ params }: DrawAnalysisPageProps
                 : "cursor-not-allowed border-white/5 bg-slate-950/20 text-slate-600"
             ].join(" ")}
           >
-            {older ? `Older analysis: round ${older.round}` : "No older analysis"}
+            {older ? `이전 분석: ${older.round}회` : "이전 분석 없음"}
           </Link>
         </div>
       </section>

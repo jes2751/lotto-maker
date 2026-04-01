@@ -34,3 +34,29 @@ test("frequency strategy includes a non-empty reason", async () => {
 
   assert.ok(set.reason.trim().length > 0);
 });
+
+test("filter strategy respects fixed and excluded numbers", async () => {
+  const service = new StaticGenerationService(seedDraws);
+  const [set] = await service.generate({
+    strategy: "filter",
+    count: 1,
+    includeBonus: false,
+    filters: {
+      fixedNumbers: [7, 21],
+      excludedNumbers: [1, 2, 45],
+      oddEven: "balanced",
+      allowConsecutive: false
+    }
+  });
+
+  assert.ok(set.numbers.includes(7));
+  assert.ok(set.numbers.includes(21));
+  assert.ok(!set.numbers.includes(1));
+  assert.ok(!set.numbers.includes(2));
+  assert.ok(!set.numbers.includes(45));
+  assert.equal(set.numbers.filter((value) => value % 2 === 1).length, 3);
+
+  for (let index = 1; index < set.numbers.length; index += 1) {
+    assert.notEqual(set.numbers[index] - set.numbers[index - 1], 1);
+  }
+});

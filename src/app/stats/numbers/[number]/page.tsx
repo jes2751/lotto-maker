@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { NumberBall } from "@/components/lotto/number-ball";
 import { NumberSet } from "@/components/lotto/number-set";
 import { drawRepository } from "@/lib/lotto";
 import { findDrawsContainingNumber, getNumberFrequency } from "@/lib/lotto/stats";
+import { createPageMetadata } from "@/lib/site";
 
 interface NumberDetailPageProps {
   params: {
@@ -17,16 +17,24 @@ export async function generateMetadata({ params }: NumberDetailPageProps): Promi
   const number = Number.parseInt(params.number, 10);
 
   if (!Number.isInteger(number) || number < 1 || number > 45) {
-    return {
-      title: "번호 상세 통계",
-      description: "특정 번호의 전체 회차 기준 등장 빈도와 최근 흐름을 확인하는 페이지입니다."
-    };
+    return createPageMetadata({
+      locale: "ko",
+      path: "/stats",
+      titleKo: "번호 상세",
+      titleEn: "Number Detail",
+      descriptionKo: "번호별 출현 통계와 최근 포함 회차를 확인할 수 있습니다.",
+      descriptionEn: "View number-level frequency stats and recent draws containing the selected number."
+    });
   }
 
-  return {
-    title: `${number}번 로또 통계`,
-    description: `${number}번 번호가 전체 회차와 최근 10회에서 얼마나 자주 등장했는지 확인할 수 있습니다.`
-  };
+  return createPageMetadata({
+    locale: "ko",
+    path: `/stats/numbers/${number}`,
+    titleKo: `${number}번 번호 상세`,
+    titleEn: `Number ${number} Detail`,
+    descriptionKo: `${number}번 번호의 전체 출현 횟수와 최근 포함 회차를 확인할 수 있습니다.`,
+    descriptionEn: `Check the overall frequency and recent draws that included number ${number}.`
+  });
 }
 
 export default async function NumberDetailPage({ params }: NumberDetailPageProps) {
@@ -46,87 +54,61 @@ export default async function NumberDetailPage({ params }: NumberDetailPageProps
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Number Detail</p>
-          <div className="mt-4 flex items-center gap-4">
-            <NumberBall value={number} />
-            <div>
-              <h1 className="text-4xl font-semibold text-white">{number}번 상세 통계</h1>
-              <p className="mt-2 text-slate-300">전체 회차와 최근 10회 기준에서 이 번호가 얼마나 자주 나왔는지 확인합니다.</p>
-            </div>
-          </div>
+          <h1 className="mt-4 text-4xl font-semibold text-white">{number}번 번호 상세 통계</h1>
+          <p className="mt-3 text-slate-300">전체 출현 빈도와 최근 포함 회차를 함께 보는 번호 상세 페이지입니다.</p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href={`/draws?number=${number}`} className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-            이 번호가 나온 회차 보기
-          </Link>
-          <Link href="/stats" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-            통계로 돌아가기
-          </Link>
-        </div>
+        <Link href="/stats" className="cta-button">
+          통계로 돌아가기
+        </Link>
       </div>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <div className="panel">
           <p className="eyebrow">Overall</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">전체 등장 횟수</p>
-              <p className="mt-2 text-3xl font-semibold text-white">{overall.frequency}회</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">회차 대비 비율</p>
-              <p className="mt-2 text-3xl font-semibold text-white">{overall.percentage}%</p>
-            </div>
-          </div>
+          <p className="mt-4 text-4xl font-semibold text-white">{overall.frequency}</p>
+          <p className="mt-2 text-sm text-slate-400">전체 회차 출현 횟수</p>
+        </div>
+        <div className="panel">
+          <p className="eyebrow">Overall Rate</p>
+          <p className="mt-4 text-4xl font-semibold text-white">{overall.percentage}%</p>
+          <p className="mt-2 text-sm text-slate-400">전체 회차 기준 출현 비율</p>
         </div>
         <div className="panel">
           <p className="eyebrow">Recent 10</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">최근 10회 등장</p>
-              <p className="mt-2 text-3xl font-semibold text-white">{recent.frequency}회</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">최근 비율</p>
-              <p className="mt-2 text-3xl font-semibold text-white">{recent.percentage}%</p>
-            </div>
-          </div>
+          <p className="mt-4 text-4xl font-semibold text-white">{recent.frequency}</p>
+          <p className="mt-2 text-sm text-slate-400">최근 10회 출현 횟수</p>
+        </div>
+        <div className="panel">
+          <p className="eyebrow">Recent Rate</p>
+          <p className="mt-4 text-4xl font-semibold text-white">{recent.percentage}%</p>
+          <p className="mt-2 text-sm text-slate-400">최근 10회 출현 비율</p>
         </div>
       </section>
 
       <section className="panel">
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex items-end justify-between gap-3">
           <div>
             <p className="eyebrow">Recent Draws</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">이 번호가 포함된 최근 회차</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-white">{number}번이 포함된 최근 회차</h2>
           </div>
-          <p className="text-sm text-slate-400">최대 8개 회차 표시</p>
         </div>
-        <div className="mt-6 grid gap-4">
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {recentDraws.map((draw) => (
-            <Link
-              key={draw.round}
-              href={`/draws/${draw.round}`}
-              className="rounded-3xl border border-white/10 bg-slate-900/60 p-5 transition hover:border-white/30"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-4">
+            <div key={draw.round} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+              <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-2xl font-semibold text-white">{draw.round}회</p>
-                  <p className="mt-1 text-sm text-slate-400">{draw.drawDate}</p>
+                  <p className="text-lg font-semibold text-white">{draw.round}회</p>
+                  <p className="text-sm text-slate-400">{draw.drawDate}</p>
                 </div>
-                <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
-                  회차 상세
-                </span>
+                <Link href={`/draws/${draw.round}`} className="text-sm text-teal transition hover:text-teal-200">
+                  Round detail
+                </Link>
               </div>
               <div className="mt-4">
                 <NumberSet numbers={draw.numbers} bonus={draw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
               </div>
-            </Link>
-          ))}
-          {recentDraws.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              이 번호가 포함된 회차를 찾지 못했습니다.
             </div>
-          ) : null}
+          ))}
         </div>
       </section>
     </div>

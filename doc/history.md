@@ -1,333 +1,78 @@
 # History
 
-## 2026-04-01 03:08 KST
-
-* 작업: Google Analytics 측정 ID를 교체했다.
-* 변경: `layout.tsx`와 `.env.example`의 기본/예시 GA4 measurement id를 `G-ZV2SQ4LW4X`로 변경했다.
-* 검증: 설정값 교체 작업이라 별도 테스트는 생략했다.
-* 다음: 배포 환경의 실제 Realtime 수집 여부를 확인한다.
+## 2026-04-01 20:00 KST
 
-## 2026-04-01 02:50 KST
+- 작업: 필터 추첨기 구현
+- 변경: `filter` 전략에 고정수, 제외수, 홀짝 조건, 합계 범위, 연속번호 허용 여부를 추가하고 UI와 API를 함께 연결함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: 종합 통계 대시보드 고도화
 
-* 작업: Google Analytics 태그를 앱 공통 layout에 추가했다.
-* 변경: `layout.tsx`에 GA4 `gtag.js`를 붙이고, `.env.example`에 `NEXT_PUBLIC_GA_MEASUREMENT_ID`를 추가했다. 같이 남아 있던 SEO 랜딩 테스트 문자열도 정리 중이다.
-* 검증: `npm test`, `npm run build`를 다시 실행할 예정이다.
-* 다음: 배포 환경에서 실시간 방문이 GA4 Realtime에 잡히는지 확인한다.
+## 2026-04-01 20:45 KST
 
-## 2026-04-01 02:05 KST
+- 작업: 홈 화면 정리
+- 변경: 홈을 히어로, 최신 회차, 빠른 이동, 핵심 요약 중심으로 단순화함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: 통계 화면 고도화
 
-* 작업: 검색 유입을 위한 분석형 페이지와 구조화 데이터를 추가했다.
-* 변경: `draw-analysis/[round]` 기사형 페이지를 만들고, `odd-even-pattern`, `sum-pattern` 랜딩 페이지와 `JsonLd`, `sitemap` 확장을 반영했다.
-* 검증: `npm test`, `npm run build`를 다시 실행했고 모두 통과했다.
-* 다음: Search Console 제출용 메타/색인 점검과 회차 분석 링크 확장을 이어간다.
+## 2026-04-01 21:10 KST
 
-## 2026-04-01 02:28 KST
+- 작업: 문서 구조 상향
+- 변경: `Product_Spec.md`, `Technical_Spec.md`, `WORKFLOW.md`, `check_list.md`를 실행 문서 수준으로 재정리함
+- 검증: 문서 기준과 실제 구현 방향 대조 완료
+- 다음: 브랜드/메타데이터 정리
 
-* 작업: Search Console 제출 준비와 회차 분석 링크 확장을 진행했다.
-* 변경: `GOOGLE_SITE_VERIFICATION` 환경변수와 layout verification 메타를 추가하고, `robots`/`sitemap` 테스트를 붙였다. 회차 분석 링크와 문구는 이어서 확장 중이다.
-* 검증: `npm test`, `npm run build`를 다시 실행할 예정이다.
-* 다음: 회차 상세, 최신 결과, 최근 10회 분석 페이지에 round analysis 연결을 더 촘촘히 넣는다.
-
-## 2026-04-01 01:27 KST
-
-* 작업: 공식 서비스 도메인을 `lotto-maker.cloud` 기준으로 반영
-* 변경: `src/lib/site.ts`와 `.env.example`의 기본 사이트 URL을 `https://lotto-maker.cloud`로 변경
-* 변경: 이후 sitemap, robots, canonical, 메타데이터 기본 URL은 새 도메인을 기준으로 생성되도록 정리
-* 검증: 코드상 기본 사이트 URL 기준만 바꾼 상태이며, 이어서 테스트와 빌드에서 검색 유입용 구조 전체를 확인할 예정
-* 다음: 현재 진행 중인 SEO 랜딩 페이지 추가 작업과 함께 테스트/빌드 검증
-
-## 2026-04-01 01:15 KST
-
-* 작업: 배포와 푸시를 분리하는 기준으로 `WORKFLOW.md` 운영 규칙 개편
-* 변경: `doc/WORKFLOW.md`를 `로컬 작업 -> 로컬 검증 -> 커밋 후보 -> 사용자 승인 후 main 푸시` 흐름으로 재정리
-* 변경: `커밋 != 즉시 푸시`, `main 푸시는 배포 가능 상태에서만`, `사용자 요청 시에만 origin/main 푸시` 기준을 문서에 명시
-* 검증: 문서 변경만 수행했고, 배포와 연결된 저장소 운영 규칙이 현재 배포 방식에 맞게 더 보수적으로 정리됨
-* 다음: 앞으로 중간 개발 상태는 로컬에서 먼저 누적하고, 배포 가능한 수준에서만 커밋/푸시 여부를 판단
-
-## 2026-04-01 01:15 KST
-
-* 작업: 배포와 푸시를 분리하는 기준으로 `WORKFLOW.md` 운영 규칙 개편
-* 변경: `doc/WORKFLOW.md`를 `로컬 작업 -> 로컬 검증 -> 커밋 후보 -> 사용자 승인 후 main 푸시` 흐름으로 재정리
-* 변경: `커밋 != 즉시 푸시`, `main 푸시는 배포 가능 상태에서만`, `사용자 요청 시에만 origin/main 푸시` 기준을 문서에 명시
-* 검증: 문서 변경만 수행했고, 배포와 연결된 저장소 운영 규칙이 현재 배포 방식에 맞게 더 보수적으로 정리됨
-* 다음: 앞으로 중간 개발 상태는 로컬에서 먼저 누적하고, 배포 가능한 수준에서만 커밋/푸시 여부를 판단
-
-## 2026-04-01 01:02 KST
-
-* 작업: 검색 유입과 재방문 중심의 성장 전략을 `plan.md`에 반영
-* 변경: `doc/plan.md`를 최신 기준으로 재정리하고 기술 SEO, 랜딩 페이지 후보, 메타데이터 방향, 콘텐츠 주제, 주간 운영 루틴, 성장 우선순위를 추가
-* 변경: 광고 수익화보다 검색 유입과 재방문 이유 만들기를 먼저 두는 기준을 문서에 명시
-* 검증: 기능 로드맵과 별도로 성장 로드맵이 분리되어 출시 전 개발과 출시 후 운영 우선순위를 함께 볼 수 있게 정리
-* 다음: `Product_Spec.md`와 실제 라우트/메타데이터 구현을 이 성장 로드맵 기준으로 순차 반영
-
-## 2026-04-01 00:46 KST
-
-* 작업: Google AdSense 정책 기준으로 광고 표시 방식과 안내 구조를 보수적으로 정리
-* 변경: `src/components/ads/ad-slot.tsx`를 수정해 광고 라벨을 `광고`로 고정하고 콘텐츠와 분리된 광고 영역이라는 안내를 추가
-* 변경: `src/app/generate/page.tsx`에서 생성기 본문 앞 광고를 제거해 핵심 상호작용과 광고가 섞이지 않도록 조정
-* 변경: `src/app/policies/ads/page.tsx`를 추가하고 `src/components/layout/site-footer.tsx`에 광고 안내 링크를 연결
-* 변경: `src/app/layout.tsx`, `src/components/layout/site-header.tsx` 문구를 정리해 서비스 설명과 광고 운영 원칙을 더 명확하게 반영
-* 검증: 다음 단계에서 `npm test`, `npm run build`로 페이지/라우트 추가와 레이아웃 변경을 확인
-* 다음: 테스트와 빌드가 통과하면 커밋 후 원격에 푸시
-
-## 2026-04-01 00:27 KST
-
-* 작업: Cloudflare Workers 배포 실패 원인인 미래 `compatibility_date` 수정
-* 변경: `wrangler.jsonc`의 `compatibility_date`를 `2026-04-01`에서 `2025-12-01`로 낮춰 Cloudflare API가 허용하는 유효 날짜로 조정
-* 검증: 배포 로그 기준으로 OpenNext 빌드와 asset 업로드는 정상 완료됐고, 실패 원인은 미래 날짜 검증 오류 하나였다.
-* 다음: 같은 설정으로 Cloudflare Workers 배포를 다시 실행하면 된다.
-
-## 2026-04-01 00:20 KST
-
-* 작업: Cloudflare Workers/OpenNext 배포용 설정 파일과 스크립트 정리
-* 변경: `package.json`에 `preview`, `deploy`, `cf-typegen` 스크립트와 `@opennextjs/cloudflare`, `wrangler` 의존성을 추가
-* 변경: `.gitignore`에 `.open-next`, `.wrangler`, `cloudflare-env.d.ts`를 추가
-* 변경: `wrangler.jsonc`, `open-next.config.ts`를 새로 추가해 Cloudflare Workers 배포 기준을 반영
-* 검증: `npm install`로 `package-lock.json`까지 갱신했고, `npm test`, `npm run build`는 통과했다.
-* 검증: `npx opennextjs-cloudflare build`는 Windows 환경에서 `spawn EPERM`으로 실패했다. OpenNext도 Windows보다 WSL 사용을 권장했다.
-* 다음: 실제 Cloudflare Workers 배포 검증은 WSL 또는 CI 환경에서 `npm run preview` 또는 `npm run deploy`로 이어간다.
-
-## 2026-04-01 00:16 KST
-
-* 작업: `plan.md` 기준에 맞춰 하위 문서의 범위와 우선순위를 정렬
-* 변경: `doc/Product_Spec.md`에 퍼블리시 전 확장 요구사항과 퍼블리시 구현 기준을 추가하고, 후속 백로그를 그룹 추첨기/고급 통계 중심으로 재정리
-* 변경: `doc/Design_Guide.md`에 퍼블리시 전 디자인 우선순위를 추가하고 섹션 번호를 정리
-* 변경: `doc/Technical_Spec.md`에 퍼블리시 전 기술 우선순위를 추가하고 후속 기술 확장을 `plan.md` 기준으로 맞춤
-* 검증: 문서 변경만 수행했고 실행 테스트는 필요하지 않았다.
-* 다음: 실제 개발 작업은 문서 기준대로 `필터 추첨기` 구현부터 시작하면 된다.
-
-## 2026-04-01 00:11 KST
-
-* 작업: `plan.md` 확장 로드맵에서 가상 체험 기능 섹션 제거
-* 변경: `doc/plan.md`의 `6-3. 가상 체험 기능` 항목을 삭제하고 확장 원칙 섹션 번호를 정리
-* 검증: 문서 변경만 수행했고 실행 테스트는 필요하지 않았다.
-* 다음: 확장 로드맵은 추천기와 통계 중심 범위로 유지한다.
-
-## 2026-04-01 00:07 KST
-
-* 작업: 퍼블리시 전까지 구현할 확장 범위를 1차/2차 우선순위 기준으로 `plan.md`에 재정리
-* 변경: `doc/plan.md`의 확장 로드맵 상단에 `퍼블리시 전 구현 우선순위` 섹션을 추가해 1차 우선순위, 2차 우선순위, 퍼블리시 기준선, 실행 순서를 명시
-* 변경: 기존 `우선순위` 섹션도 퍼블리시 1차 구현, 퍼블리시 QA, 2차 확장 기준으로 다시 정렬
-* 검증: 문서 변경만 수행했고 실행 테스트는 필요하지 않았다.
-* 다음: 이 기준으로 다음 실제 개발 작업은 `필터 추첨기`부터 시작하면 된다.
-
-## 2026-04-01 00:02 KST
-
-* 작업: AdSense가 연결되기 전까지 광고 영역을 페이지에서 숨기도록 기준 변경
-* 변경: `src/components/ads/ad-slot.tsx`를 수정해 AdSense 환경변수가 없으면 광고 슬롯 컴포넌트가 아무것도 렌더링하지 않도록 처리
-* 변경: `doc/Technical_Spec.md`, `doc/note.md`에 광고 미설정 시 광고가 노출되지 않는 기준으로 문구를 정리
-* 검증: 컴포넌트 분기만 변경했고, 기존 광고 미설정 환경에서는 레이아웃만 더 단순해진다.
-* 다음: 실제 AdSense 값을 넣을 시점에만 광고 슬롯 노출과 배치 밀도를 다시 점검하면 된다.
-
-## 2026-03-31 23:56 KST
-
-* 작업: v1 마감 단계에서 추천기와 상세 화면의 잔여 카피를 정리하고 AdSense 배포 준비 파일을 추가
-* 변경: `src/components/lotto/generator-panel.tsx`를 다시 정리해 깨진 한글 문구를 모두 교체하고 추천 결과/저장 조합 UX를 읽기 쉬운 한국어 기준으로 맞춤
-* 변경: `src/app/draws/[round]/page.tsx`, `src/app/stats/numbers/[number]/page.tsx`를 보강해 번호 상세 통계 이동 흐름과 상세 화면 설명 문구를 정리
-* 변경: `public/ads.txt` 플레이스홀더를 추가해 AdSense 실운영 전 교체 지점을 명확히 함
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 실제 배포 URL에서 모바일 기준 광고 밀도와 CTA 우선순위를 마지막으로 확인하면 v1 공개 마감에 더 가까워짐
-
-## 2026-03-31 23:47 KST
-
-* 작업: v1 마감 품질을 높이기 위해 광고 준비 구조와 핵심 화면 문구를 정리
-* 변경: `src/components/ads/adsense-script.tsx`, `src/components/ads/ad-slot.tsx`, `.env.example`를 추가/갱신해 AdSense 환경변수 기반 스크립트 로딩과 광고 슬롯 플레이스홀더 구조를 마련
-* 변경: `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/generate/page.tsx`, `src/app/draws/page.tsx`, `src/app/stats/page.tsx`, `src/components/layout/site-header.tsx`, `src/components/layout/site-footer.tsx`, `src/components/lotto/frequency-chart.tsx`를 정리해 깨진 문구와 메타데이터를 수정하고 홈/생성기/통계에 광고 슬롯 위치를 반영
-* 변경: `doc/Product_Spec.md`, `doc/Design_Guide.md`, `doc/Technical_Spec.md`, `doc/note.md`를 보강해 광고 운영 원칙, 배치 규칙, 환경변수, 배포 준비 기준을 문서화
-* 변경: `tests/pages.test.ts`를 갱신해 주요 화면 렌더링 문구를 최신 상태에 맞춰 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 남은 상세 화면의 한글 카피와 광고 배치 밀도를 실제 브라우저 기준으로 한 번 더 점검하면 v1 마감도는 더 올라감
-
-## 2026-03-31 23:27 KST
-
-* 작업: 서비스 운영 방향에서 유료/회원 전용 요소를 제거
-* 변경: `doc/plan.md`의 확장 로드맵에서 `회원/유료화 후보` 섹션을 삭제하고, 확장 원칙을 `무료 서비스`, `로그인 없이 핵심 기능 사용` 기준으로 수정
-* 검증: 문서 변경만 수행했고 실행 테스트는 필요하지 않았다.
-* 다음: 필요하면 `Product_Spec.md`와 `Design_Guide.md`도 같은 무료 서비스 원칙 기준으로 표현을 더 정리할 수 있음
-
-## 2026-03-31 23:24 KST
-
-* 작업: 참고 이미지 기반 기능 아이디어를 `plan.md` 확장 로드맵에 반영
-* 변경: `doc/plan.md`에 `v1 이후 확장 로드맵` 섹션을 추가해 추첨기 확장, 통계 확장, 가상 체험, 회원/유료화 후보 기능을 구조화
-* 변경: 참고 서비스의 기능을 그대로 복제하지 않고, 우리 서비스 방향에 맞게 `데이터 기반 추천 중심` 확장 원칙을 함께 명시
-* 검증: 문서 변경만 수행했고 실행 테스트는 필요하지 않았다.
-* 다음: 필요하면 이 확장 로드맵을 기준으로 `Product_Spec.md`와 `Design_Guide.md`의 후속 백로그도 같은 분류로 맞출 수 있음
-
-## 2026-03-31 23:18 KST
-
-* 작업: 추천기 화면 문구를 정상화하고 추천 결과에서 통계로 바로 이동하는 흐름을 추가
-* 변경: `src/app/generate/page.tsx`, `src/components/lotto/generator-panel.tsx`를 정리해 깨진 문구를 모두 교체하고, 추천 전략 설명과 결과/저장 조합 UX를 한국어 기준으로 다시 맞춤
-* 변경: `src/components/lotto/number-set.tsx`에 선택적 링크 기능을 추가해 추천 결과 번호와 저장된 번호를 클릭하면 번호 상세 통계로 바로 이동할 수 있게 구성
-* 변경: `tests/pages.test.ts`를 갱신해 추천기 페이지 렌더링과 주요 문구가 정상 노출되는지 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 추천 결과 카드에 번호 조합 패턴 요약이나 여러 번호 동시 비교 진입점을 추가하면 분석 흐름이 더 좋아짐
-
-## 2026-03-31 23:08 KST
-
-* 작업: 통계 번호 드릴다운과 회차 숫자 필터를 연결해 탐색 흐름을 확장
-* 변경: `src/app/stats/numbers/[number]/page.tsx`, `src/lib/lotto/stats.ts`를 추가/확장해 번호별 상세 통계와 해당 번호가 포함된 최근 회차 목록을 제공하고, 통계 카드에서 번호 상세 페이지로 이동할 수 있게 구성
-* 변경: `src/app/draws/page.tsx`에 번호 포함 회차 검색 필터를 추가해 전체 회차 중 특정 번호가 나온 회차만 페이지 단위로 탐색할 수 있게 수정
-* 변경: `src/app/stats/page.tsx`, `src/components/lotto/frequency-chart.tsx`의 깨진 문구를 정리하고, `tests/pages.test.ts`를 보강해 번호 필터와 번호 상세 화면 렌더링을 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 검증: OneDrive 환경에서 `.next` 캐시 readlink 오류가 발생해 임시 빌드 폴더를 정리한 뒤 빌드를 다시 확인
-* 다음: 번호 상세 통계에서 더 긴 회차 히스토리나 번호 조합 패턴 분석으로 확장할 수 있음
-
-## 2026-03-31 22:50 KST
-
-* 작업: 통계 화면에 기간 선택과 상위 표시 개수 조절 기능을 추가
-* 변경: `src/app/stats/page.tsx`를 갱신해 `전체 회차/최근 10회` 전환과 `상위 5/10/15개` 선택 UI를 붙이고, 선택 기준에 따라 차트와 카드 목록이 함께 바뀌도록 구성
-* 변경: `src/app/api/v1/stats/frequency/route.ts`에 `limit` 파라미터를 추가해 API도 같은 기준으로 상위 개수 제한을 지원
-* 변경: `tests/api.test.ts`, `tests/pages.test.ts`를 보강해 통계 API limit 동작과 통계 화면 필터 UI 렌더링을 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 통계 화면에 번호 상세 드릴다운이나 추천기로 이어지는 연결 액션을 추가하면 사용 흐름이 더 좋아짐
-
-## 2026-03-31 22:44 KST
-
-* 작업: 전체 회차 탐색 UX를 위해 회차 목록 페이지에 페이지네이션을 추가
-* 변경: `src/app/draws/page.tsx`에 `offset`, `limit` 기반 페이지 이동과 페이지 정보 표시를 넣어 최신 12개 고정 목록에서 벗어나 전체 회차를 순차 탐색할 수 있게 구성
-* 변경: 회차 찾기 검색은 유지하면서 페이지 이동 시 검색 파라미터도 함께 유지되도록 링크 구성을 정리
-* 변경: `tests/pages.test.ts`를 갱신해 회차 목록 화면에 페이지 이동 UI가 렌더링되는지 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 브라우저 기준으로 페이지 이동 UX와 저장된 추천 조합 섹션의 사용성을 점검하고, 필요하면 필터를 더 보강할 것
-
-## 2026-03-31 22:38 KST
-
-* 작업: 전체 회차 검색과 전체 회차 기준 통계를 반영하도록 데이터 저장소 계층을 확장
-* 변경: `src/lib/data/remote-draws.ts`를 추가해 전체 회차 JSON 데이터셋을 읽고 로컬 시드와 병합하는 로직을 구현
-* 변경: `src/lib/lotto/repository.ts`를 정적 시드 전용 구조에서 전체 회차 원격 데이터 + 시드 fallback 구조로 전환해 회차 검색과 통계가 전체 회차를 반영하도록 수정
-* 변경: `tests/all.test.ts`에 테스트 환경용 원격 데이터 비활성화 설정을 추가해 기존 테스트 안정성을 유지
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 브라우저에서 초기 로딩 속도와 전체 회차 검색 UX를 실제로 확인하고, 필요하면 캐싱 전략을 더 다듬을 것
-
-## 2026-03-31 22:31 KST
-
-* 작업: 회차 조회 사용성과 화면 문구를 추가 정리
-* 변경: `src/app/draws/page.tsx`에 `회차 찾기` 검색 폼과 검색 결과 섹션을 추가해 원하는 회차를 바로 찾을 수 있게 구성
-* 변경: `src/components/lotto/generator-panel.tsx`, `src/app/stats/page.tsx`의 사용자 노출 문구를 다시 정리하고 추천 결과 복사 버튼 문구를 한국어 기준으로 보정
-* 변경: `tests/pages.test.ts`를 갱신해 회차 검색 UI가 렌더링되는지 함께 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 브라우저에서 모바일 레이아웃과 입력 UX를 실제로 확인하고 필요하면 검색/필터를 더 정교하게 다듬을 것
-
-## 2026-03-31 22:25 KST
-
-* 작업: 실행 방법 노트 추가와 함께 회차 상세 탐색성, 추천기 상호작용을 보강
-* 변경: `doc/note.md`를 생성해 로컬 실행, 주요 경로, 테스트/빌드, 자주 막히는 경우를 한 번에 볼 수 있게 정리
-* 변경: `src/app/draws/[round]/page.tsx`에 이전/다음 회차 이동과 추천기 이동 CTA를 추가하고, `src/components/lotto/generator-panel.tsx`에 추천 결과 복사 기능과 문구 정리를 반영
-* 변경: `tests/pages.test.ts`를 보강해 회차 상세 화면의 CTA 노출까지 검증
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 추천기 결과 저장 또는 통계/회차 필터 같은 v1.1 성격 기능을 붙일 수 있음
-
-## 2026-03-31 22:22 KST
-
-* 작업: 실행 방법 안내 문서를 추가해 로컬 실행과 기본 검증 절차를 정리
-* 변경: `doc/note.md`를 생성해 `npm install`, `npm run dev`, 주요 페이지 주소, 테스트/빌드 확인, 자주 막히는 경우, 배포 초입 절차를 기록
-* 검증: 문서 기준 실행 절차가 현재 프로젝트 스크립트와 라우트 구조와 일치하는지 확인
-* 다음: 필요하면 `README`와 문서 인덱스에도 `note.md` 링크를 추가할 것
-
-## 2026-03-31 22:18 KST
-
-* 작업: 회차 상세 페이지와 통계 시각화 추가로 v1 탐색 경험 보강
-* 변경: `src/app/draws/[round]/page.tsx`를 추가해 회차별 상세 화면을 만들고, `src/app/draws/page.tsx`, `src/app/page.tsx`에서 상세 페이지로 이동할 수 있게 링크 흐름을 정리
-* 변경: `src/components/lotto/frequency-chart.tsx`, `src/app/stats/page.tsx`를 추가/수정해 전체 기준과 최근 10회 기준의 빈도 차트를 붙이고 통계 화면을 시각화
-* 변경: `tests/api.test.ts`, `tests/pages.test.ts`를 보강해 회차 상세 API 성공 케이스와 회차 상세 페이지 렌더링을 검증
-* 검증: `npm test` 통과, `npm run build` 통과, 빌드 전 `.next` 생성 캐시를 정리해 Windows/OneDrive 환경의 캐시 오류를 해소
-* 다음: 모바일에서 카드 높이와 차트 가독성을 점검하고, 필요하면 회차 상세와 통계에 필터/보조 설명을 더할 것
-
-## 2026-03-31 22:11 KST
-
-* 작업: v1 UI 2차 정리로 홈, 추천기, 회차 조회, 통계 화면의 정보 밀도와 사용자 노출 문구를 개선
-* 변경: `src/app/page.tsx`, `src/app/generate/page.tsx`, `src/app/draws/page.tsx`, `src/app/stats/page.tsx`를 재작성해 요약 카드, 보조 설명, 회차/통계 하이라이트를 추가
-* 변경: `src/components/layout/site-header.tsx`, `src/components/layout/site-footer.tsx`, `src/components/lotto/generator-panel.tsx`, `src/lib/lotto/generation.ts`를 정리해 깨진 텍스트를 정상화하고 추천 이유 문구를 읽기 쉽게 수정
-* 검증: `npm test` 통과, `npm run build` 통과
-* 다음: 실제 브라우저 기준으로 여백, 카드 밀도, 모바일 배치감을 확인하면서 시각 완성도를 더 높일 것
-
-## 2026-03-31 22:03 KST
-
-* 작업: v1 개발 시작 기준으로 앱 빌드 안정화, 테스트 경로 정리, 주간 당첨번호 동기화 초안 추가
-* 변경: `package.json` 테스트/동기화 스크립트 정리, `tsconfig.test.json` 추가, 홈/생성기 카피를 데이터 기반 추천 방향으로 조정, `src/lib/data/draw-sync.ts`와 `scripts/sync-draws.ts`로 일요일 주간 반영 로직 초안 구현
-* 변경: `tests/pages.test.ts`, `tests/generation.test.ts`, `tests/draw-sync.test.ts`, `tests/all.test.ts`를 정리해 페이지 렌더링과 동기화 예외 케이스까지 검증하도록 보강
-* 검증: `npm test` 통과, `npm run build` 통과, `npm run sync:draws:check` 실행 결과 현재 기준 신규 회차 없음 확인
-* 다음: 실제 v1 화면 구현을 이어가면서 홈, 생성기, 회차 조회, 통계 화면의 UI 완성도와 API 연결 품질을 높일 것
-
-## 2026-03-31 19:55 KST
-
-* 작업: 개발 전 마지막 기획 체크 항목을 문서에 고정
-* 변경: `plan.md`, `Product_Spec.md`, `Design_Guide.md`, `Technical_Spec.md`에 주간 데이터 반영 규칙, 홈 화면 배치, 기본 추천 전략, 테스트 완료 기준, 실패 문구를 추가했다.
-* 변경: 최신 당첨 데이터는 매주 일요일 `Asia/Seoul` 기준으로 반영하고, 홈 첫 화면에는 지난 회차 당첨번호 카드를 CTA 바로 아래에 두는 기준을 문서화했다.
-* 검증: 제품, 디자인, 기술 문서가 같은 방향으로 정렬되도록 문구를 맞췄다.
-* 검증: 앱 실행 검증은 이번 문서 변경 범위에서 수행하지 않았다.
-* 다음: 구현 전 공식 당첨 데이터 응답 경로를 최종 확정하고, 필요하면 홈 화면 와이어 수준 문서를 별도 추가
-
-## 2026-03-31 19:35 KST
-
-* 작업: 디자인 가이드에 홈의 지난 회차 당첨번호 표시 기준 추가
-* 변경: `Design_Guide.md`에 홈 화면 구성 규칙 섹션을 추가하고, 지난 회차 당첨번호 카드의 필수 표시 정보와 배치 기준을 명시했다.
-* 검증: 홈 화면에서 지난 회차 당첨번호를 반드시 노출해야 한다는 디자인 기준이 문서에 반영되었다.
-* 검증: 앱 실행 검증은 이번 문서 변경 범위에서 수행하지 않았다.
-* 다음: 원하면 홈 화면 UI 자체도 이 기준에 맞게 문구와 배치를 조정
-
-## 2026-03-31 19:25 KST
-
-* 작업: 제품 방향을 `기존 당첨 데이터 기반 추천` 중심으로 강화
-* 변경: `plan.md`, `Product_Spec.md`, `Technical_Spec.md`에서 추천의 기본 기준이 과거 당첨 데이터임을 명확히 했다.
-* 변경: `frequency`, `mixed`는 데이터 기반 추천 전략으로, `random`은 비교용 옵션으로 위치를 낮췄다.
-* 검증: 문서상 제품 방향과 기술 방향이 `기존 당첨 데이터 기반 추천`으로 일관되게 맞춰졌다.
-* 검증: 앱 실행 검증은 이번 문서 변경 범위에서 수행하지 않았다.
-* 다음: 원하면 이 기준에 맞춰 홈/생성기 문구와 UI 표현도 데이터 기반 추천 중심으로 조정
-
-## 2026-03-31 19:05 KST
-
-* 작업: 문서 체계를 5개 핵심 문서 기준으로 재편
-* 변경: `plan.md`, `Product_Spec.md`, `Design_Guide.md`, `Technical_Spec.md`, `WORKFLOW.md`, `history.md` 중심 구조로 정리했다.
-* 변경: 기존 상세 문서는 `doc/archive`로 이동해 보관하고, 현재 문서는 기획/디자인/기술/운영 기준서 역할에 맞게 축소 또는 통합했다.
-* 검증: 새 문서 구조와 `archive` 폴더가 생성되었고, `README.md`에 현재 문서 체계를 반영했다.
-* 검증: 앱 실행 검증은 이번 문서 변경 범위에서 수행하지 않았다.
-* 다음: archive 문서와 현행 문서 간 중복을 더 줄일지, 디자인 가이드를 실제 UI 규칙 수준으로 더 세분화할지 결정
-
-## 2026-03-31 18:45 KST
-
-* 작업: `WORKFLOW.md` 역할 구조에 웹디자이너 추가
-* 변경: 개발 흐름을 `기획자 -> 웹디자이너 -> 개발자 -> 테스터 -> 커밋/푸시` 순서로 재정리했다.
-* 변경: 웹디자이너의 책임, 산출물, 필수 게이트를 추가하고, 개발자/테스터 단계에서 디자인 기준을 검증하도록 문구를 보강했다.
-* 검증: 역할명은 `웹디자이너`로 추가했고, `history.md` 작성 규칙에도 디자인 변경이 드러나도록 기준을 반영했다.
-* 검증: 앱 실행 검증은 이번 문서 변경 범위에서 수행하지 않았다.
-* 다음: 역할 구조 기준으로 필요한 디자인 문서와 실제 UI 구현 규칙을 더 구체화할지 결정
-
-## 2026-03-31 18:30 KST
-
-* 작업: `WORKFLOW.md`에 역할 기반 개발 규칙 추가
-* 변경: 개발 흐름을 `기획자 -> 개발자 -> 테스터 -> 커밋/푸시` 순서로 재정리하고, 역할 정의, 산출물, 필수 게이트를 문서에 추가했다.
-* 변경: `history.md` 기록 규칙도 역할 기준으로 보강해 기획 변경, 구현 변경, 검증 결과가 드러나도록 기준을 명시했다.
-* 검증: 역할명은 `기획자`, `개발자`, `테스터`로 통일했고, 테스트베드 개념은 테스터 설명 안에 포함시켰다.
-* 검증: 앱 실행 검증은 이번 문서 변경 범위에서 수행하지 않았다.
-* 다음: 문서 보강 패키지의 나머지 변경까지 함께 정리해 커밋 후 원격에 푸시
-## 2026-03-31 18:05 KST
-
-* 작업: 문서 보강 패키지 v1 반영
-* 변경: 생성 로직, API 상세 계약, 데이터 수집 및 검증, 화면 상태, 배포 및 운영 체크리스트 문서를 새로 추가했다.
-* 변경: 기존 `plan.md`, `Requirements.md`, `API_Spec.md`, `IA_and_Screens.md`, `DB_Schema.md`, `WORKFLOW.md`를 인덱스 역할에 맞게 링크 중심으로 정리했다.
-* 검증: 새 문서 5개가 기존 문서에서 참조되도록 연결했고, 코드 타입과 주요 필드명(`drawDate`, `include_bonus`, `meta_json`) 기준을 문서에 반영했다.
-* 검증: 앱 실행 검증은 이번 작업 범위에서 수행하지 않았다.
-* 다음: 필요 시 이 문서 기준으로 코드 구현 범위를 다시 쪼개고, 실행 검증 결과를 별도 기록
-## 2026-03-31 17:35 KST
-
-* 작업: GitHub 원격 저장소 연결과 첫 푸시 준비
-* 변경: 사용자 제공 URL `https://github.com/jes2751/lotto-maker.git`을 `origin`으로 연결하는 작업을 진행한다.
-* 검증: 현재 로컬 브랜치는 `main`이고 워크트리는 깨끗하다. 원격 저장소는 아직 연결되지 않은 상태였다.
-* 다음: `origin` 연결 후 이 기록을 커밋하고 `main` 브랜치를 원격에 푸시
-## 2026-03-31 17:20 KST
-
-* 작업: 루트 Markdown 문서를 `doc` 폴더로 이동
-* 변경: `README.md`, `WORKFLOW.md`, `history.md`를 모두 `doc` 아래로 정리했다.
-* 변경: 이동 후 문서 내부 참조를 새 상대 경로 기준으로 수정했다.
-* 검증: 루트 Markdown 파일 3개가 `doc`로 이동하도록 반영했다.
-* 다음: 원격 저장소 URL이 주어지면 `origin` 연결 후 다음 작업부터 새 문서 경로 기준으로 기록 유지
-
-## 2026-03-31 17:00 KST
-
-* 작업: 저장소 운영 규칙과 작업 기록 체계 추가
-* 변경: `WORKFLOW.md`를 추가해 커밋/푸시 규칙, `history.md` 작성 형식, 검증 기준, `.env.example` 규칙을 정리했다.
-* 변경: `README.md`에 운영 규칙과 기록 흐름을 연결했다.
-* 검증: 로컬 Git 저장소를 초기화했고 기본 브랜치를 `main`으로 맞췄다. 현재 원격 `origin`은 아직 연결되지 않았다.
-* 검증: 의존성 설치 검증은 완료하지 못했다. 이 환경에서는 `npm install`이 장시간 대기 후 타임아웃되어 실행 확인이 남아 있다.
-* 다음: 현재 변경을 로컬 커밋으로 남기고, GitHub URL 제공 시 `origin` 연결 후 첫 푸시 수행
+## 2026-04-01 21:35 KST
+
+- 작업: 브랜드 통일
+- 변경: 서비스명을 `Lotto Maker Lab` 기준으로 맞추고 메타데이터와 주요 표기를 통일함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: 깨진 문서와 카피 복구
+
+## 2026-04-01 22:25 KST
+
+- 작업: 핵심 문서 UTF-8 복구
+- 변경: `plan.md`, `Product_Spec.md`, `Technical_Spec.md`, `WORKFLOW.md`, `history.md`, `check_list.md`를 정상 한글로 재작성함
+- 검증: IDE 기준 한글 표시 확인
+- 다음: 종합 통계 대시보드 구현
+
+## 2026-04-01 23:10 KST
+
+- 작업: 종합 통계 대시보드 구현
+- 변경: `/stats`를 요약 카드, 패턴 비교, 최근 반복 번호, 차트와 상위 번호 목록 중심으로 재구성함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: 정책/신뢰 페이지 구현
+
+## 2026-04-01 23:40 KST
+
+- 작업: 정책/신뢰 페이지 추가
+- 변경: `privacy`, `terms`, `faq`, `contact`, `policies/ads` 페이지와 푸터 링크를 정리함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: 홈 하단 설명 섹션 추가
+
+## 2026-04-01 23:55 KST
+
+- 작업: 홈 하단 설명 섹션 구현
+- 변경: 서비스 소개, 이용 방법, FAQ 요약, 확률 안내 섹션과 신뢰 링크를 홈에 추가함
+- 검증: `.next` 캐시 정리 후 `npm test`, `npm run build` 통과
+- 다음: Search Console 제출 준비 마감
+
+## 2026-04-02 00:10 KST
+
+- 작업: Search Console 제출 준비
+- 변경: `note.md`에 제출 절차를 정리하고 sitemap/robots/검증 환경변수 기준을 문서화함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: 회차 분석 페이지 확장
+
+## 2026-04-02 00:35 KST
+
+- 작업: 회차 분석 허브와 주요 랜딩 정리
+- 변경: `/draw-analysis` 허브를 추가하고 홈, 최신 결과, 회차 상세를 정상 한글 카피와 분석 링크 중심으로 재작성함
+- 검증: `npm test`, `npm run build` 통과
+- 다음: Search Console 실제 제출과 색인 확인
+
+## 2026-04-02 00:45 KST
+
+- 작업: Google Analytics 측정 ID 변경
+- 변경: 기본 GA 측정 ID와 `.env.example` 값을 `G-H6Z8MLCSYK`로 교체함
+- 검증: 설정 변경만 반영
+- 다음: 필요 시 배포 후 GA Realtime 확인

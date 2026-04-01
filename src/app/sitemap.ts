@@ -8,6 +8,7 @@ const staticRoutes = [
   "/generate",
   "/draws",
   "/stats",
+  "/draw-analysis",
   "/latest-lotto-results",
   "/lotto-number-generator",
   "/lotto-statistics",
@@ -16,7 +17,15 @@ const staticRoutes = [
   "/odd-even-pattern",
   "/sum-pattern",
   "/recent-10-draw-analysis",
-  "/policies/ads"
+  "/guides",
+  "/guides/lotto-number-generator-vs-random",
+  "/guides/recent-20-hot-numbers",
+  "/guides/odd-even-pattern-guide",
+  "/policies/ads",
+  "/privacy",
+  "/terms",
+  "/faq",
+  "/contact"
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

@@ -14,6 +14,6 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-export function isValidStrategy(value: string): value is "random" | "frequency" | "mixed" {
-  return value === "random" || value === "frequency" || value === "mixed";
+export function isValidStrategy(value: string): value is "random" | "frequency" | "mixed" | "filter" {
+  return value === "random" || value === "frequency" || value === "mixed" || value === "filter";
 }

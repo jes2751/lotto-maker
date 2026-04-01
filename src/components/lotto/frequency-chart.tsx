@@ -30,7 +30,7 @@ export function FrequencyChart({ title, stats, color }: FrequencyChartProps) {
             labels: stats.map((item) => `${item.number}`),
             datasets: [
               {
-                label: "등장 횟수",
+                label: "출현 횟수",
                 data: stats.map((item) => item.frequency),
                 backgroundColor: color,
                 borderRadius: 10,
@@ -47,7 +47,7 @@ export function FrequencyChart({ title, stats, color }: FrequencyChartProps) {
               },
               tooltip: {
                 callbacks: {
-                  label: (context) => `등장 ${context.parsed.y}회`
+                  label: (context) => `출현 ${context.parsed.y}회`
                 }
               }
             },
