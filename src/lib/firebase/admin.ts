@@ -57,8 +57,31 @@ export interface DailyVisitMetric {
 
 let tokenCache: GoogleAccessTokenCache | null = null;
 
-function getEnv(name: string): string {
+function normalizeEnvValue(value: string) {
+  const trimmed = value.trim();
+
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1);
+  }
+
+  return trimmed;
+}
+
+function getOptionalEnv(name: string) {
   const value = process.env[name];
+
+  if (!value || value.trim() === "") {
+    return undefined;
+  }
+
+  return normalizeEnvValue(value);
+}
+
+function getEnv(name: string): string {
+  const value = getOptionalEnv(name);
 
   if (!value) {
     throw new Error(`${name} is required for Firestore admin access.`);
@@ -69,19 +92,22 @@ function getEnv(name: string): string {
 
 export function hasFirestoreAdminEnv() {
   return Boolean(
-    process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL &&
-      process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY &&
-      (process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
+    getOptionalEnv("FIREBASE_SERVICE_ACCOUNT_EMAIL") &&
+      getOptionalEnv("FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY") &&
+      (getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getOptionalEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"))
   );
 }
 
 export function hasFirestorePublicEnv() {
-  return Boolean((process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) && process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+  return Boolean(
+    (getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getOptionalEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID")) &&
+      getOptionalEnv("NEXT_PUBLIC_FIREBASE_API_KEY")
+  );
 }
 
 function getFirestoreAdminConfig() {
   return {
-    projectId: process.env.FIREBASE_ADMIN_PROJECT_ID || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
+    projectId: getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
     clientEmail: getEnv("FIREBASE_SERVICE_ACCOUNT_EMAIL"),
     privateKey: getEnv("FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY").replace(/\\n/g, "\n")
   };
@@ -319,7 +345,7 @@ function parseDrawDocument(document: FirestoreDocument): LottoDrawRecord {
 }
 
 async function firestorePublicRequest(path: string, init: RequestInit = {}) {
-  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  const projectId = getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
   const apiKey = getEnv("NEXT_PUBLIC_FIREBASE_API_KEY");
   const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}?key=${apiKey}`, {
     ...init,

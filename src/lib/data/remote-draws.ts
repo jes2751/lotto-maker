@@ -6,7 +6,16 @@ import type { Draw } from "@/types/lotto";
 
 export async function getConfiguredOfficialDraws(): Promise<Draw[]> {
   if (hasFirestoreAdminEnv()) {
-    return getAllStoredLottoDraws();
+    try {
+      return await getAllStoredLottoDraws();
+    } catch (error) {
+      if (hasFirestorePublicEnv()) {
+        console.warn("Firestore admin draw fetch failed. Retrying with public Firestore access.", error);
+        return getAllPublicStoredLottoDraws();
+      }
+
+      throw error;
+    }
   }
 
   if (hasFirestorePublicEnv()) {
@@ -18,7 +27,7 @@ export async function getConfiguredOfficialDraws(): Promise<Draw[]> {
 
 export const getCachedOfficialDraws = unstable_cache(
   async () => getConfiguredOfficialDraws(),
-  ["official-draws-v1"],
+  ["official-draws-v2"],
   {
     revalidate: 21600 // 6 hours
   }
@@ -26,7 +35,13 @@ export const getCachedOfficialDraws = unstable_cache(
 
 async function getOfficialDraws() {
   try {
-    return await getCachedOfficialDraws();
+    const cachedDraws = await getCachedOfficialDraws();
+
+    if (cachedDraws.length === 0 && (hasFirestoreAdminEnv() || hasFirestorePublicEnv())) {
+      return getConfiguredOfficialDraws();
+    }
+
+    return cachedDraws;
   } catch (error) {
     if (error instanceof Error && error.message.includes("incrementalCache missing in unstable_cache")) {
       return getConfiguredOfficialDraws();
