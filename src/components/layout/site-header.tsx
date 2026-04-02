@@ -6,22 +6,24 @@ import { siteConfig } from "@/lib/site";
 
 const content = {
   ko: {
-    tagline: "과거 당첨 데이터 기반 추천, 회차 조회, 통계를 제공하는 무료 로또 웹 서비스",
+    tagline: "과거 당첨 데이터 기반 추천, 회차 조회, 생성 통계를 한곳에서 보는 로또 웹 서비스",
     navigation: [
       { href: "/", label: "홈" },
-      { href: "/generate", label: "추천기" },
+      { href: "/generate", label: "번호 생성기" },
       { href: "/draws", label: "회차 조회" },
       { href: "/stats", label: "통계" },
+      { href: "/community", label: "생성 통계" },
       { href: "/guides", label: "가이드" }
     ]
   },
   en: {
-    tagline: "Free Lotto web service for historical recommendations, draw lookup, and statistics",
+    tagline: "Lotto web service for data-driven picks, draw lookup, statistics, and generated stats",
     navigation: [
       { href: "/", label: "Home" },
       { href: "/generate", label: "Generator" },
       { href: "/draws", label: "Draws" },
       { href: "/stats", label: "Stats" },
+      { href: "/community", label: "Generated Stats" },
       { href: "/guides", label: "Guides" }
     ]
   }

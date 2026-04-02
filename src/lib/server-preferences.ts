@@ -2,9 +2,9 @@ import { cookies } from "next/headers";
 
 import { isLocale, isThemeMode, type Locale, type ThemeMode, preferenceCookie } from "@/lib/preferences";
 
-export function getRequestPreferences() {
+export async function getRequestPreferences() {
   try {
-    const store = cookies();
+    const store = await cookies();
     const themeCookie = store.get(preferenceCookie.theme)?.value;
     const localeCookie = store.get(preferenceCookie.locale)?.value;
 

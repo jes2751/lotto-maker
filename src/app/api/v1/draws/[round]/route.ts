@@ -1,8 +1,9 @@
 import { jsonError, jsonSuccess } from "@/lib/http";
 import { drawRepository } from "@/lib/lotto";
 
-export async function GET(_: Request, context: { params: { round: string } }) {
-  const round = Number.parseInt(context.params.round, 10);
+export async function GET(_: Request, context: { params: Promise<{ round: string }> }) {
+  const { round: roundParam } = await context.params;
+  const round = Number.parseInt(roundParam, 10);
 
   if (Number.isNaN(round) || round < 1) {
     return jsonError("VALIDATION_ERROR", "유효한 회차를 입력해 주세요.");

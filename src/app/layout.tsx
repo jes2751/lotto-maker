@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import "@/app/globals.css";
 import { AdSenseScript } from "@/components/ads/adsense-script";
+import { FirebaseAnalytics } from "@/components/analytics/firebase-analytics";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getRequestPreferences } from "@/lib/server-preferences";
@@ -35,10 +36,9 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const siteUrl = getSiteUrl();
-  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-H6Z8MLCSYK";
-  const { locale, theme } = getRequestPreferences();
+  const { locale, theme } = await getRequestPreferences();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -52,6 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html lang={locale} data-theme={theme}>
       <body className="font-sans">
         <AdSenseScript />
+        <FirebaseAnalytics />
         <Script id="theme-preference" strategy="beforeInteractive">
           {`
             (function() {
@@ -59,15 +60,6 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
               var theme = match ? decodeURIComponent(match[1]) : '${theme}';
               document.documentElement.dataset.theme = theme;
             })();
-          `}
-        </Script>
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`} strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${gaMeasurementId}');
           `}
         </Script>
         <JsonLd data={structuredData} />

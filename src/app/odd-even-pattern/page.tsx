@@ -7,7 +7,7 @@ import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = getRequestPreferences();
+  const { locale } = await getRequestPreferences();
 
   return createPageMetadata({
     locale,
@@ -59,4 +59,3 @@ export default async function OddEvenPatternPage() {
     </div>
   );
 }
-

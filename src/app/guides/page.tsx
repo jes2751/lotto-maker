@@ -43,7 +43,7 @@ const guideEntries = {
 } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = getRequestPreferences();
+  const { locale } = await getRequestPreferences();
 
   return locale === "ko"
     ? {
@@ -58,8 +58,8 @@ export async function generateMetadata(): Promise<Metadata> {
       };
 }
 
-export default function GuidesHubPage() {
-  const { locale } = getRequestPreferences();
+export default async function GuidesHubPage() {
+  const { locale } = await getRequestPreferences();
   const siteUrl = getSiteUrl();
   const entries = guideEntries[locale];
   const copy =

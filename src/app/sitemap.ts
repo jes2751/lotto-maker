@@ -8,6 +8,7 @@ const staticRoutes = [
   "/generate",
   "/draws",
   "/stats",
+  "/community",
   "/draw-analysis",
   "/latest-lotto-results",
   "/lotto-number-generator",

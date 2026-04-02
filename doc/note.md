@@ -1,108 +1,160 @@
 # Note
 
-## 1. 로컬 실행
+## 2026-04-02 운영 브리핑
 
-프로젝트 루트에서 아래 순서로 실행합니다.
+- 공식 도메인: `https://lotto-maker.cloud`
+- 브랜드명: `Lotto Maker Lab`
+- Firestore `lotto_draws` 초기 적재 완료
+  - `1회 ~ 1217회`
+- Cloudflare 주간 sync Worker 배포 완료
+  - `https://lotto-maker-draw-sync.jes2751.workers.dev`
+  - `0 1 * * SUN`
+- 생성 통계 허브(`/community`)는 Firestore `generated_records` 기반으로 동작
+- 남은 운영 작업은 Search Console 등록과 모바일 QA 위주다
+
+## draw seed 최신 결과
+
+```json
+{
+  "mode": "seed",
+  "lastKnownRound": 0,
+  "latestRound": 1217,
+  "writtenCount": 1217,
+  "settledCount": 0
+}
+```
+
+## 1. 로컬 실행
 
 ```bash
 npm install
 npm run dev
 ```
 
-브라우저 접속 주소:
+기본 주소:
 
 ```text
 http://localhost:3000
 ```
 
-## 2. 주요 화면
+## 2. 주요 경로
 
-- 홈: `http://localhost:3000/`
-- 추천기: `http://localhost:3000/generate`
-- 회차 조회: `http://localhost:3000/draws`
-- 회차 상세 예시: `http://localhost:3000/draws/1169`
-- 회차 분석 예시: `http://localhost:3000/draw-analysis/1169`
-- 통계 대시보드: `http://localhost:3000/stats`
-- 최신 결과 랜딩: `http://localhost:3000/latest-lotto-results`
-- 최근 10회 분석: `http://localhost:3000/recent-10-draw-analysis`
-- 개인정보처리방침: `http://localhost:3000/privacy`
-- 이용약관: `http://localhost:3000/terms`
-- FAQ: `http://localhost:3000/faq`
-- 문의 / 운영 안내: `http://localhost:3000/contact`
+- `/`
+- `/generate`
+- `/draws`
+- `/draws/1169`
+- `/stats`
+- `/community`
+- `/latest-lotto-results`
+- `/draw-analysis`
+- `/draw-analysis/1169`
+- `/privacy`
+- `/terms`
+- `/faq`
+- `/contact`
 
-## 3. 기본 검증
+## 3. 검증
 
 ```bash
 npm test
 npm run build
 ```
 
-## 4. 자주 막히는 경우
+## 4. Windows / OneDrive 메모
 
-- `npm` 명령이 안 되면 Node.js 설치와 PATH를 먼저 확인합니다.
-- `npm run dev` 실행 후 포트가 바뀌면 터미널에 표시된 실제 주소로 접속합니다.
-- Windows + OneDrive 환경에서는 `.next` 캐시 때문에 빌드가 꼬일 수 있습니다. 이 경우 `.next`를 지우고 다시 빌드합니다.
+`.next` 캐시가 꼬이면 아래 순서로 정리한다.
 
 ```powershell
 Remove-Item -LiteralPath .next -Recurse -Force
 npm run build
 ```
 
-## 5. AdSense 준비
-
-광고를 실제로 노출하려면 `.env`에 아래 값을 넣습니다.
+## 5. 환경변수
 
 ```bash
-NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-xxxxxxxxxxxxxxxx
-NEXT_PUBLIC_ADSENSE_SLOT_INLINE=1234567890
+NEXT_PUBLIC_SITE_URL=https://lotto-maker.cloud
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-H6Z8MLCSYK
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=lotto-maker-lab.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=lotto-maker-lab
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=lotto-maker-lab.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=606623120175
+NEXT_PUBLIC_FIREBASE_APP_ID=1:606623120175:web:e9029cd0fbc38ce0a33fda
+GOOGLE_SITE_VERIFICATION=
+FIREBASE_ADMIN_PROJECT_ID=lotto-maker-lab
+FIREBASE_SERVICE_ACCOUNT_EMAIL=
+FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY=
+DRAW_SYNC_SECRET=
 ```
 
-값이 없으면 광고 컴포넌트는 자동으로 숨김 처리됩니다.
+## 6. Firestore generated stats
 
-## 6. Search Console 제출 준비
+- 생성기는 Firestore `generated_records`에 결과를 저장한다.
+- 생성 통계 허브(`/community`)는 Firestore 읽기 기반이다.
+- 전략 성과, 적중 분포, 이번 회차 생성 현황을 볼 수 있다.
 
-공식 도메인:
+## 7. Firestore 당첨번호 적재
+
+컬렉션:
+- `lotto_draws`
+
+전체 적재:
+
+```bash
+npm run firestore:draws:seed
+```
+
+신규 회차 동기화:
+
+```bash
+npm run firestore:draws:sync
+```
+
+보호된 내부 API:
+
+```text
+POST /api/internal/draws/sync
+```
+
+## 8. Cloudflare Cron Worker
+
+파일:
+- `workers/draw-sync-cron.ts`
+- `wrangler.draw-sync.jsonc`
+
+배포:
+
+```bash
+npm run deploy:draw-sync
+```
+
+기본 스케줄:
+- `0 1 * * SUN` (UTC)
+
+기본 호출 대상:
+- `https://lotto-maker.cloud/api/internal/draws/sync`
+
+## 9. Search Console
+
+제출 대상:
 
 ```text
 https://lotto-maker.cloud
 ```
 
-먼저 확인할 주소:
+확인 경로:
+- `/robots.txt`
+- `/sitemap.xml`
+- `/`
+- `/generate`
+- `/stats`
+- `/community`
+- `/latest-lotto-results`
+- `/draw-analysis`
 
-- `https://lotto-maker.cloud/robots.txt`
-- `https://lotto-maker.cloud/sitemap.xml`
-- `https://lotto-maker.cloud/latest-lotto-results`
-- `https://lotto-maker.cloud/lotto-number-generator`
-- `https://lotto-maker.cloud/lotto-statistics`
-- `https://lotto-maker.cloud/hot-numbers`
-- `https://lotto-maker.cloud/cold-numbers`
-- `https://lotto-maker.cloud/odd-even-pattern`
-- `https://lotto-maker.cloud/sum-pattern`
-- `https://lotto-maker.cloud/recent-10-draw-analysis`
-- `https://lotto-maker.cloud/draw-analysis/1169`
-- `https://lotto-maker.cloud/privacy`
-- `https://lotto-maker.cloud/terms`
-- `https://lotto-maker.cloud/faq`
-- `https://lotto-maker.cloud/contact`
+## 10. 현재 남은 운영 작업
 
-Search Console 소유권 확인 메타를 쓰려면 `.env`에 아래 값을 넣습니다.
-
-```bash
-GOOGLE_SITE_VERIFICATION=your_verification_token
-```
-
-제출 순서:
-
-1. Search Console에서 `https://lotto-maker.cloud`를 URL prefix 속성으로 등록
-2. 소유권 확인
-3. `sitemap.xml` 제출
-4. 주요 랜딩 페이지 색인 요청
-5. 회차 분석 페이지와 정책 페이지 색인 상태 확인
-
-## 7. Cloudflare Workers 배포 메모
-
-현재 프로젝트는 `Cloudflare Workers + OpenNext` 기준입니다.
-
-- `pages.dev`가 아니라 Workers 배포 URL 또는 연결한 공식 도메인을 확인합니다.
-- 배포 전에는 `npm test`, `npm run build`를 먼저 통과시킵니다.
-- `wrangler.jsonc`의 `compatibility_date`는 미래 날짜로 두지 않습니다.
+- Search Console 실제 등록
+- draw sync Worker 실제 배포
+- 최신 회차 자동 반영 검증
+- 모바일/실브라우저 QA

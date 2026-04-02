@@ -6,7 +6,7 @@ import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = getRequestPreferences();
+  const { locale } = await getRequestPreferences();
 
   return createPageMetadata({
     locale,
@@ -52,7 +52,7 @@ const cards = [
 ];
 
 export default async function LottoStatisticsLandingPage() {
-  const { locale } = getRequestPreferences();
+  const { locale } = await getRequestPreferences();
   const siteUrl = getSiteUrl();
 
   return (
@@ -95,4 +95,3 @@ export default async function LottoStatisticsLandingPage() {
     </div>
   );
 }
-

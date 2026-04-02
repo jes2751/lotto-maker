@@ -8,7 +8,7 @@ import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = getRequestPreferences();
+  const { locale } = await getRequestPreferences();
 
   return createPageMetadata({
     locale,
@@ -68,7 +68,7 @@ const content = {
 } as const;
 
 export default async function LatestLottoResultsPage() {
-  const { locale } = getRequestPreferences();
+  const { locale } = await getRequestPreferences();
   const copy = content[locale];
   const draws = await drawRepository.getAll();
   const latest = draws[0];

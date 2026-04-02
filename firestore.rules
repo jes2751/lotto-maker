@@ -1,0 +1,93 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidNumberList(numbers, expectedSize) {
+      return numbers is list
+        && numbers.size() == expectedSize
+        && numbers[0] is int && numbers[0] >= 1 && numbers[0] <= 45
+        && numbers[1] is int && numbers[1] >= 1 && numbers[1] <= 45
+        && numbers[2] is int && numbers[2] >= 1 && numbers[2] <= 45
+        && numbers[3] is int && numbers[3] >= 1 && numbers[3] <= 45
+        && numbers[4] is int && numbers[4] >= 1 && numbers[4] <= 45
+        && numbers[5] is int && numbers[5] >= 1 && numbers[5] <= 45;
+    }
+
+    function isValidOptionalNumberList(numbers, maxSize) {
+      return numbers is list
+        && numbers.size() <= maxSize;
+    }
+
+    function isValidFilters(filters) {
+      return filters is map
+        && filters.keys().hasOnly([
+          "fixedNumbers",
+          "excludedNumbers",
+          "oddEven",
+          "sumMin",
+          "sumMax",
+          "allowConsecutive"
+        ])
+        && isValidOptionalNumberList(filters.fixedNumbers, 5)
+        && isValidOptionalNumberList(filters.excludedNumbers, 35)
+        && filters.oddEven in ["any", "balanced", "odd-heavy", "even-heavy"]
+        && (filters.sumMin == null || filters.sumMin is int)
+        && (filters.sumMax == null || filters.sumMax is int)
+        && filters.allowConsecutive is bool;
+    }
+
+    function isValidStrategy(strategy) {
+      return strategy in ["random", "frequency", "mixed", "filter"];
+    }
+
+    match /lotto_draws/{roundId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /generated_records/{recordId} {
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasOnly([
+          "anonymousId",
+          "strategy",
+          "numbers",
+          "bonus",
+          "reason",
+          "generatedAt",
+          "createdAt",
+          "createdSource",
+          "targetRound",
+          "filters",
+          "matchedRound",
+          "matchCount",
+          "bonusMatched",
+          "settledAt"
+        ])
+        && request.resource.data.anonymousId is string
+        && request.resource.data.anonymousId.size() >= 8
+        && isValidStrategy(request.resource.data.strategy)
+        && isValidNumberList(request.resource.data.numbers, 6)
+        && (request.resource.data.bonus == null
+          || (request.resource.data.bonus is int
+            && request.resource.data.bonus >= 1
+            && request.resource.data.bonus <= 45))
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0
+        && request.resource.data.generatedAt is string
+        && request.resource.data.createdSource == "generator"
+        && (request.resource.data.targetRound == null || request.resource.data.targetRound is int)
+        && isValidFilters(request.resource.data.filters)
+        && request.resource.data.matchedRound == null
+        && request.resource.data.matchCount == null
+        && request.resource.data.bonusMatched is bool
+        && request.resource.data.settledAt == null;
+
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

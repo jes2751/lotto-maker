@@ -22,7 +22,7 @@ export function NumberSet({ numbers, bonus, hrefBuilder }: NumberSetProps) {
           <Link
             key={number}
             href={href}
-            aria-label={`${number}번 상세 통계로 이동`}
+            aria-label={`${number}번 번호 통계로 이동`}
             className="inline-flex rounded-full"
           >
             <NumberBall value={number} />
@@ -35,7 +35,7 @@ export function NumberSet({ numbers, bonus, hrefBuilder }: NumberSetProps) {
           {hrefBuilder ? (
             <Link
               href={hrefBuilder(bonus, true)}
-              aria-label={`보너스 ${bonus}번 상세 통계로 이동`}
+              aria-label={`보너스 번호 ${bonus}번 통계로 이동`}
               className="inline-flex rounded-full"
             >
               <NumberBall value={bonus} bonus />

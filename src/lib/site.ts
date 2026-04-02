@@ -8,9 +8,9 @@ export const siteConfig = {
   domain: "lotto-maker.cloud",
   defaultUrl: "https://lotto-maker.cloud",
   descriptionKo:
-    "과거 당첨 데이터 기반 로또 추천, 최신 회차 조회, 통계 분석을 한 번에 제공하는 무료 로또 웹 서비스입니다.",
+    "과거 당첨 데이터 기반 로또 번호 추천, 최신 회차 조회, 통계 분석, 생성 통계를 제공하는 무료 로또 웹 서비스입니다.",
   descriptionEn:
-    "Free Lotto web service with historical-data-based number recommendations, latest draw lookup, and statistics analysis."
+    "Free Lotto web service with historical-data-based recommendations, latest draw lookup, statistics, and generated stats."
 };
 
 export function getSiteUrl() {

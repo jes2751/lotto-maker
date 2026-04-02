@@ -1,5 +1,12 @@
 import { createNumberPool, LOTTO_MAX, LOTTO_MIN, MAIN_NUMBER_COUNT, sortNumbers } from "@/lib/lotto/shared";
-import type { Draw, GenerateNumbersInput, GeneratedSet, GenerationFilters, GenerationService, OddEvenFilter } from "@/types/lotto";
+import type {
+  Draw,
+  GenerateNumbersInput,
+  GeneratedSet,
+  GenerationFilters,
+  GenerationService,
+  OddEvenFilter
+} from "@/types/lotto";
 
 function randomIndex(length: number): number {
   return Math.floor(Math.random() * length);
@@ -59,7 +66,11 @@ function pickWeightedUnique(count: number, pool: number[], weights: Map<number, 
   return sortNumbers(picked);
 }
 
-function createBaseNumbers(strategy: "random" | "frequency" | "mixed", draws: Draw[], pool = createNumberPool()): number[] {
+function createBaseNumbers(
+  strategy: "random" | "frequency" | "mixed",
+  draws: Draw[],
+  pool = createNumberPool()
+): number[] {
   if (strategy === "random") {
     return pickRandomUnique(MAIN_NUMBER_COUNT, pool);
   }
@@ -214,7 +225,7 @@ function createReason(strategy: GenerateNumbersInput["strategy"], filters?: Gene
   }
 
   if (strategy === "frequency") {
-    return "과거 당첨 데이터에서 자주 나온 번호에 가중치를 두고 조합했습니다.";
+    return "과거 당첨 데이터에서 자주 나온 번호에 가중치를 주고 조합했습니다.";
   }
 
   if (strategy === "mixed") {
@@ -225,11 +236,11 @@ function createReason(strategy: GenerateNumbersInput["strategy"], filters?: Gene
   const parts: string[] = ["선택한 필터 조건을 반영해 데이터 기반 조합을 만들었습니다."];
 
   if (normalized.fixedNumbers.length > 0) {
-    parts.push(`고정수: ${normalized.fixedNumbers.join(", ")}`);
+    parts.push(`고정수 ${normalized.fixedNumbers.join(", ")}`);
   }
 
   if (normalized.excludedNumbers.length > 0) {
-    parts.push(`제외수: ${normalized.excludedNumbers.join(", ")}`);
+    parts.push(`제외수 ${normalized.excludedNumbers.join(", ")}`);
   }
 
   const oddEven = formatOddEven(normalized.oddEven);

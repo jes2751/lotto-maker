@@ -1,42 +1,37 @@
-# Technical Spec v1.1
+# Technical Spec v1.4
 
-## 1. 문서 목적
+## 2026-04-02 운영 반영 상태
 
-이 문서는 Lotto Maker Lab의 구현 기준서다.  
-타입, 로직, API, 데이터, 배포 기준을 한곳에 정리한다.
+- Firestore `generated_records`
+  - 생성기에서 익명 생성 결과를 저장한다.
+  - 생성 통계 허브(`/community`)는 이 컬렉션을 읽어 전략 성과와 적중 분포를 집계한다.
+- Firestore `lotto_draws`
+  - 공식 당첨번호 저장 컬렉션이다.
+  - 현재 `1회 ~ 1217회`까지 초기 적재를 마쳤다.
+- 내부 동기화 API
+  - `POST /api/internal/draws/sync`
+  - 인증 방식은 `Authorization: Bearer ${DRAW_SYNC_SECRET}`
+- Cloudflare Cron Worker
+  - 주 1회 `0 1 * * SUN`에 위 sync API를 호출한다.
+  - Worker URL: `https://lotto-maker-draw-sync.jes2751.workers.dev`
+- 주간 생성 통계 마감
+  - 새 당첨번호가 반영되면 해당 회차의 `generated_records`를 자동 마감한다.
+  - 저장 필드: `matchedRound`, `matchCount`, `bonusMatched`, `settledAt`
 
-## 2. 기술 스택
+## 1. 기술 스택
 
-- Next.js 14 App Router
+- Next.js App Router
 - TypeScript
 - Tailwind CSS
-- Route Handlers
-- 정적 시드 + 전체 회차 데이터 로딩 구조
-- Cloudflare Workers/OpenNext 배포 기준
+- Firebase Analytics
+- Firebase Firestore
+- Cloudflare Workers / OpenNext
 
-## 3. 시스템 구조
+## 2. 핵심 데이터 모델
 
-### 3-1. 프론트엔드
+### 2-1. Draw
 
-- App Router 기반 페이지 구성
-- 서버 컴포넌트 중심
-- 필요한 곳만 클라이언트 컴포넌트 사용
-
-### 3-2. 백엔드
-
-- Route Handlers 기반 API
-- 추천 로직과 통계 계산은 `src/lib/lotto` 내부 서비스 계층에 둔다
-
-### 3-3. 데이터
-
-- 기본 단위는 `Draw`
-- 전체 회차 데이터는 저장소 계층에서 통합 관리한다
-- 향후 Prisma/PostgreSQL로 확장 가능한 구조를 유지한다
-
-## 4. 핵심 타입
-
-### 4-1. Draw
-
+- `id`
 - `round`
 - `drawDate`
 - `numbers[6]`
@@ -45,7 +40,7 @@
 - `firstPrize?`
 - `totalPrize?`
 
-### 4-2. GeneratedSet
+### 2-2. GeneratedSet
 
 - `id`
 - `strategy`
@@ -54,31 +49,52 @@
 - `reason`
 - `generatedAt`
 
-### 4-3. 전략
+### 2-3. GeneratedRecord
 
-- `random`
-- `frequency`
-- `mixed`
-- `filter`
+- `anonymousId`
+- `strategy`
+- `numbers`
+- `bonus`
+- `reason`
+- `generatedAt`
+- `createdAt`
+- `createdSource`
+- `targetRound`
+- `filters`
+- `matchedRound`
+- `matchCount`
+- `bonusMatched`
 
-## 5. 추천 로직 기준
+### 2-4. LottoDrawRecord
 
-### 5-1. random
+- `id`
+- `round`
+- `drawDate`
+- `numbers`
+- `bonus`
+- `winnerCount`
+- `firstPrize`
+- `totalPrize`
+- `source`
+- `syncedAt`
 
-- 1~45 사이 숫자 6개를 중복 없이 뽑는다
-- 오름차순 정렬한다
+## 3. 추천 로직
 
-### 5-2. frequency
+### 3-1. random
 
-- 전체 당첨 데이터 기준 빈도를 참고한다
-- 많이 등장한 번호 흐름을 반영한다
+- 1~45 중복 없이 6개 추출
+- 오름차순 정렬
 
-### 5-3. mixed
+### 3-2. frequency
 
-- 랜덤성과 빈도 흐름을 함께 반영한다
-- 기본 추천 전략으로 사용한다
+- 과거 당첨 데이터 기반 빈도 가중치 적용
+- 출현 빈도가 높은 번호가 선택될 확률이 상대적으로 높다
 
-### 5-4. filter
+### 3-3. mixed
+
+- `frequency`와 `random`을 혼합한 기본 전략
+
+### 3-4. filter
 
 - 고정수
 - 제외수
@@ -86,82 +102,105 @@
 - 합계 범위
 - 연속번호 허용 여부
 
-필터 조건을 만족하는 조합만 생성한다.
+## 4. 회차 데이터 소스
 
-## 6. 통계 계산 기준
+- 원격 전체 회차 데이터셋
+- 공식 회차 API
+- 로컬 seed fallback
 
-### 6-1. 기본 통계
+현재는 조회 쪽에서 원격 데이터 + seed fallback을 사용하고, 운영 쪽에서는 Firestore `lotto_draws` 적재 경로를 추가했다.
 
-- 번호별 출현 횟수
-- 번호별 출현 비율
-- 전체 회차 기준 상위 번호
-- 전체 회차 기준 하위 번호
+## 5. 생성 통계
 
-### 6-2. 패턴 통계
+- 저장 컬렉션: `generated_records`
+- 익명 ID 기준으로 생성 결과 저장
+- 클라이언트 생성 후 Firestore에 write
+- 통계 허브(`/community`)에서 읽기 전용 집계
 
-- 홀짝 패턴
-- 합계 패턴
-- 최근 10회 흐름
+요약 항목:
+- 현재 회차 생성 수
+- 전략 점유율
+- 전략 성과 보드
+- 적중 분포
+- 많이 생성된 번호
+- 최근 생성 번호
 
-### 6-3. 번호 상세 통계
+## 6. Firestore Draw Sync
 
-- 전체 출현 횟수
-- 전체 출현 비율
-- 최근 10회 출현 횟수
-- 최근 10회 출현 비율
-- 최근 포함 회차 목록
+### 6-1. 컬렉션
 
-## 7. API 기준
+- `lotto_draws`
+- 문서 ID: 회차 번호 문자열
 
-### 7-1. `GET /api/v1/draws`
+### 6-2. 필드
 
-- 회차 목록 반환
-- `limit`, `offset` 지원
+- `id`
+- `round`
+- `drawDate`
+- `numbers`
+- `bonus`
+- `winnerCount`
+- `firstPrize`
+- `totalPrize`
+- `source`
+- `syncedAt`
 
-### 7-2. `GET /api/v1/draws/[round]`
+### 6-3. 서버 쓰기 경로
 
-- 특정 회차 상세 반환
-- 없으면 `404`
+- `src/lib/firebase/admin.ts`
+  - 서비스 계정 JWT 서명
+  - Google OAuth access token 발급
+  - Firestore REST commit / query 호출
+- `src/lib/data/firestore-draw-sync.ts`
+  - 전체 seed
+  - 신규 sync
 
-### 7-3. `POST /api/v1/generate`
+### 6-4. 실행 경로
 
-- 전략과 조합 수를 받아 추천 결과 반환
-- `filter` 전략은 조건 필드를 함께 받는다
+- 전체 적재
+  - `npm run firestore:draws:seed`
+- 신규 회차 동기화
+  - `npm run firestore:draws:sync`
+- 보호된 내부 API
+  - `POST /api/internal/draws/sync`
+- Cloudflare Cron Worker
+  - `workers/draw-sync-cron.ts`
+  - `wrangler.draw-sync.jsonc`
 
-### 7-4. `GET /api/v1/stats/frequency`
+### 6-5. 환경변수
 
-- `all`, `recent_10` 기간 지원
-- 번호별 빈도 데이터 반환
+- `FIREBASE_ADMIN_PROJECT_ID`
+- `FIREBASE_SERVICE_ACCOUNT_EMAIL`
+- `FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY`
+- `DRAW_SYNC_SECRET`
 
-## 8. SEO/메타데이터 기준
+## 7. API
 
-- 공식 서비스명: `Lotto Maker Lab`
-- 로고형 표기: `LOTTO MAKER LAB`
-- 공식 도메인: `https://lotto-maker.cloud`
-- 메타 제목 형식: `페이지명 | Lotto Maker Lab`
-- canonical, Open Graph, Twitter metadata를 공통 helper로 관리한다
+- `GET /api/health`
+- `GET /api/v1/draws`
+- `GET /api/v1/draws/[round]`
+- `POST /api/v1/generate`
+- `GET /api/v1/stats/frequency`
+- `POST /api/internal/draws/sync`
 
-## 9. 광고/분석 기술 기준
+## 8. Firestore Rules
 
-- Google Analytics 측정 ID는 환경변수로 관리할 수 있어야 한다
-- AdSense 설정 전까지 광고 슬롯은 렌더링하지 않는다
-- `ads.txt`를 공개 경로에 둔다
+- `generated_records`: public read, create only, update/delete 금지
+- `lotto_draws`: public read, write 금지
 
-## 10. 데이터 반영 기준
+서버 쓰기는 Firestore REST API + 서비스 계정 경로만 사용한다.
 
-- 최신 회차 반영은 `Asia/Seoul` 기준으로 판단한다
-- 주간 동기화는 전체 회차 데이터 정합성을 깨지 않도록 검증 후 반영한다
-- 원격 소스가 비정상 응답을 주면 기존 데이터를 유지한다
+## 9. 배포
 
-## 11. 테스트 기준
+- 메인 앱: Cloudflare Workers / OpenNext
+- draw sync 자동화: 별도 Cloudflare Cron Worker
+- Analytics: Firebase Analytics
+- 광고: Google AdSense 준비 구조, 미설정 시 비노출
 
-- `npm test` 통과
-- `npm run build` 통과
-- 홈, 추천기, 회차 조회, 회차 상세, 통계, 랜딩 페이지 렌더 테스트 유지
-- 추천 로직과 API 기본 검증 유지
+## 10. 검증 기준
 
-## 12. 배포 기준
-
-- Cloudflare Workers/OpenNext 기준
-- 배포 전 테스트/빌드 필수
-- `main` 푸시는 사용자 승인 후에만 진행
+- `npm test`
+- `npm run build`
+- Firestore rules/indexes 배포 확인
+- 실브라우저 QA
+- Search Console 색인 점검

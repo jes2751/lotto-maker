@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "lotto-maker-draw-sync",
+  "main": "workers/draw-sync-cron.ts",
+  "compatibility_date": "2025-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": ["0 1 * * SUN"]
+  },
+  "vars": {
+    "DRAW_SYNC_URL": "https://lotto-maker.cloud/api/internal/draws/sync"
+  }
+}
