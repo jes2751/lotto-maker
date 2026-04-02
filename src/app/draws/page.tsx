@@ -18,12 +18,12 @@ export const metadata: Metadata = {
 };
 
 interface DrawsPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     round?: string;
     number?: string;
     offset?: string;
     limit?: string;
-  };
+  }>;
 }
 
 const DEFAULT_LIMIT = 12;
@@ -99,12 +99,13 @@ function getPaginationRange(currentPage: number, totalPages: number) {
 }
 
 export default async function DrawsPage({ searchParams }: DrawsPageProps) {
-  const limit = Math.min(Math.max(parsePositiveInteger(searchParams?.limit, DEFAULT_LIMIT), 1), 20);
-  const offset = parsePositiveInteger(searchParams?.offset, 0);
+  const resolvedSearchParams = await searchParams;
+  const limit = Math.min(Math.max(parsePositiveInteger(resolvedSearchParams?.limit, DEFAULT_LIMIT), 1), 20);
+  const offset = parsePositiveInteger(resolvedSearchParams?.offset, 0);
   const allDraws = await drawRepository.getAll();
   const latest = allDraws[0] ?? null;
-  const roundQuery = searchParams?.round?.trim() ?? "";
-  const numberFilter = parseNumberFilter(searchParams?.number);
+  const roundQuery = resolvedSearchParams?.round?.trim() ?? "";
+  const numberFilter = parseNumberFilter(resolvedSearchParams?.number);
   const selectedNumber = numberFilter.value;
   const requestedRound = Number.parseInt(roundQuery, 10);
   const searchedDraw =

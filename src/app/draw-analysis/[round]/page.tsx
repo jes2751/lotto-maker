@@ -9,15 +9,16 @@ import { analyzeDraw, buildDrawAnalysisSummary } from "@/lib/lotto/analysis";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
 
 interface DrawAnalysisPageProps {
-  params: {
+  params: Promise<{
     round: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({
   params
 }: DrawAnalysisPageProps): Promise<Metadata> {
-  const round = Number.parseInt(params.round, 10);
+  const { round: roundParam } = await params;
+  const round = Number.parseInt(roundParam, 10);
   const draw = Number.isInteger(round) ? await drawRepository.getByRound(round) : null;
 
   if (!draw) {
@@ -45,7 +46,8 @@ export async function generateMetadata({
 export default async function DrawAnalysisPage({
   params
 }: DrawAnalysisPageProps) {
-  const round = Number.parseInt(params.round, 10);
+  const { round: roundParam } = await params;
+  const round = Number.parseInt(roundParam, 10);
 
   if (!Number.isInteger(round) || round < 1) {
     notFound();

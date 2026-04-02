@@ -7,13 +7,14 @@ import { drawRepository } from "@/lib/lotto";
 import { createPageMetadata } from "@/lib/site";
 
 interface DrawDetailPageProps {
-  params: {
+  params: Promise<{
     round: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: DrawDetailPageProps): Promise<Metadata> {
-  const round = Number.parseInt(params.round, 10);
+  const { round: roundParam } = await params;
+  const round = Number.parseInt(roundParam, 10);
   const draw = Number.isInteger(round) ? await drawRepository.getByRound(round) : null;
 
   if (!draw) {
@@ -46,7 +47,8 @@ function formatWonAmount(value?: number | null) {
 }
 
 export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
-  const round = Number.parseInt(params.round, 10);
+  const { round: roundParam } = await params;
+  const round = Number.parseInt(roundParam, 10);
 
   if (!Number.isInteger(round) || round < 1) {
     notFound();
