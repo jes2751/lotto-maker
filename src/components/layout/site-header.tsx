@@ -9,6 +9,7 @@ const navigation = [
   { href: "/", label: "홈" },
   { href: "/guides", label: "가이드" },
   { href: "/generate", label: "번호 생성기" },
+  { href: "/check", label: "당첨 확인" },
   { href: "/draws", label: "회차 조회" },
   { href: "/stats", label: "통계" },
   { href: "/generated-stats", label: "생성 통계" }
