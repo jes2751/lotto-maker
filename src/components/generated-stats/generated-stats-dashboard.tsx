@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
 
 import { NumberSet } from "@/components/lotto/number-set";
-import { getFirebaseDb } from "@/lib/firebase/client";
 import {
   buildGeneratedStatsSummary,
   getStrategyLabel,
@@ -57,64 +55,90 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const db = getFirebaseDb();
-    const recordsQuery = query(
-      collection(db, GENERATED_RECORDS_COLLECTION),
-      orderBy("generatedAt", "desc"),
-      limit(RECORD_LIMIT)
-    );
+    let ignore = false;
+    let unsubscribe: (() => void) | null = null;
 
-    const unsubscribe = onSnapshot(
-      recordsQuery,
-      (snapshot) => {
-        const nextRecords = snapshot.docs
-          .map<StoredGeneratedRecord | null>((doc) => {
-            const data = doc.data();
+    async function subscribe() {
+      try {
+        const [{ collection, limit, onSnapshot, orderBy, query }, { getFirebaseDb }] = await Promise.all([
+          import("firebase/firestore"),
+          import("@/lib/firebase/client")
+        ]);
 
-            if (!isValidRecordShape(data)) {
-              return null;
-            }
+        if (ignore) {
+          return;
+        }
 
-            return {
-              id: doc.id,
-              anonymousId: data.anonymousId,
-              strategy: data.strategy,
-              numbers: [...data.numbers].filter((item): item is number => typeof item === "number"),
-              bonus: typeof data.bonus === "number" ? data.bonus : null,
-              reason: data.reason,
-              generatedAt: data.generatedAt,
-              targetRound: typeof data.targetRound === "number" ? data.targetRound : null,
-              matchedRound: typeof data.matchedRound === "number" ? data.matchedRound : null,
-              matchCount: typeof data.matchCount === "number" ? data.matchCount : null,
-              bonusMatched: data.bonusMatched === true,
-              settledAt: typeof data.settledAt === "string" ? data.settledAt : null,
-              filters: {
-                fixedNumbers: Array.isArray(data.filters?.fixedNumbers)
-                  ? data.filters.fixedNumbers.filter((item): item is number => typeof item === "number")
-                  : [],
-                excludedNumbers: Array.isArray(data.filters?.excludedNumbers)
-                  ? data.filters.excludedNumbers.filter((item): item is number => typeof item === "number")
-                  : [],
-                oddEven: typeof data.filters?.oddEven === "string" ? data.filters.oddEven : "any",
-                sumMin: typeof data.filters?.sumMin === "number" ? data.filters.sumMin : null,
-                sumMax: typeof data.filters?.sumMax === "number" ? data.filters.sumMax : null,
-                allowConsecutive: data.filters?.allowConsecutive !== false
-              }
-            } satisfies StoredGeneratedRecord;
-          })
-          .filter((record): record is StoredGeneratedRecord => record !== null);
+        const db = getFirebaseDb();
+        const recordsQuery = query(
+          collection(db, GENERATED_RECORDS_COLLECTION),
+          orderBy("generatedAt", "desc"),
+          limit(RECORD_LIMIT)
+        );
 
-        setRecords(nextRecords);
-        setLoading(false);
-        setError(null);
-      },
-      () => {
-        setError("생성 통계를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.");
-        setLoading(false);
+        unsubscribe = onSnapshot(
+          recordsQuery,
+          (snapshot) => {
+            const nextRecords = snapshot.docs
+              .map<StoredGeneratedRecord | null>((doc) => {
+                const data = doc.data();
+
+                if (!isValidRecordShape(data)) {
+                  return null;
+                }
+
+                return {
+                  id: doc.id,
+                  anonymousId: data.anonymousId,
+                  strategy: data.strategy,
+                  numbers: [...data.numbers].filter((item): item is number => typeof item === "number"),
+                  bonus: typeof data.bonus === "number" ? data.bonus : null,
+                  reason: data.reason,
+                  generatedAt: data.generatedAt,
+                  targetRound: typeof data.targetRound === "number" ? data.targetRound : null,
+                  matchedRound: typeof data.matchedRound === "number" ? data.matchedRound : null,
+                  matchCount: typeof data.matchCount === "number" ? data.matchCount : null,
+                  bonusMatched: data.bonusMatched === true,
+                  settledAt: typeof data.settledAt === "string" ? data.settledAt : null,
+                  filters: {
+                    fixedNumbers: Array.isArray(data.filters?.fixedNumbers)
+                      ? data.filters.fixedNumbers.filter((item): item is number => typeof item === "number")
+                      : [],
+                    excludedNumbers: Array.isArray(data.filters?.excludedNumbers)
+                      ? data.filters.excludedNumbers.filter((item): item is number => typeof item === "number")
+                      : [],
+                    oddEven: typeof data.filters?.oddEven === "string" ? data.filters.oddEven : "any",
+                    sumMin: typeof data.filters?.sumMin === "number" ? data.filters.sumMin : null,
+                    sumMax: typeof data.filters?.sumMax === "number" ? data.filters.sumMax : null,
+                    allowConsecutive: data.filters?.allowConsecutive !== false
+                  }
+                } satisfies StoredGeneratedRecord;
+              })
+              .filter((record): record is StoredGeneratedRecord => record !== null);
+
+            setRecords(nextRecords);
+            setLoading(false);
+            setError(null);
+          },
+          () => {
+            setError("생성 통계를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.");
+            setLoading(false);
+          }
+        );
+      } catch {
+        if (!ignore) {
+          setError("생성 통계를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.");
+          setLoading(false);
+        }
       }
-    );
+    }
 
-    return () => unsubscribe();
+    void subscribe();
+
+    return () => {
+      ignore = true;
+      unsubscribe?.();
+    };
   }, []);
 
   const summary = useMemo(() => buildGeneratedStatsSummary(records, latestDraw), [records, latestDraw]);

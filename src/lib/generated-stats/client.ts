@@ -1,8 +1,5 @@
 "use client";
 
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-
-import { getFirebaseDb } from "@/lib/firebase/client";
 import type { GeneratedSet, GenerationFilters, GenerationStrategy } from "@/types/lotto";
 
 const ANONYMOUS_ID_STORAGE_KEY = "lotto-lab-anonymous-id";
@@ -54,6 +51,11 @@ export async function recordGeneratedSets({ strategy, sets, filters, targetRound
   if (typeof window === "undefined" || sets.length === 0) {
     return;
   }
+
+  const [{ addDoc, collection, serverTimestamp }, { getFirebaseDb }] = await Promise.all([
+    import("firebase/firestore"),
+    import("@/lib/firebase/client")
+  ]);
 
   const db = getFirebaseDb();
   const anonymousId = getAnonymousId();
