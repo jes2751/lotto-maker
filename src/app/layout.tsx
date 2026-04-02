@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { Outfit } from "next/font/google";
 
 import "@/app/globals.css";
 import { AdSenseScript } from "@/components/ads/adsense-script";
@@ -10,6 +11,12 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { getRequestPreferences } from "@/lib/server-preferences";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getAbsoluteUrl, getSiteUrl, siteConfig } from "@/lib/site";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -38,7 +45,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const siteUrl = getSiteUrl();
-  const { locale, theme } = await getRequestPreferences();
+  const { theme } = await getRequestPreferences();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -49,8 +56,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   };
 
   return (
-    <html lang={locale} data-theme={theme}>
-      <body className="font-sans">
+    <html lang="ko" data-theme={theme}>
+      <body className={`font-sans ${outfit.variable}`}>
         <AdSenseScript />
         <FirebaseAnalytics />
         <Script id="theme-preference" strategy="beforeInteractive">
@@ -64,9 +71,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </Script>
         <JsonLd data={structuredData} />
         <div className="flex min-h-screen flex-col">
-          <SiteHeader locale={locale} theme={theme} />
+          <SiteHeader theme={theme} />
           <main className="flex-1">{children}</main>
-          <SiteFooter locale={locale} />
+          <SiteFooter />
         </div>
       </body>
     </html>

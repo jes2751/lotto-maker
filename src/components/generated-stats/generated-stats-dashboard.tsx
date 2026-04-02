@@ -109,7 +109,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         setError(null);
       },
       () => {
-        setError("생성 통계를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.");
+        setError("생성 통계를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.");
         setLoading(false);
       }
     );
@@ -123,40 +123,40 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
     <div className="grid gap-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-xs uppercase tracking-[0.22em] text-slate-500">대상 회차</p>
+          <p className="text-base text-slate-300">대상 회차</p>
           <p className="mt-3 text-3xl font-semibold text-white">
             {summary.currentTargetRound ? `${summary.currentTargetRound}회` : "-"}
           </p>
-          <p className="mt-2 text-sm text-slate-400">현재 생성 결과를 모으는 회차입니다.</p>
+          <p className="mt-2 text-sm text-slate-400">지금 공개 생성 기록이 모이는 기준 회차입니다.</p>
         </article>
         <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-xs uppercase tracking-[0.22em] text-slate-500">이번 회차 생성 수</p>
+          <p className="text-base text-slate-300">이번 회차 생성 수</p>
           <p className="mt-3 text-3xl font-semibold text-white">{summary.currentRecords.length}</p>
-          <p className="mt-2 text-sm text-slate-400">공개 생성 현황에 반영된 번호 세트 수입니다.</p>
+          <p className="mt-2 text-sm text-slate-400">현재 회차를 대상으로 생성된 공개 기록 수입니다.</p>
         </article>
         <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-xs uppercase tracking-[0.22em] text-slate-500">최근 평가 회차</p>
+          <p className="text-base text-slate-300">최근 평가 회차</p>
           <p className="mt-3 text-3xl font-semibold text-white">
             {summary.latestEvaluatedRound ? `${summary.latestEvaluatedRound}회` : "-"}
           </p>
-          <p className="mt-2 text-sm text-slate-400">실제 당첨번호와 비교를 마친 가장 최근 회차입니다.</p>
+          <p className="mt-2 text-sm text-slate-400">당첨번호와 비교 평가가 끝난 가장 최근 회차입니다.</p>
         </article>
         <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-xs uppercase tracking-[0.22em] text-slate-500">3개 이상 일치</p>
+          <p className="text-base text-slate-300">3개 이상 적중</p>
           <p className="mt-3 text-3xl font-semibold text-white">
             {summary.evaluatedRecords.filter((record) => record.matchCount >= 3).length}
           </p>
-          <p className="mt-2 text-sm text-slate-400">최근 평가 회차에서 3개 이상 맞은 생성 결과 수입니다.</p>
+          <p className="mt-2 text-sm text-slate-400">최근 평가 회차 기준으로 3개 이상 맞은 기록 수입니다.</p>
         </article>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="panel">
+      <section className="grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="panel self-start">
           <p className="eyebrow">전략 성과</p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">최근 평가 회차 기준 전략별 결과</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-400">
-            어떤 전략이 더 많이 쓰였는지보다, 실제 당첨번호와 비교했을 때 어느 전략이 더 가까웠는지를
-            먼저 보여줍니다.
+          <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 어떤 전략이 강했는지 봅니다</h2>
+          <p className="body-small mt-3 text-slate-400">
+            전략별 생성 수, 최고 적중 수, 3개 이상 적중 수를 비교해서 어떤 흐름이 상대적으로 좋았는지
+            확인할 수 있습니다.
           </p>
 
           {summary.strategyBoard.length > 0 ? (
@@ -167,25 +167,25 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                     <div>
                       <p className="text-lg font-semibold text-white">{getStrategyLabel(item.strategy)}</p>
                       <p className="mt-2 text-sm text-slate-400">
-                        {item.totalGenerated}건 평가, 평균 {item.averageMatch}개 일치
+                        총 {item.totalGenerated}세트 · 평균 {item.averageMatch}개 적중
                       </p>
                     </div>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-teal">
+                    <span className="rounded-full border border-white/10 px-3 py-1.5 text-sm text-teal">
                       최고 {item.bestMatch}개
                     </span>
                   </div>
 
                   <div className="mt-4 grid gap-3 sm:grid-cols-3">
                     <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">3개 이상</p>
+                      <p className="text-sm text-slate-400">3개 이상</p>
                       <p className="mt-2 text-2xl font-semibold text-white">{item.threePlusHits}</p>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">4개 이상</p>
+                      <p className="text-sm text-slate-400">4개 이상</p>
                       <p className="mt-2 text-2xl font-semibold text-white">{item.fourPlusHits}</p>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">보너스 일치</p>
+                      <p className="text-sm text-slate-400">보너스 적중</p>
                       <p className="mt-2 text-2xl font-semibold text-white">{item.bonusHits}</p>
                     </div>
                   </div>
@@ -194,17 +194,17 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
             </div>
           ) : (
             <div className="mt-6 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              아직 평가를 마친 생성 기록이 없습니다. 다음 회차 결과가 반영되면 전략 성과가 이곳에 나타납니다.
+              아직 평가가 끝난 생성 기록이 없습니다. 회차 결과가 쌓이면 전략 성과가 여기에 표시됩니다.
             </div>
           )}
         </div>
 
         <div className="panel">
-          <p className="eyebrow">현재 흐름</p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">이번 회차에서 많이 생성된 번호와 전략</h2>
+          <p className="eyebrow">현재 회차 현황</p>
+          <h2 className="section-subtitle mt-3 text-white">이번 회차 공개 생성 흐름</h2>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-sm font-medium text-white">전략 점유율</p>
+              <p className="text-base font-medium text-white">전략 점유율</p>
               <div className="mt-4 space-y-4">
                 {summary.currentStrategyTotals.length > 0 ? (
                   summary.currentStrategyTotals.map((item) => (
@@ -212,7 +212,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                       <div className="flex items-center justify-between gap-3 text-sm">
                         <span className="text-slate-200">{getStrategyLabel(item.strategy)}</span>
                         <span className="text-slate-400">
-                          {item.totalGenerated}건 · {item.sharePercentage}%
+                          {item.totalGenerated}세트 · {item.sharePercentage}%
                         </span>
                       </div>
                       <div className="mt-2 h-2 rounded-full bg-white/10">
@@ -224,13 +224,13 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-slate-400">이번 회차 생성 기록이 아직 많지 않습니다.</p>
+                  <p className="text-sm text-slate-400">이번 회차 생성 기록이 아직 없습니다.</p>
                 )}
               </div>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-sm font-medium text-white">많이 생성된 번호 TOP 10</p>
+              <p className="text-base font-medium text-white">많이 생성된 번호 TOP 10</p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {summary.currentTopNumbers.length > 0 ? (
                   summary.currentTopNumbers.map((item) => (
@@ -240,11 +240,11 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                       className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
                     >
                       <span className="font-semibold text-white">{item.number}</span>
-                      <span className="text-slate-500">{item.count}건</span>
+                      <span className="text-slate-500">{item.count}회</span>
                     </Link>
                   ))
                 ) : (
-                  <p className="text-sm text-slate-400">집계할 번호가 아직 없습니다.</p>
+                  <p className="text-sm text-slate-400">집계된 번호가 아직 없습니다.</p>
                 )}
               </div>
             </div>
@@ -252,17 +252,17 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-        <div className="panel">
+      <section className="grid items-start gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+        <div className="panel self-start">
           <p className="eyebrow">적중 분포</p>
-          <h2 className="mt-3 text-2xl font-semibold text-white">최근 평가 회차에서 몇 개가 맞았는지</h2>
+          <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 몇 개가 맞았는지 봅니다</h2>
           <div className="mt-6 space-y-4">
             {summary.matchDistribution.map((item) => (
               <div key={item.label}>
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-slate-200">{item.label}</span>
                   <span className="text-slate-400">
-                    {item.count}건 · {item.percentage}%
+                    {item.count}세트 · {item.percentage}%
                   </span>
                 </div>
                 <div className="mt-2 h-2 rounded-full bg-white/10">
@@ -280,7 +280,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="eyebrow">최근 생성 번호</p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">최근 생성된 번호 일부</h2>
+              <h2 className="section-subtitle mt-3 text-white">이번 회차에 공개된 번호 일부</h2>
             </div>
             <Link
               href="/generate"
@@ -322,7 +322,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
               ))}
               {summary.currentRecords.length === 0 ? (
                 <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-5 text-sm text-slate-400">
-                  아직 이번 회차 생성 기록이 충분하지 않습니다.
+                  이번 회차 공개 생성 기록이 아직 없습니다.
                 </div>
               ) : null}
             </div>

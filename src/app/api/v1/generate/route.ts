@@ -6,7 +6,6 @@ import type { GenerationFilters, OddEvenFilter } from "@/types/lotto";
 interface GenerateRequestBody {
   strategy?: string;
   count?: number;
-  include_bonus?: boolean;
   filters?: {
     fixed_numbers?: number[];
     excluded_numbers?: number[];
@@ -51,7 +50,6 @@ export async function POST(request: Request) {
 
   const strategy = body.strategy ?? "mixed";
   const count = typeof body.count === "number" ? body.count : 1;
-  const includeBonus = body.include_bonus ?? true;
   const filters = normalizeFilters(body.filters);
 
   if (!isValidStrategy(strategy)) {
@@ -82,7 +80,6 @@ export async function POST(request: Request) {
     const sets = await generationService.generate({
       strategy,
       count,
-      includeBonus,
       filters
     });
 

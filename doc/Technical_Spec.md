@@ -1,206 +1,122 @@
-# Technical Spec v1.4
+# Technical Spec v1.6
 
-## 2026-04-02 운영 반영 상태
+## 1. 핵심 기술 구성
 
-- Firestore `generated_records`
-  - 생성기에서 익명 생성 결과를 저장한다.
-  - 생성 통계 허브(`/community`)는 이 컬렉션을 읽어 전략 성과와 적중 분포를 집계한다.
-- Firestore `lotto_draws`
-  - 공식 당첨번호 저장 컬렉션이다.
-  - 현재 `1회 ~ 1217회`까지 초기 적재를 마쳤다.
-- 내부 동기화 API
-  - `POST /api/internal/draws/sync`
-  - 인증 방식은 `Authorization: Bearer ${DRAW_SYNC_SECRET}`
-- Cloudflare Cron Worker
-  - 주 1회 `0 1 * * SUN`에 위 sync API를 호출한다.
-  - Worker URL: `https://lotto-maker-draw-sync.jes2751.workers.dev`
-- 주간 생성 통계 마감
-  - 새 당첨번호가 반영되면 해당 회차의 `generated_records`를 자동 마감한다.
-  - 저장 필드: `matchedRound`, `matchCount`, `bonusMatched`, `settledAt`
-
-## 1. 기술 스택
-
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- Firebase Analytics
-- Firebase Firestore
-- Cloudflare Workers / OpenNext
-
-## 2. 핵심 데이터 모델
-
-### 2-1. Draw
-
-- `id`
-- `round`
-- `drawDate`
-- `numbers[6]`
-- `bonus`
-- `winnerCount?`
-- `firstPrize?`
-- `totalPrize?`
-
-### 2-2. GeneratedSet
-
-- `id`
-- `strategy`
-- `numbers`
-- `bonus?`
-- `reason`
-- `generatedAt`
-
-### 2-3. GeneratedRecord
-
-- `anonymousId`
-- `strategy`
-- `numbers`
-- `bonus`
-- `reason`
-- `generatedAt`
-- `createdAt`
-- `createdSource`
-- `targetRound`
-- `filters`
-- `matchedRound`
-- `matchCount`
-- `bonusMatched`
-
-### 2-4. LottoDrawRecord
-
-- `id`
-- `round`
-- `drawDate`
-- `numbers`
-- `bonus`
-- `winnerCount`
-- `firstPrize`
-- `totalPrize`
-- `source`
-- `syncedAt`
-
-## 3. 추천 로직
-
-### 3-1. random
-
-- 1~45 중복 없이 6개 추출
-- 오름차순 정렬
-
-### 3-2. frequency
-
-- 과거 당첨 데이터 기반 빈도 가중치 적용
-- 출현 빈도가 높은 번호가 선택될 확률이 상대적으로 높다
-
-### 3-3. mixed
-
-- `frequency`와 `random`을 혼합한 기본 전략
-
-### 3-4. filter
-
-- 고정수
-- 제외수
-- 홀짝 조건
-- 합계 범위
-- 연속번호 허용 여부
-
-## 4. 회차 데이터 소스
-
-- 원격 전체 회차 데이터셋
-- 공식 회차 API
-- 로컬 seed fallback
-
-현재는 조회 쪽에서 원격 데이터 + seed fallback을 사용하고, 운영 쪽에서는 Firestore `lotto_draws` 적재 경로를 추가했다.
-
-## 5. 생성 통계
-
-- 저장 컬렉션: `generated_records`
-- 익명 ID 기준으로 생성 결과 저장
-- 클라이언트 생성 후 Firestore에 write
-- 통계 허브(`/community`)에서 읽기 전용 집계
-
-요약 항목:
-- 현재 회차 생성 수
-- 전략 점유율
-- 전략 성과 보드
-- 적중 분포
-- 많이 생성된 번호
-- 최근 생성 번호
-
-## 6. Firestore Draw Sync
-
-### 6-1. 컬렉션
-
-- `lotto_draws`
-- 문서 ID: 회차 번호 문자열
-
-### 6-2. 필드
-
-- `id`
-- `round`
-- `drawDate`
-- `numbers`
-- `bonus`
-- `winnerCount`
-- `firstPrize`
-- `totalPrize`
-- `source`
-- `syncedAt`
-
-### 6-3. 서버 쓰기 경로
-
-- `src/lib/firebase/admin.ts`
-  - 서비스 계정 JWT 서명
-  - Google OAuth access token 발급
-  - Firestore REST commit / query 호출
-- `src/lib/data/firestore-draw-sync.ts`
-  - 전체 seed
-  - 신규 sync
-
-### 6-4. 실행 경로
-
-- 전체 적재
-  - `npm run firestore:draws:seed`
-- 신규 회차 동기화
-  - `npm run firestore:draws:sync`
-- 보호된 내부 API
-  - `POST /api/internal/draws/sync`
-- Cloudflare Cron Worker
-  - `workers/draw-sync-cron.ts`
-  - `wrangler.draw-sync.jsonc`
-
-### 6-5. 환경변수
-
-- `FIREBASE_ADMIN_PROJECT_ID`
-- `FIREBASE_SERVICE_ACCOUNT_EMAIL`
-- `FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY`
-- `DRAW_SYNC_SECRET`
-
-## 7. API
-
-- `GET /api/health`
-- `GET /api/v1/draws`
-- `GET /api/v1/draws/[round]`
-- `POST /api/v1/generate`
-- `GET /api/v1/stats/frequency`
-- `POST /api/internal/draws/sync`
-
-## 8. Firestore Rules
-
-- `generated_records`: public read, create only, update/delete 금지
-- `lotto_draws`: public read, write 금지
-
-서버 쓰기는 Firestore REST API + 서비스 계정 경로만 사용한다.
-
-## 9. 배포
-
-- 메인 앱: Cloudflare Workers / OpenNext
-- draw sync 자동화: 별도 Cloudflare Cron Worker
+- Frontend: Next.js App Router
 - Analytics: Firebase Analytics
-- 광고: Google AdSense 준비 구조, 미설정 시 비노출
+- Generated stats storage: Firebase Firestore
+- Draw storage: Firebase Firestore `lotto_draws`
+- Weekly sync: Cloudflare Worker cron
 
-## 10. 검증 기준
+## 2. 데이터 구조
+
+### 2-1. `generated_records`
+- 생성된 번호 기록 저장
+- 주요 필드:
+  - `strategy`
+  - `numbers`
+  - `bonus`
+  - `generatedAt`
+  - `targetRound`
+  - `reason`
+  - `filters`
+  - `matchedRound`
+  - `matchCount`
+  - `bonusMatched`
+  - `settledAt`
+
+### 2-2. `lotto_draws`
+- 당첨 회차 저장
+- 1회부터 최신 회차까지 적재
+- 주간 sync 시 신규 회차만 추가
+
+### 2-3. `site_metrics`
+- 사이트 운영 지표 저장
+- 현재 사용 필드:
+  - `type`
+  - `dateKey`
+  - `count`
+  - `updatedAt`
+- 현재 문서:
+  - `daily-YYYY-MM-DD`
+
+## 3. 생성기 동작 규칙
+
+- 기본 전략은 `mixed`
+- 기본 생성 수는 `5`
+- 보너스 번호는 항상 포함
+- 첫 진입 시 자동 생성하지 않는다
+- `filter` 전략일 때만 필터 입력 UI를 노출한다
+- 생성 직후 Firestore `generated_records`에 비동기로 저장한다
+
+## 4. 생성 통계 계산 규칙
+
+- 대상 회차: 최신 당첨 회차 + 1
+- 최근 평가 회차: 최신 당첨 회차
+- 전략 성과:
+  - 전략별 생성 수
+  - 최고 적중 수
+  - 3개 이상 적중 수
+  - 4개 이상 적중 수
+  - 보너스 적중 수
+- 적중 분포:
+  - 0개~6개 일치
+
+## 5. 당첨번호 동기화
+
+- 전체 seed:
+  - `npm run firestore:draws:seed`
+- 신규 sync:
+  - 내부 sync API 호출
+  - 신규 회차만 Firestore에 저장
+  - 같은 회차를 대상으로 생성된 기록을 자동 마감
+- 주간 자동 실행:
+  - Cloudflare Worker cron
+  - 매주 일요일 실행
+
+## 6. 온라인 구매 안내 페이지 구현 기준
+
+### 6-1. 라우트
+- `/lotto-buy-guide`
+
+### 6-2. 내용 원칙
+- 동행복권 공식 기준 정보만 사용
+- 공식 사이트 외 링크는 기본적으로 넣지 않음
+- 사용자에게 필요한 정보만 간단히 정리
+  - 온라인 구매 가능 여부
+  - 구매 한도
+  - 판매 시간
+  - 추첨 시간
+  - 기본 유의사항
+  - 동행복권 메인페이지 바로가기
+
+### 6-3. 운영 원칙
+- 정책성 정보는 변경 가능성이 있으므로 정기 점검 대상에 포함
+- 공식 안내 변경 시 문서와 페이지를 함께 수정
+- 사용자 화면에는 `공식 안내 기준` 문구를 명시
+- 공식 링크는 에러 가능성이 낮은 안정적인 경로를 우선 사용
+
+## 7. SEO / 사이트맵
+
+- `/lotto-buy-guide`를 `sitemap.xml`에 포함
+- 메타데이터:
+  - 한국어 제목/설명
+- 공식 도메인 canonical 유지
+
+## 8. 방문 수 카운트
+
+- 헤더 우측에 `오늘 방문`을 보조 정보 수준으로 노출
+- KST 기준 일별 카운트 사용
+- 같은 브라우저에서는 하루에 한 번만 증가하도록 localStorage 키로 중복 증가를 막음
+- 데이터는 Firestore `site_metrics`에 저장
+- 공개 API:
+  - `GET /api/visits/today`
+  - `POST /api/visits/today`
+
+## 9. 검증 규칙
 
 - `npm test`
 - `npm run build`
-- Firestore rules/indexes 배포 확인
-- 실브라우저 QA
-- Search Console 색인 점검
+- 새 라우트가 sitemap에 포함되는지 확인
+- 사용자 화면에 깨진 한글이나 내부 운영 용어가 없는지 확인
+- 사용자 화면에 영어 전환 UI나 영어 카피가 남아 있지 않은지 확인

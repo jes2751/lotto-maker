@@ -6,11 +6,21 @@ interface NumberSetProps {
   numbers: number[];
   bonus?: number;
   hrefBuilder?: (value: number, isBonus: boolean) => string;
+  className?: string;
+  wrap?: boolean;
 }
 
-export function NumberSet({ numbers, bonus, hrefBuilder }: NumberSetProps) {
+export function NumberSet({
+  numbers,
+  bonus,
+  hrefBuilder,
+  className,
+  wrap = true
+}: NumberSetProps) {
+  const wrapClass = wrap ? "flex-wrap" : "flex-nowrap";
+
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className={`flex items-center gap-3 ${wrapClass} ${className ?? ""}`.trim()}>
       {numbers.map((number) => {
         const href = hrefBuilder?.(number, false);
 
@@ -29,13 +39,19 @@ export function NumberSet({ numbers, bonus, hrefBuilder }: NumberSetProps) {
           </Link>
         );
       })}
+
       {typeof bonus === "number" ? (
         <>
-          <span className="text-sm text-slate-500">BONUS</span>
+          <span
+            aria-hidden="true"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg font-semibold text-slate-400"
+          >
+            +
+          </span>
           {hrefBuilder ? (
             <Link
               href={hrefBuilder(bonus, true)}
-              aria-label={`보너스 번호 ${bonus}번 통계 보기`}
+              aria-label={`보너스 번호 ${bonus} 통계 보기`}
               className="inline-flex rounded-full"
             >
               <NumberBall value={bonus} bonus />

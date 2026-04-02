@@ -100,9 +100,7 @@ export function evaluateGeneratedRecord(record: StoredGeneratedRecord, draw: Dra
 
   const matchedMainNumbers = record.numbers.filter((number) => draw.numbers.includes(number)).length;
   const bonusMatched =
-    typeof record.bonus === "number"
-      ? record.bonus === draw.bonus
-      : record.numbers.includes(draw.bonus);
+    typeof record.bonus === "number" ? record.bonus === draw.bonus : record.numbers.includes(draw.bonus);
 
   return {
     ...record,
@@ -159,9 +157,7 @@ export function buildGeneratedStatsSummary(
 ): GeneratedStatsSummary {
   const currentTargetRound = getTargetRound(latestDraw);
   const currentRecords =
-    currentTargetRound === null
-      ? []
-      : records.filter((record) => record.targetRound === currentTargetRound);
+    currentTargetRound === null ? [] : records.filter((record) => record.targetRound === currentTargetRound);
 
   const evaluatedRecords =
     latestDraw === null

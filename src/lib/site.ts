@@ -7,10 +7,9 @@ export const siteConfig = {
   logoName: "LOTTO MAKER LAB",
   domain: "lotto-maker.cloud",
   defaultUrl: "https://lotto-maker.cloud",
-  descriptionKo:
-    "과거 당첨 데이터 기반 추천, 회차 조회, 통계, 생성 통계를 제공하는 무료 로또 웹 서비스입니다.",
+  descriptionKo: "과거 당첨 데이터 기반 추천, 회차 조회, 통계, 생성 통계를 제공하는 무료 로또 웹 서비스입니다.",
   descriptionEn:
-    "Free Lotto web service with historical-data-based recommendations, latest draw lookup, statistics, and generated stats."
+    "Free Lotto web service with historical-data-based recommendations, draw lookup, statistics, and generated stats."
 };
 
 export function getSiteUrl() {
@@ -40,8 +39,7 @@ export function createPageMetadata({
   descriptionEn,
   path = "/"
 }: PageMetadataInput): Metadata {
-  const title =
-    locale === "ko" ? `${titleKo} | ${siteConfig.name}` : `${titleEn} | ${siteConfig.name}`;
+  const title = locale === "ko" ? `${titleKo} | ${siteConfig.name}` : `${titleEn} | ${siteConfig.name}`;
   const description = locale === "ko" ? descriptionKo : descriptionEn;
   const canonical = getAbsoluteUrl(path);
 

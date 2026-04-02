@@ -3,244 +3,210 @@ import Link from "next/link";
 
 import { NumberSet } from "@/components/lotto/number-set";
 import { computeDashboardSummary, computeFrequencyStats, drawRepository } from "@/lib/lotto";
-import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata } from "@/lib/site";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = await getRequestPreferences();
-
-  return createPageMetadata({
-    locale,
+export const metadata: Metadata = {
+  ...createPageMetadata({
+    locale: "ko",
     path: "/",
-    titleKo: "최신 당첨번호, 번호 생성기, 핵심 통계",
-    titleEn: "Latest results, generator, and core statistics",
+    titleKo: "최신 결과, 번호 생성, 핵심 통계",
+    titleEn: "Latest result, generator, and core statistics",
     descriptionKo:
-      "최신 당첨번호 확인, 로또 번호 생성, 자주 나온 번호와 최근 흐름 확인을 한 화면에서 빠르게 볼 수 있습니다.",
+      "최신 당첨번호를 확인하고, 번호를 생성하고, 자주 보는 핵심 통계를 빠르게 볼 수 있습니다.",
     descriptionEn:
-      "Quick access to the latest draw, Lotto number generation, and the most useful statistics in one place."
-  });
-}
-
-const content = {
-  ko: {
-    eyebrow: "LOTTO MAKER LAB",
-    title: "최신 결과를 보고\n바로 번호를 만들어보세요",
-    description:
-      "홈에서는 최신 당첨번호, 바로 시작할 수 있는 생성기, 자주 확인하는 핵심 통계만 먼저 보여줍니다.",
-    primaryCta: "번호 생성하기",
-    secondaryCta: "회차 조회",
-    latestEyebrow: "최신 당첨번호",
-    latestLink: "회차 상세 보기",
-    quickEyebrow: "빠른 시작",
-    quickTitle: "가장 많이 찾는 기능만 먼저 정리했습니다",
-    quickCards: [
-      {
-        href: "/generate",
-        title: "번호 생성기",
-        body: "혼합, 빈도, 랜덤, 필터 전략으로 바로 번호를 만들 수 있습니다."
-      },
-      {
-        href: "/stats",
-        title: "핵심 통계",
-        body: "자주 나온 번호, 최근 흐름, 패턴 요약을 빠르게 확인할 수 있습니다."
-      },
-      {
-        href: "/community",
-        title: "생성 통계",
-        body: "이번 회차 공개 생성 수와 전략별 성과를 한눈에 볼 수 있습니다."
-      }
-    ],
-    statsEyebrow: "핵심 요약",
-    statsTitle: "지금 가장 많이 참고하는 숫자 흐름",
-    hotLabel: "전체 회차 기준 자주 나온 번호",
-    recentLabel: "최근 10회 자주 나온 번호",
-    summaryCards: {
-      averageSum: "평균 합계",
-      consecutiveRate: "연속번호 포함 비율",
-      oddEven: "가장 흔한 홀짝 비율"
-    },
-    linksTitle: "더 자세히 보기",
-    links: [
-      { href: "/latest-lotto-results", label: "최신 결과 허브" },
-      { href: "/draw-analysis", label: "회차 분석 허브" },
-      { href: "/faq", label: "자주 묻는 질문" }
-    ]
-  },
-  en: {
-    eyebrow: "LOTTO MAKER LAB",
-    title: "Check the latest result\nand generate a set right away",
-    description:
-      "The home page focuses on the latest draw, the generator, and the small set of stats most visitors check first.",
-    primaryCta: "Open generator",
-    secondaryCta: "Browse draws",
-    latestEyebrow: "Latest draw",
-    latestLink: "Round detail",
-    quickEyebrow: "Quick Start",
-    quickTitle: "Start with the most-used paths",
-    quickCards: [
-      {
-        href: "/generate",
-        title: "Generator",
-        body: "Create sets with mixed, frequency, random, and filter strategies."
-      },
-      {
-        href: "/stats",
-        title: "Core stats",
-        body: "See hot numbers, recent trends, and pattern summaries at a glance."
-      },
-      {
-        href: "/community",
-        title: "Generated stats",
-        body: "Review public pick volume and strategy performance for the current round."
-      }
-    ],
-    statsEyebrow: "Core Summary",
-    statsTitle: "The number trends most visitors check first",
-    hotLabel: "Most frequent across all draws",
-    recentLabel: "Most frequent in the recent 10 draws",
-    summaryCards: {
-      averageSum: "Average sum",
-      consecutiveRate: "Consecutive-number rate",
-      oddEven: "Most common odd-even split"
-    },
-    linksTitle: "Keep exploring",
-    links: [
-      { href: "/latest-lotto-results", label: "Latest results" },
-      { href: "/draw-analysis", label: "Analysis hub" },
-      { href: "/faq", label: "FAQ" }
-    ]
-  }
-} as const;
+      "Check the latest draw, generate a new set, and review the core statistics most visitors need first."
+  })
+};
 
 export default async function HomePage() {
-  const { locale } = await getRequestPreferences();
-  const copy = content[locale];
   const draws = await drawRepository.getAll();
   const latestDraw = draws[0] ?? null;
-  const allSummary = computeDashboardSummary(draws, "all");
+  const summary = computeDashboardSummary(draws, "all");
   const allHotNumbers = computeFrequencyStats(draws, "all").slice(0, 5);
   const recentHotNumbers = computeFrequencyStats(draws, "recent_10").slice(0, 5);
-  const mostCommonOddEven = allSummary.oddEvenBreakdown[0]?.label ?? "-";
+  const oddEvenLeader = summary.oddEvenBreakdown[0]?.label ?? "-";
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="panel">
-          <p className="eyebrow">{copy.eyebrow}</p>
-          <h1 className="mt-4 whitespace-pre-line text-4xl font-semibold text-white">{copy.title}</h1>
-          <p className="mt-4 max-w-2xl leading-8 text-slate-300">{copy.description}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/generate" className="cta-button">
-              {copy.primaryCta}
-            </Link>
-            <Link
-              href="/draws"
-              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-            >
-              {copy.secondaryCta}
-            </Link>
-          </div>
-        </div>
+      <section className="panel">
+        <p className="eyebrow">회차 당첨번호</p>
+        {latestDraw ? (
+          <div className="mt-5 grid gap-5 xl:grid-cols-[180px_minmax(0,1fr)_180px] xl:items-center">
+            <div>
+              <h2 className="text-5xl font-semibold text-white">{latestDraw.round}회</h2>
+              <p className="mt-3 text-xl font-medium text-slate-400">{latestDraw.drawDate}</p>
+            </div>
 
-        <div className="panel">
-          <p className="eyebrow">{copy.latestEyebrow}</p>
-          {latestDraw ? (
-            <>
-              <div className="mt-4 flex items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-3xl font-semibold text-white">{latestDraw.round}회</h2>
-                  <p className="mt-2 text-slate-400">{latestDraw.drawDate}</p>
-                </div>
-                <Link href={`/draws/${latestDraw.round}`} className="text-sm text-teal transition hover:text-teal-200">
-                  {copy.latestLink}
-                </Link>
-              </div>
-              <div className="mt-6">
-                <NumberSet
-                  numbers={latestDraw.numbers}
-                  bonus={latestDraw.bonus}
-                  hrefBuilder={(value) => `/stats/numbers/${value}`}
-                />
-              </div>
-            </>
-          ) : (
-            <p className="mt-4 text-slate-400">
-              {locale === "ko" ? "최신 회차 데이터를 아직 불러오지 못했습니다." : "Latest draw data is not ready yet."}
-            </p>
-          )}
+            <div className="overflow-x-auto">
+              <NumberSet
+                numbers={latestDraw.numbers}
+                bonus={latestDraw.bonus}
+                hrefBuilder={(value) => `/stats/numbers/${value}`}
+                wrap={false}
+                className="min-w-max"
+              />
+            </div>
+
+            <div className="xl:text-right">
+              <Link
+                href={`/draws/${latestDraw.round}`}
+                className="text-lg font-medium text-teal transition hover:text-teal-200"
+              >
+                회차 상세 보기
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-4 body-medium text-slate-400">최신 당첨번호를 불러오는 중입니다.</p>
+        )}
+      </section>
+
+      <section className="panel">
+        <p className="eyebrow">LOTTO MAKER LAB</p>
+        <h1 className="section-title mt-4 text-white">최신 결과를 보고 바로 번호를 만들어보세요</h1>
+        <p className="body-large mt-4 max-w-5xl text-slate-300">
+          최신 당첨번호 확인, 번호 생성, 자주 보는 핵심 통계를 한 화면에서 빠르게 확인할 수 있습니다.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/generate" className="cta-button">
+            번호 생성하기
+          </Link>
+          <Link
+            href="/draws"
+            className="rounded-full border border-white/10 px-5 py-3 text-base font-medium text-slate-200 transition hover:border-white/30"
+          >
+            회차 조회
+          </Link>
         </div>
       </section>
 
       <section className="panel">
-        <p className="eyebrow">{copy.quickEyebrow}</p>
-        <h2 className="mt-4 text-2xl font-semibold text-white">{copy.quickTitle}</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {copy.quickCards.map((card) => (
-            <Link key={card.href} href={card.href} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30">
-              <p className="text-lg font-semibold text-white">{card.title}</p>
-              <p className="mt-3 text-sm leading-7 text-slate-300">{card.body}</p>
+        <p className="eyebrow">빠른 시작</p>
+        <h2 className="section-subtitle mt-4 text-white">가장 자주 쓰는 기능부터 시작하세요</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              href: "/generate",
+              title: "번호 생성기",
+              body: "혼합 추천, 빈도 추천, 랜덤 추천, 필터 추천으로 원하는 방식의 번호를 만들 수 있습니다."
+            },
+            {
+              href: "/draws",
+              title: "회차 조회",
+              body: "전체 회차를 찾아보고 원하는 회차의 당첨번호와 상세 정보를 확인할 수 있습니다."
+            },
+            {
+              href: "/stats",
+              title: "통계 보기",
+              body: "자주 나온 번호, 최근 흐름, 홀짝 비율, 합계 구간을 한 번에 비교할 수 있습니다."
+            },
+            {
+              href: "/generated-stats",
+              title: "생성 통계",
+              body: "이번 회차 공개 생성 현황과 전략별 성과를 한눈에 확인할 수 있습니다."
+            }
+          ].map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="rounded-3xl border border-white/10 bg-slate-950/50 p-5 transition hover:border-white/30"
+            >
+              <p className="section-subtitle text-white">{card.title}</p>
+              <p className="body-medium mt-3 text-slate-300">{card.body}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="panel">
+        <p className="eyebrow">핵심 요약</p>
+        <h2 className="section-subtitle mt-4 text-white">지금 가장 많이 참고하는 숫자 흐름</h2>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <Link href="/sum-pattern" className="rounded-3xl border border-white/10 bg-slate-950/50 p-6 transition hover:border-white/30">
+            <p className="text-base text-slate-300">평균 합계</p>
+            <p className="mt-4 text-5xl font-semibold text-white">{summary.averageSum}</p>
+          </Link>
+          <Link
+            href="/recent-10-draw-analysis"
+            className="rounded-3xl border border-white/10 bg-slate-950/50 p-6 transition hover:border-white/30"
+          >
+            <p className="text-base text-slate-300">연속번호 비율</p>
+            <p className="mt-4 text-5xl font-semibold text-white">{summary.consecutiveSummary.percentage}%</p>
+          </Link>
+          <Link
+            href="/odd-even-pattern"
+            className="rounded-3xl border border-white/10 bg-slate-950/50 p-6 transition hover:border-white/30"
+          >
+            <p className="text-base text-slate-300">대표 홀짝 비율</p>
+            <p className="mt-4 text-5xl font-semibold text-white">{oddEvenLeader}</p>
+          </Link>
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-6">
+            <p className="section-subtitle text-white">전체 회차 인기 번호</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {allHotNumbers.map((item) => (
+                <Link
+                  key={`all-hot-${item.number}`}
+                  href={`/stats/numbers/${item.number}`}
+                  className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
+                >
+                  {item.number} <span className="text-slate-500">{item.frequency}회</span>
+                </Link>
+              ))}
+            </div>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-6">
+            <p className="section-subtitle text-white">최근 10회 인기 번호</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {recentHotNumbers.map((item) => (
+                <Link
+                  key={`recent-hot-${item.number}`}
+                  href={`/stats/numbers/${item.number}`}
+                  className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
+                >
+                  {item.number} <span className="text-slate-500">{item.frequency}회</span>
+                </Link>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
         <div className="panel">
-          <p className="eyebrow">{copy.statsEyebrow}</p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">{copy.statsTitle}</h2>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">{copy.summaryCards.averageSum}</p>
-              <p className="mt-3 text-3xl font-semibold text-white">{allSummary.averageSum}</p>
-            </article>
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">{copy.summaryCards.consecutiveRate}</p>
-              <p className="mt-3 text-3xl font-semibold text-white">{allSummary.consecutiveSummary.percentage}%</p>
-            </article>
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">{copy.summaryCards.oddEven}</p>
-              <p className="mt-3 text-3xl font-semibold text-white">{mostCommonOddEven}</p>
-            </article>
-          </div>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-sm font-medium text-white">{copy.hotLabel}</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {allHotNumbers.map((item) => (
-                  <Link
-                    key={`all-hot-${item.number}`}
-                    href={`/stats/numbers/${item.number}`}
-                    className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
-                  >
-                    {item.number} <span className="text-slate-500">{item.frequency}회</span>
-                  </Link>
-                ))}
-              </div>
-            </article>
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-              <p className="text-sm font-medium text-white">{copy.recentLabel}</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {recentHotNumbers.map((item) => (
-                  <Link
-                    key={`recent-hot-${item.number}`}
-                    href={`/stats/numbers/${item.number}`}
-                    className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
-                  >
-                    {item.number} <span className="text-slate-500">{item.frequency}회</span>
-                  </Link>
-                ))}
-              </div>
-            </article>
+          <p className="eyebrow">가이드</p>
+          <h2 className="section-subtitle mt-4 text-white">자주 보는 로또 가이드</h2>
+          <div className="mt-6 grid gap-4">
+            {[
+              { href: "/guides/lotto-number-generator-vs-random", label: "생성기 vs 랜덤 추천" },
+              { href: "/guides/recent-20-hot-numbers", label: "최근 20회 자주 나온 번호" },
+              { href: "/guides/odd-even-pattern-guide", label: "홀짝 패턴은 어떻게 읽을까" }
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-3xl border border-white/10 bg-slate-950/50 p-5 text-base font-medium text-white transition hover:border-white/30"
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
 
         <div className="panel">
-          <p className="eyebrow">{locale === "ko" ? "더 보기" : "Explore"}</p>
-          <h2 className="mt-4 text-2xl font-semibold text-white">{copy.linksTitle}</h2>
+          <p className="eyebrow">서비스 안내</p>
+          <h2 className="section-subtitle mt-4 text-white">처음 방문했다면 여기부터 보세요</h2>
           <div className="mt-6 grid gap-4">
-            {copy.links.map((item) => (
+            {[
+              { href: "/lotto-buy-guide", label: "온라인 구매 안내" },
+              { href: "/latest-lotto-results", label: "최신 결과 보기" },
+              { href: "/draw-analysis", label: "회차 분석 보기" },
+              { href: "/faq", label: "자주 묻는 질문" }
+            ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

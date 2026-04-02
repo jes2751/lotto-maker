@@ -281,7 +281,7 @@ export class StaticGenerationService implements GenerationService {
         id: `gen_${Date.now()}_${index + 1}`,
         strategy: input.strategy,
         numbers,
-        bonus: input.includeBonus ? createBonus(numbers) : undefined,
+        bonus: createBonus(numbers),
         reason: createReason(input.strategy, input.filters),
         generatedAt: new Date().toISOString()
       };

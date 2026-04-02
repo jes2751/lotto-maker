@@ -9,7 +9,7 @@ const guideEntries = {
   ko: [
     {
       href: "/guides/lotto-number-generator-vs-random",
-      title: "로또 번호 생성기와 랜덤 추천의 차이",
+      title: "생성기 vs 랜덤 추천",
       description: "완전 랜덤 추천과 과거 당첨 데이터 기반 추천이 어떻게 다른지 설명합니다."
     },
     {

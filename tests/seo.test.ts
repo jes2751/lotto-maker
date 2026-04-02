@@ -25,7 +25,8 @@ test("sitemap includes seo landing and analysis routes", async () => {
 
   assert.ok(urls.includes("https://lotto-maker.cloud/odd-even-pattern"));
   assert.ok(urls.includes("https://lotto-maker.cloud/sum-pattern"));
-  assert.ok(urls.includes("https://lotto-maker.cloud/community"));
+  assert.ok(urls.includes("https://lotto-maker.cloud/generated-stats"));
+  assert.ok(urls.includes("https://lotto-maker.cloud/lotto-buy-guide"));
   assert.ok(urls.includes("https://lotto-maker.cloud/draw-analysis"));
   assert.ok(urls.includes("https://lotto-maker.cloud/draw-analysis/1169"));
   assert.ok(urls.includes("https://lotto-maker.cloud/privacy"));

@@ -23,7 +23,7 @@ interface FrequencyChartProps {
 export function FrequencyChart({ title, stats, color }: FrequencyChartProps) {
   return (
     <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-5">
-      <p className="text-sm font-medium text-white">{title}</p>
+      <p className="text-base font-medium text-white">{title}</p>
       <div className="mt-4 h-64">
         <Bar
           data={{

@@ -85,6 +85,19 @@ function buildDrawsHref(params: { offset?: number; limit: number; round?: string
   return query ? `/draws?${query}` : "/draws";
 }
 
+function getPaginationRange(currentPage: number, totalPages: number) {
+  const maxVisible = 5;
+  const half = Math.floor(maxVisible / 2);
+  let start = Math.max(currentPage - half, 1);
+  let end = Math.min(start + maxVisible - 1, totalPages);
+
+  if (end - start + 1 < maxVisible) {
+    start = Math.max(end - maxVisible + 1, 1);
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+}
+
 export default async function DrawsPage({ searchParams }: DrawsPageProps) {
   const limit = Math.min(Math.max(parsePositiveInteger(searchParams?.limit, DEFAULT_LIMIT), 1), 20);
   const offset = parsePositiveInteger(searchParams?.offset, 0);
@@ -104,6 +117,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
   const totalPages = Math.max(Math.ceil(total / limit), 1);
   const previousOffset = Math.max(offset - limit, 0);
   const nextOffset = offset + limit;
+  const pageNumbers = getPaginationRange(currentPage, totalPages);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
@@ -111,7 +125,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         <div className="panel">
           <p className="eyebrow">Draws</p>
           <h1 className="mt-4 text-4xl font-semibold text-white">전체 회차 조회</h1>
-          <p className="mt-3 text-slate-300">전체 회차 데이터를 기준으로 최신부터 페이지 단위로 탐색할 수 있습니다.</p>
+          <p className="mt-3 text-slate-300">전체 회차 데이터를 기준으로 최신 회차부터 차례대로 확인할 수 있습니다.</p>
         </div>
         <div className="panel">
           <p className="eyebrow">Find Round</p>
@@ -150,11 +164,11 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">최신 회차</p>
+              <p className="text-sm text-slate-400">최신 회차</p>
               <p className="mt-2 text-2xl font-semibold text-white">{latest ? `${latest.round}회` : "-"}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">전체 회차 수</p>
+              <p className="text-sm text-slate-400">전체 회차 수</p>
               <p className="mt-2 text-2xl font-semibold text-white">{total}개</p>
             </div>
           </div>
@@ -217,44 +231,6 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         </section>
       ) : null}
 
-      <section className="panel">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="eyebrow">Paging</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">{selectedNumber ? `${selectedNumber}번 기준 회차 목록` : "회차 목록 페이지"}</h2>
-          </div>
-          <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">
-            {currentPage} / {totalPages} 페이지
-          </div>
-        </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link
-            href={buildDrawsHref({ offset: previousOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
-            aria-disabled={offset === 0}
-            className={[
-              "rounded-full border px-5 py-3 text-sm transition",
-              offset === 0
-                ? "pointer-events-none border-white/5 bg-slate-950/20 text-slate-600"
-                : "border-white/10 text-slate-200 hover:border-white/30"
-            ].join(" ")}
-          >
-            이전 페이지
-          </Link>
-          <Link
-            href={buildDrawsHref({ offset: nextOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
-            aria-disabled={!hasMore}
-            className={[
-              "rounded-full border px-5 py-3 text-sm transition",
-              !hasMore
-                ? "pointer-events-none border-white/5 bg-slate-950/20 text-slate-600"
-                : "border-white/10 text-slate-200 hover:border-white/30"
-            ].join(" ")}
-          >
-            다음 페이지
-          </Link>
-        </div>
-      </section>
-
       <div className="grid gap-4">
         {draws.map((draw) => (
           <article key={draw.round} className="panel">
@@ -269,7 +245,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
                   href={`/draws/${draw.round}`}
                   className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
                 >
-                  Detail
+                  상세 보기
                 </Link>
               </div>
             </div>
@@ -283,6 +259,57 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
           </article>
         ))}
       </div>
+
+      <section className="panel">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-200">
+          <Link
+            href={buildDrawsHref({ offset: previousOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
+            aria-disabled={offset === 0}
+            className={[
+              "rounded-full border px-4 py-2 transition",
+              offset === 0
+                ? "pointer-events-none border-white/5 bg-slate-950/20 text-slate-600"
+                : "border-white/10 text-slate-200 hover:border-white/30"
+            ].join(" ")}
+          >
+            이전
+          </Link>
+
+          {pageNumbers.map((page) => {
+            const pageOffset = (page - 1) * limit;
+            const isActive = page === currentPage;
+
+            return (
+              <Link
+                key={page}
+                href={buildDrawsHref({ offset: pageOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
+                aria-current={isActive ? "page" : undefined}
+                className={[
+                  "min-w-10 rounded-full border px-4 py-2 text-center transition",
+                  isActive
+                    ? "border-cyan-400 bg-cyan-400/10 text-cyan-300"
+                    : "border-white/10 text-slate-200 hover:border-white/30"
+                ].join(" ")}
+              >
+                {page}
+              </Link>
+            );
+          })}
+
+          <Link
+            href={buildDrawsHref({ offset: nextOffset, limit, round: roundQuery || undefined, number: numberFilter.raw || undefined })}
+            aria-disabled={!hasMore}
+            className={[
+              "rounded-full border px-4 py-2 transition",
+              !hasMore
+                ? "pointer-events-none border-white/5 bg-slate-950/20 text-slate-600"
+                : "border-white/10 text-slate-200 hover:border-white/30"
+            ].join(" ")}
+          >
+            다음
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

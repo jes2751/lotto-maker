@@ -39,9 +39,9 @@ const strategies: Array<{ value: GenerationStrategy; label: string; description:
 
 const oddEvenOptions: Array<{ value: OddEvenFilter; label: string }> = [
   { value: "any", label: "조건 없음" },
-  { value: "balanced", label: "균형형(3:3)" },
-  { value: "odd-heavy", label: "홀수 많음" },
-  { value: "even-heavy", label: "짝수 많음" }
+  { value: "balanced", label: "균형형 3:3" },
+  { value: "odd-heavy", label: "홀수 비중 높게" },
+  { value: "even-heavy", label: "짝수 비중 높게" }
 ];
 
 type RecordStatus = "idle" | "recording" | "recorded" | "failed";
@@ -62,10 +62,7 @@ function parseNumberInput(value: string) {
 }
 
 function formatCopyText(set: GeneratedSet) {
-  const numbers = set.numbers.join(", ");
-  const bonus = typeof set.bonus === "number" ? ` | 보너스 ${set.bonus}` : "";
-
-  return `${set.strategy}: ${numbers}${bonus}`;
+  return `${set.strategy}: ${set.numbers.join(", ")} + ${set.bonus}`;
 }
 
 function loadSavedSets(): GeneratedSet[] {
@@ -75,7 +72,6 @@ function loadSavedSets(): GeneratedSet[] {
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-
     if (!raw) {
       return [];
     }
@@ -101,8 +97,7 @@ function buildStatsHref(value: number) {
 
 export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
   const [strategy, setStrategy] = useState<GenerationStrategy>("mixed");
-  const [count, setCount] = useState(2);
-  const [includeBonus, setIncludeBonus] = useState(true);
+  const [count, setCount] = useState(5);
   const [fixedNumbersInput, setFixedNumbersInput] = useState("");
   const [excludedNumbersInput, setExcludedNumbersInput] = useState("");
   const [oddEven, setOddEven] = useState<OddEvenFilter>("any");
@@ -159,6 +154,11 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     return parts.length > 0 ? parts.join(" / ") : "조건 없음";
   }, [allowConsecutive, excludedNumbers, fixedNumbers, oddEven, sumMax, sumMin]);
 
+  const selectedStrategy = useMemo(
+    () => strategies.find((item) => item.value === strategy),
+    [strategy]
+  );
+
   async function generate() {
     setLoading(true);
     setError(null);
@@ -167,13 +167,10 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     try {
       const response = await fetch("/api/v1/generate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           strategy,
           count,
-          include_bonus: includeBonus,
           filters: {
             fixed_numbers: filters.fixedNumbers,
             excluded_numbers: filters.excludedNumbers,
@@ -243,270 +240,301 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
 
   useEffect(() => {
     setSavedSets(loadSavedSets());
-    void generate();
   }, []);
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[1.05fr_1.1fr_0.95fr]">
+    <div className="flex flex-col gap-8">
       <section className="panel">
-        <p className="eyebrow">생성 설정</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">전략과 조건을 정한 뒤 번호를 생성하세요</h2>
-        <p className="mt-3 text-sm leading-7 text-slate-400">
-          생성 결과는 공개 생성 통계에 익명으로 반영됩니다. 어떤 전략이 실제 결과와 더 가까웠는지 나중에
-          비교할 수 있습니다.
-        </p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow">생성 설정</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">전략을 고르고 바로 번호를 만들어보세요</h2>
+          </div>
+          <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">
+            보너스 번호는 항상 포함됩니다.
+          </div>
+        </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
           {strategies.map((item) => (
             <button
               key={item.value}
               type="button"
               onClick={() => setStrategy(item.value)}
               className={[
-                "w-full rounded-2xl border px-4 py-4 text-left transition",
+                "rounded-2xl border px-4 py-4 text-left transition",
                 strategy === item.value
                   ? "border-accent bg-accent/10 text-white"
                   : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20"
               ].join(" ")}
             >
               <div className="font-medium">{item.label}</div>
-              <div className="mt-1 text-sm text-slate-400">{item.description}</div>
+              <div className="mt-2 text-sm leading-6 text-slate-400">{item.description}</div>
             </button>
           ))}
         </div>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-          <label className="space-y-2 text-sm text-slate-300">
-            <span>생성 수</span>
-            <select
-              value={count}
-              onChange={(event) => setCount(Number(event.target.value))}
-              className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
-            >
-              {[1, 2, 3, 4, 5].map((option) => (
-                <option key={option} value={option}>
-                  {option}세트
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
-            <input
-              type="checkbox"
-              checked={includeBonus}
-              onChange={(event) => setIncludeBonus(event.target.checked)}
-              className="h-4 w-4 accent-accent"
-            />
-            보너스 번호 포함
-          </label>
-        </div>
-
-        <div className="mt-6 rounded-3xl border border-white/10 bg-slate-900/60 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-medium text-white">현재 필터 요약</p>
-            <p className="text-xs text-slate-500">
-              고정수 {fixedNumbers.length}개 / 제외수 {excludedNumbers.length}개
-            </p>
-          </div>
-          <p className="mt-3 text-sm leading-7 text-slate-400">{filterSummary}</p>
-        </div>
-
-        <div className="mt-6 space-y-4">
-          <label className="space-y-2 text-sm text-slate-300">
-            <span>고정수 입력</span>
-            <input
-              value={fixedNumbersInput}
-              onChange={(event) => setFixedNumbersInput(event.target.value)}
-              placeholder="예: 3, 11, 27"
-              className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-            />
-            <p className="text-xs text-slate-500">숫자는 최대 5개까지 넣을 수 있습니다.</p>
-          </label>
-
-          <label className="space-y-2 text-sm text-slate-300">
-            <span>제외수 입력</span>
-            <input
-              value={excludedNumbersInput}
-              onChange={(event) => setExcludedNumbersInput(event.target.value)}
-              placeholder="예: 1, 2, 45"
-              className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-            />
-            <p className="text-xs text-slate-500">제외수는 최대 35개까지 넣을 수 있습니다.</p>
-          </label>
-
-          <label className="space-y-2 text-sm text-slate-300">
-            <span>홀짝 조건</span>
-            <select
-              value={oddEven}
-              onChange={(event) => setOddEven(event.target.value as OddEvenFilter)}
-              className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
-            >
-              {oddEvenOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2 text-sm text-slate-300">
-              <span>합계 최소값</span>
-              <input
-                value={sumMin}
-                onChange={(event) => setSumMin(event.target.value)}
-                inputMode="numeric"
-                placeholder="예: 90"
-                className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-              />
-            </label>
-            <label className="space-y-2 text-sm text-slate-300">
-              <span>합계 최대값</span>
-              <input
-                value={sumMax}
-                onChange={(event) => setSumMax(event.target.value)}
-                inputMode="numeric"
-                placeholder="예: 170"
-                className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-              />
-            </label>
-          </div>
-
-          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
-            <input
-              type="checkbox"
-              checked={allowConsecutive}
-              onChange={(event) => setAllowConsecutive(event.target.checked)}
-              className="h-4 w-4 accent-accent"
-            />
-            연속번호 허용
-          </label>
-        </div>
-
-        <button type="button" onClick={() => void generate()} className="cta-button mt-6 w-full" disabled={loading}>
-          {loading ? "번호 생성 중..." : "번호 생성하기"}
-        </button>
       </section>
 
       <section className="panel">
-        <p className="eyebrow">생성 결과</p>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="mt-3 text-2xl font-semibold text-white">지금 생성된 추천 번호</h2>
-            <p className="mt-2 text-sm text-slate-400">
-              생성한 번호는 번호 통계와 연결되고, 공개 생성 통계에도 익명으로 반영됩니다.
-            </p>
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-[0.6fr_0.4fr]">
+              <label className="space-y-2 text-sm text-slate-300">
+                <span>생성 수</span>
+                <select
+                  value={count}
+                  onChange={(event) => setCount(Number(event.target.value))}
+                  className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
+                >
+                  {[1, 2, 3, 4, 5].map((option) => (
+                    <option key={option} value={option}>
+                      {option}세트
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-white">현재 전략</p>
+                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                    {selectedStrategy?.label ?? strategy}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  {selectedStrategy?.description ?? "현재 전략 설명이 준비되지 않았습니다."}
+                </p>
+              </div>
+            </div>
+
+            {strategy === "filter" ? (
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-white">현재 필터 요약</p>
+                    <p className="text-xs text-slate-500">
+                      고정수 {fixedNumbers.length}개 / 제외수 {excludedNumbers.length}개
+                    </p>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-slate-400">{filterSummary}</p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-2 text-sm text-slate-300">
+                    <span>고정수 입력</span>
+                    <input
+                      value={fixedNumbersInput}
+                      onChange={(event) => setFixedNumbersInput(event.target.value)}
+                      placeholder="예: 3, 11, 27"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                    />
+                    <p className="text-xs text-slate-500">숫자는 최대 5개까지 넣을 수 있습니다.</p>
+                  </label>
+
+                  <label className="space-y-2 text-sm text-slate-300">
+                    <span>제외수 입력</span>
+                    <input
+                      value={excludedNumbersInput}
+                      onChange={(event) => setExcludedNumbersInput(event.target.value)}
+                      placeholder="예: 1, 2, 45"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                    />
+                    <p className="text-xs text-slate-500">제외수는 최대 35개까지 넣을 수 있습니다.</p>
+                  </label>
+
+                  <label className="space-y-2 text-sm text-slate-300">
+                    <span>홀짝 조건</span>
+                    <select
+                      value={oddEven}
+                      onChange={(event) => setOddEven(event.target.value as OddEvenFilter)}
+                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
+                    >
+                      {oddEvenOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="space-y-2 text-sm text-slate-300">
+                      <span>합계 최소값</span>
+                      <input
+                        value={sumMin}
+                        onChange={(event) => setSumMin(event.target.value)}
+                        inputMode="numeric"
+                        placeholder="예: 90"
+                        className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                      />
+                    </label>
+                    <label className="space-y-2 text-sm text-slate-300">
+                      <span>합계 최대값</span>
+                      <input
+                        value={sumMax}
+                        onChange={(event) => setSumMax(event.target.value)}
+                        inputMode="numeric"
+                        placeholder="예: 170"
+                        className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={allowConsecutive}
+                    onChange={(event) => setAllowConsecutive(event.target.checked)}
+                    className="h-4 w-4 accent-accent"
+                  />
+                  연속번호 허용
+                </label>
+              </div>
+            ) : null}
           </div>
-          <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-400">
-            {sets.length} set
-          </span>
+
+          <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-slate-950/30 p-5">
+            <div>
+              <p className="text-sm font-medium text-white">생성 기준</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                {targetRound ? `${targetRound}회 대상 번호로 기록됩니다.` : "다음 회차 기준을 계산 중입니다."}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                생성 결과는 참고용이며 공개 생성 통계에도 익명으로 반영됩니다.
+              </p>
+            </div>
+
+            <button type="button" onClick={() => void generate()} className="cta-button mt-auto w-full" disabled={loading}>
+              {loading ? "번호 생성 중..." : "번호 생성하기"}
+            </button>
+          </div>
         </div>
+      </section>
 
-        {targetRound ? (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-            현재 생성 결과는 <strong>{targetRound}회</strong> 대상 번호로 기록됩니다.
+      <section className="grid gap-8 xl:grid-cols-[1.35fr_0.65fr]">
+        <section className="panel">
+          <p className="eyebrow">생성 결과</p>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="mt-3 text-2xl font-semibold text-white">지금 생성된 추천 번호</h2>
+              <p className="mt-2 text-sm text-slate-400">
+                생성한 번호는 번호 통계와 연결되고, 공개 생성 통계에도 익명으로 반영됩니다.
+              </p>
+            </div>
+            <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-400">
+              {sets.length} set
+            </span>
           </div>
-        ) : null}
 
-        {recordStatus !== "idle" ? (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-            {recordStatus === "recording" && "생성 통계에 반영하는 중입니다."}
-            {recordStatus === "recorded" && "생성 통계에 반영되었습니다."}
-            {recordStatus === "failed" && "번호 생성은 완료됐지만 생성 통계 반영에는 실패했습니다."}
+          {targetRound ? (
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+              현재 생성 결과는 <strong>{targetRound}회</strong> 대상 번호로 기록됩니다.
+            </div>
+          ) : null}
+
+          {recordStatus !== "idle" ? (
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+              {recordStatus === "recording" && "생성 통계에 반영 중입니다."}
+              {recordStatus === "recorded" && "생성 통계에 반영됐습니다."}
+              {recordStatus === "failed" && "번호는 생성됐지만 생성 통계 기록에는 실패했습니다."}
+            </div>
+          ) : null}
+
+          {error ? (
+            <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
+              {error}
+            </div>
+          ) : null}
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            {sets.map((set) => (
+              <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
+                    {set.strategy}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</span>
+                    <button
+                      type="button"
+                      onClick={() => void copySet(set)}
+                      className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                    >
+                      {copiedId === set.id ? "복사 완료" : "복사"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => saveSet(set)}
+                      className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                    >
+                      {savedId === set.id ? "저장 완료" : "저장"}
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={buildStatsHref} />
+                </div>
+                <p className="mt-4 text-sm leading-7 text-slate-400">{set.reason}</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    href={`/draws?number=${set.numbers[0]}`}
+                    className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                  >
+                    관련 회차 보기
+                  </Link>
+                  <Link
+                    href={`/stats/numbers/${set.numbers[0]}`}
+                    className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                  >
+                    번호 통계 보기
+                  </Link>
+                </div>
+              </article>
+            ))}
           </div>
-        ) : null}
 
-        {error ? (
-          <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
-            {error}
-          </div>
-        ) : null}
+          {!error && sets.length === 0 ? (
+            <div className="mt-6 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
+              아직 생성된 결과가 없습니다. 전략을 선택하고 번호를 생성해보세요.
+            </div>
+          ) : null}
+        </section>
 
-        <div className="mt-6 space-y-4">
-          {sets.map((set) => (
-            <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
-                  {set.strategy}
-                </span>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</span>
+        <section className="panel">
+          <p className="eyebrow">임시 저장</p>
+          <h2 className="mt-3 text-2xl font-semibold text-white">다시 보고 싶은 번호</h2>
+          <p className="mt-2 text-sm text-slate-400">최근 저장한 번호를 최대 8세트까지 유지합니다.</p>
+
+          <div className="mt-6 space-y-4">
+            {savedSets.map((set) => (
+              <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
+                    {set.strategy}
+                  </span>
                   <button
                     type="button"
-                    onClick={() => void copySet(set)}
+                    onClick={() => removeSavedSet(set.id)}
                     className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
                   >
-                    {copiedId === set.id ? "복사 완료" : "복사"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => saveSet(set)}
-                    className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                  >
-                    {savedId === set.id ? "저장 완료" : "저장"}
+                    삭제
                   </button>
                 </div>
-              </div>
-              <div className="mt-4">
-                <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={(value) => buildStatsHref(value)} />
-              </div>
-              <p className="mt-4 text-sm leading-7 text-slate-400">{set.reason}</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Link
-                  href={`/draws?number=${set.numbers[0]}`}
-                  className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                >
-                  관련 회차 보기
-                </Link>
-                <Link
-                  href={`/stats/numbers/${set.numbers[0]}`}
-                  className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                >
-                  번호 통계 보기
-                </Link>
-              </div>
-            </article>
-          ))}
-          {!error && sets.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              아직 생성된 결과가 없습니다. 전략을 선택한 뒤 번호를 만들어보세요.
-            </div>
-          ) : null}
-        </div>
-      </section>
+                <div className="mt-4">
+                  <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={buildStatsHref} />
+                </div>
+                <p className="mt-4 text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</p>
+              </article>
+            ))}
 
-      <section className="panel">
-        <p className="eyebrow">임시 저장</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">다시 보고 싶은 번호</h2>
-        <p className="mt-2 text-sm text-slate-400">최근 저장한 번호를 최대 8세트까지 유지합니다.</p>
-        <div className="mt-6 space-y-4">
-          {savedSets.map((set) => (
-            <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
-              <div className="flex items-center justify-between gap-3">
-                <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
-                  {set.strategy}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => removeSavedSet(set.id)}
-                  className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                >
-                  삭제
-                </button>
+            {savedSets.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
+                저장된 번호가 없습니다. 생성 결과에서 저장 버튼을 눌러 보관할 수 있습니다.
               </div>
-              <div className="mt-4">
-                <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={(value) => buildStatsHref(value)} />
-              </div>
-              <p className="mt-4 text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</p>
-            </article>
-          ))}
-          {savedSets.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              저장된 번호가 없습니다. 생성 결과에서 저장 버튼을 눌러 보관할 수 있습니다.
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        </section>
       </section>
     </div>
   );

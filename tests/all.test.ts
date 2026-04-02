@@ -7,3 +7,4 @@ import "./pages.test";
 import "./draw-sync.test";
 import "./firestore-draw-sync.test";
 import "./seo.test";
+import "./site-visits.test";

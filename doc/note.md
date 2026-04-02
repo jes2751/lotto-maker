@@ -9,7 +9,7 @@
 - Cloudflare 주간 sync Worker 배포 완료
   - `https://lotto-maker-draw-sync.jes2751.workers.dev`
   - `0 1 * * SUN`
-- 생성 통계 허브(`/community`)는 Firestore `generated_records` 기반으로 동작
+- 생성 통계 허브(`/generated-stats`)는 Firestore `generated_records` 기반으로 동작
 - 남은 운영 작업은 Search Console 등록과 모바일 QA 위주다
 
 ## draw seed 최신 결과
@@ -44,7 +44,7 @@ http://localhost:3000
 - `/draws`
 - `/draws/1169`
 - `/stats`
-- `/community`
+- `/generated-stats`
 - `/latest-lotto-results`
 - `/draw-analysis`
 - `/draw-analysis/1169`
@@ -90,7 +90,7 @@ DRAW_SYNC_SECRET=
 ## 6. Firestore generated stats
 
 - 생성기는 Firestore `generated_records`에 결과를 저장한다.
-- 생성 통계 허브(`/community`)는 Firestore 읽기 기반이다.
+- 생성 통계 허브(`/generated-stats`)는 Firestore 읽기 기반이다.
 - 전략 성과, 적중 분포, 이번 회차 생성 현황을 볼 수 있다.
 
 ## 7. Firestore 당첨번호 적재
@@ -148,7 +148,7 @@ https://lotto-maker.cloud
 - `/`
 - `/generate`
 - `/stats`
-- `/community`
+- `/generated-stats`
 - `/latest-lotto-results`
 - `/draw-analysis`
 

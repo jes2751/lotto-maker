@@ -58,7 +58,6 @@ export interface DrawRepository {
 export interface GenerateNumbersInput {
   strategy: GenerationStrategy;
   count: number;
-  includeBonus: boolean;
   filters?: GenerationFilters;
 }
 

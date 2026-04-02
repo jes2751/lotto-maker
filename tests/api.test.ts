@@ -1,8 +1,8 @@
-import test from "node:test";
 import assert from "node:assert/strict";
+import test from "node:test";
 
-import { GET as getDraws } from "../src/app/api/v1/draws/route";
 import { GET as getDrawByRound } from "../src/app/api/v1/draws/[round]/route";
+import { GET as getDraws } from "../src/app/api/v1/draws/route";
 import { POST as postGenerate } from "../src/app/api/v1/generate/route";
 import { GET as getFrequencyStats } from "../src/app/api/v1/stats/frequency/route";
 
@@ -42,7 +42,7 @@ test("generate api validates invalid strategy", async () => {
     new Request("http://localhost/api/v1/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ strategy: "invalid", count: 1, include_bonus: true })
+      body: JSON.stringify({ strategy: "invalid", count: 1 })
     })
   );
 
@@ -54,13 +54,14 @@ test("generate api returns requested set count", async () => {
     new Request("http://localhost/api/v1/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ strategy: "random", count: 2, include_bonus: true })
+      body: JSON.stringify({ strategy: "random", count: 2 })
     })
   );
   const payload = await response.json();
 
   assert.equal(response.status, 200);
   assert.equal(payload.data.sets.length, 2);
+  assert.ok(payload.data.sets.every((set: { bonus?: number; numbers: number[] }) => typeof set.bonus === "number"));
 });
 
 test("generate api validates overlapping fixed and excluded numbers", async () => {
@@ -71,7 +72,6 @@ test("generate api validates overlapping fixed and excluded numbers", async () =
       body: JSON.stringify({
         strategy: "filter",
         count: 1,
-        include_bonus: true,
         filters: {
           fixed_numbers: [3, 7],
           excluded_numbers: [7, 12]
@@ -91,7 +91,6 @@ test("generate api returns filtered sets", async () => {
       body: JSON.stringify({
         strategy: "filter",
         count: 1,
-        include_bonus: false,
         filters: {
           fixed_numbers: [3, 11],
           excluded_numbers: [1, 2, 45],
@@ -110,6 +109,7 @@ test("generate api returns filtered sets", async () => {
   assert.ok(!set.numbers.includes(1));
   assert.ok(!set.numbers.includes(2));
   assert.ok(!set.numbers.includes(45));
+  assert.ok(typeof set.bonus === "number");
 });
 
 test("stats api returns top level metadata", async () => {
