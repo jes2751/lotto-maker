@@ -20,7 +20,7 @@ export function NumberSet({
   const wrapClass = wrap ? "flex-wrap" : "flex-nowrap";
 
   return (
-    <div className={`flex items-center gap-3 ${wrapClass} ${className ?? ""}`.trim()}>
+    <div className={`flex items-center gap-3 p-1 sm:p-2 ${wrapClass} ${className ?? ""}`.trim()}>
       {numbers.map((number) => {
         const href = hrefBuilder?.(number, false);
 
