@@ -51,10 +51,20 @@ export function PreferenceControls({ locale, theme }: PreferenceControlsProps) {
         </button>
       </div>
       <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-2">
-        <button type="button" onClick={() => updateLocale("ko")} className={pillClass(locale === "ko")} disabled={isPending}>
-          한글
+        <button
+          type="button"
+          onClick={() => updateLocale("ko")}
+          className={pillClass(locale === "ko")}
+          disabled={isPending}
+        >
+          한국어
         </button>
-        <button type="button" onClick={() => updateLocale("en")} className={pillClass(locale === "en")} disabled={isPending}>
+        <button
+          type="button"
+          onClick={() => updateLocale("en")}
+          className={pillClass(locale === "en")}
+          disabled={isPending}
+        >
           ENG
         </button>
       </div>

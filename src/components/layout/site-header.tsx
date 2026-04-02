@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site";
 
 const content = {
   ko: {
-    tagline: "과거 당첨 데이터 기반 추천, 회차 조회, 생성 통계를 한곳에서 보는 로또 웹 서비스",
+    tagline: "과거 당첨 데이터 기반 추천, 회차 조회, 통계, 생성 통계를 제공하는 로또 웹 서비스",
     navigation: [
       { href: "/", label: "홈" },
       { href: "/generate", label: "번호 생성기" },

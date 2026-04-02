@@ -18,30 +18,30 @@ const strategies: Array<{ value: GenerationStrategy; label: string; description:
   {
     value: "mixed",
     label: "혼합 추천",
-    description: "전체 회차 빈도와 최근 흐름을 함께 참고해 가장 균형 있게 번호를 추천합니다."
+    description: "전체 빈도와 최근 흐름을 함께 참고해 균형 있게 번호를 만듭니다."
   },
   {
     value: "frequency",
     label: "빈도 추천",
-    description: "과거 당첨 데이터에서 자주 나온 번호를 더 강하게 반영합니다."
+    description: "과거 당첨 데이터에서 자주 나온 번호 흐름을 더 강하게 반영합니다."
   },
   {
     value: "random",
     label: "랜덤 추천",
-    description: "조건 없이 1부터 45까지의 숫자 중에서 무작위로 조합을 만듭니다."
+    description: "1부터 45까지 중복 없이 무작위로 번호를 생성합니다."
   },
   {
     value: "filter",
     label: "필터 추천",
-    description: "고정수, 제외수, 홀짝, 합계, 연속번호 여부를 반영해 조건형 번호를 생성합니다."
+    description: "고정수, 제외수, 홀짝, 합계, 연속번호 조건을 넣어 맞춤형으로 생성합니다."
   }
 ];
 
 const oddEvenOptions: Array<{ value: OddEvenFilter; label: string }> = [
-  { value: "any", label: "제한 없음" },
+  { value: "any", label: "조건 없음" },
   { value: "balanced", label: "균형형(3:3)" },
-  { value: "odd-heavy", label: "홀수 강세" },
-  { value: "even-heavy", label: "짝수 강세" }
+  { value: "odd-heavy", label: "홀수 많음" },
+  { value: "even-heavy", label: "짝수 많음" }
 ];
 
 type RecordStatus = "idle" | "recording" | "recorded" | "failed";
@@ -249,11 +249,11 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
   return (
     <div className="grid gap-8 xl:grid-cols-[1.05fr_1.1fr_0.95fr]">
       <section className="panel">
-        <p className="eyebrow">추천 설정</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">조건을 정하고 데이터 기반 추천을 바로 생성하세요</h2>
+        <p className="eyebrow">생성 설정</p>
+        <h2 className="mt-3 text-2xl font-semibold text-white">전략과 조건을 정한 뒤 번호를 생성하세요</h2>
         <p className="mt-3 text-sm leading-7 text-slate-400">
-          전략을 먼저 고르고, 필요하면 필터까지 추가해 이번 회차 참고용 번호를 생성합니다. 생성된 번호는
-          Firestore 기반 생성 통계에도 자동으로 반영됩니다.
+          생성 결과는 공개 생성 통계에 익명으로 반영됩니다. 어떤 전략이 실제 결과와 더 가까웠는지 나중에
+          비교할 수 있습니다.
         </p>
 
         <div className="mt-6 space-y-4">
@@ -277,7 +277,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <label className="space-y-2 text-sm text-slate-300">
-            <span>생성 세트 수</span>
+            <span>생성 수</span>
             <select
               value={count}
               onChange={(event) => setCount(Number(event.target.value))}
@@ -304,7 +304,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
 
         <div className="mt-6 rounded-3xl border border-white/10 bg-slate-900/60 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-medium text-white">필터 조건 요약</p>
+            <p className="text-sm font-medium text-white">현재 필터 요약</p>
             <p className="text-xs text-slate-500">
               고정수 {fixedNumbers.length}개 / 제외수 {excludedNumbers.length}개
             </p>
@@ -321,7 +321,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
               placeholder="예: 3, 11, 27"
               className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
             />
-            <p className="text-xs text-slate-500">최대 5개까지 입력하는 것을 권장합니다.</p>
+            <p className="text-xs text-slate-500">숫자는 최대 5개까지 넣을 수 있습니다.</p>
           </label>
 
           <label className="space-y-2 text-sm text-slate-300">
@@ -332,7 +332,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
               placeholder="예: 1, 2, 45"
               className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
             />
-            <p className="text-xs text-slate-500">제외수는 최대 35개 정도까지 두는 것이 적절합니다.</p>
+            <p className="text-xs text-slate-500">제외수는 최대 35개까지 넣을 수 있습니다.</p>
           </label>
 
           <label className="space-y-2 text-sm text-slate-300">
@@ -393,9 +393,9 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
         <p className="eyebrow">생성 결과</p>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="mt-3 text-2xl font-semibold text-white">방금 생성된 추천 번호</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-white">지금 생성된 추천 번호</h2>
             <p className="mt-2 text-sm text-slate-400">
-              생성된 세트는 번호별 통계 페이지와 연결되며, 생성 통계 허브에도 자동으로 누적됩니다.
+              생성한 번호는 번호 통계와 연결되고, 공개 생성 통계에도 익명으로 반영됩니다.
             </p>
           </div>
           <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-400">
@@ -405,7 +405,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
 
         {targetRound ? (
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-            현재 생성 결과는 <strong>{targetRound}회</strong> 대상 참고 번호로 저장됩니다.
+            현재 생성 결과는 <strong>{targetRound}회</strong> 대상 번호로 기록됩니다.
           </div>
         ) : null}
 
@@ -413,7 +413,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
             {recordStatus === "recording" && "생성 통계에 반영하는 중입니다."}
             {recordStatus === "recorded" && "생성 통계에 반영되었습니다."}
-            {recordStatus === "failed" && "번호 생성은 완료됐지만 생성 통계 저장에는 실패했습니다."}
+            {recordStatus === "failed" && "번호 생성은 완료됐지만 생성 통계 반영에는 실패했습니다."}
           </div>
         ) : null}
 
@@ -457,7 +457,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   href={`/draws?number=${set.numbers[0]}`}
                   className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
                 >
-                  포함 회차 보기
+                  관련 회차 보기
                 </Link>
                 <Link
                   href={`/stats/numbers/${set.numbers[0]}`}
@@ -470,16 +470,16 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           ))}
           {!error && sets.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              아직 생성된 결과가 없습니다. 전략을 고른 뒤 번호를 생성해 보세요.
+              아직 생성된 결과가 없습니다. 전략을 선택한 뒤 번호를 만들어보세요.
             </div>
           ) : null}
         </div>
       </section>
 
       <section className="panel">
-        <p className="eyebrow">로컬 저장</p>
-        <h2 className="mt-3 text-2xl font-semibold text-white">다시 보고 싶은 조합</h2>
-        <p className="mt-2 text-sm text-slate-400">최근 저장한 번호는 브라우저에 최대 8세트까지 보관됩니다.</p>
+        <p className="eyebrow">임시 저장</p>
+        <h2 className="mt-3 text-2xl font-semibold text-white">다시 보고 싶은 번호</h2>
+        <p className="mt-2 text-sm text-slate-400">최근 저장한 번호를 최대 8세트까지 유지합니다.</p>
         <div className="mt-6 space-y-4">
           {savedSets.map((set) => (
             <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
@@ -503,7 +503,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           ))}
           {savedSets.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              저장한 번호가 없습니다. 생성 결과에서 저장 버튼을 눌러 보관할 수 있습니다.
+              저장된 번호가 없습니다. 생성 결과에서 저장 버튼을 눌러 보관할 수 있습니다.
             </div>
           ) : null}
         </div>

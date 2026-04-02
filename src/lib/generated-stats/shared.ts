@@ -146,7 +146,7 @@ function buildMatchDistribution(records: EvaluatedGeneratedRecord[]): MatchDistr
     const count = records.filter((record) => record.matchCount === matchCount).length;
 
     return {
-      label: `${matchCount}개 적중`,
+      label: `${matchCount}개 일치`,
       count,
       percentage: Number(((count / totalRecords) * 100).toFixed(1))
     };

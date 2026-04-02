@@ -47,7 +47,7 @@ export function FrequencyChart({ title, stats, color }: FrequencyChartProps) {
               },
               tooltip: {
                 callbacks: {
-                  label: (context) => `출현 ${context.parsed.y}회`
+                  label: (context) => `출현 횟수 ${context.parsed.y}회`
                 }
               }
             },
