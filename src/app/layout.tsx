@@ -45,7 +45,6 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const siteUrl = getSiteUrl();
-  const { theme } = await getRequestPreferences();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -56,22 +55,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   };
 
   return (
-    <html lang="ko" data-theme={theme}>
+    <html lang="ko" data-theme="dark">
       <body className={`font-sans ${outfit.variable}`}>
         <AdSenseScript />
         <FirebaseAnalytics />
-        <Script id="theme-preference" strategy="beforeInteractive">
-          {`
-            (function() {
-              var match = document.cookie.match(/(?:^|; )lotto_theme=([^;]+)/);
-              var theme = match ? decodeURIComponent(match[1]) : '${theme}';
-              document.documentElement.dataset.theme = theme;
-            })();
-          `}
-        </Script>
         <JsonLd data={structuredData} />
         <div className="flex min-h-screen flex-col">
-          <SiteHeader theme={theme} />
+          <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </div>

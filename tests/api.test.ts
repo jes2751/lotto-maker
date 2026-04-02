@@ -17,7 +17,7 @@ test("draws api returns success payload", async () => {
 
 test("draw by round api returns 404 for unknown rounds", async () => {
   const response = await getDrawByRound(new Request("http://localhost/api/v1/draws/9999"), {
-    params: { round: "9999" }
+    params: Promise.resolve({ round: "9999" })
   });
   const payload = await response.json();
 
@@ -28,7 +28,7 @@ test("draw by round api returns 404 for unknown rounds", async () => {
 
 test("draw by round api returns success for known rounds", async () => {
   const response = await getDrawByRound(new Request("http://localhost/api/v1/draws/1169"), {
-    params: { round: "1169" }
+    params: Promise.resolve({ round: "1169" })
   });
   const payload = await response.json();
 

@@ -22,7 +22,7 @@ export function ShareTemplateCard({ title, description, body }: ShareTemplateCar
   }
 
   return (
-    <article className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+    <article className="soft-card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-white">{title}</h3>
@@ -31,12 +31,12 @@ export function ShareTemplateCard({ title, description, body }: ShareTemplateCar
         <button
           type="button"
           onClick={() => void handleCopy()}
-          className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+          className="secondary-button !px-3 !py-1.5 !text-[0.7rem] !tracking-[0.18em] uppercase"
         >
           {copied ? "복사 완료" : "템플릿 복사"}
         </button>
       </div>
-      <pre className="mt-4 whitespace-pre-wrap rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-sm leading-7 text-slate-300">
+      <pre className="mt-4 whitespace-pre-wrap rounded-[1.4rem] border border-white/10 bg-slate-950/60 p-4 text-sm leading-7 text-slate-300">
         {body}
       </pre>
     </article>

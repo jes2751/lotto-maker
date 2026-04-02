@@ -122,14 +122,18 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="panel">
-          <p className="eyebrow">Draws</p>
-          <h1 className="mt-4 text-4xl font-semibold text-white">전체 회차 조회</h1>
-          <p className="mt-3 text-slate-300">전체 회차 데이터를 기준으로 최신 회차부터 차례대로 확인할 수 있습니다.</p>
+      <section className="panel hero-panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <div>
+          <p className="eyebrow">Draw Archive</p>
+          <h1 className="section-title mt-4 text-gradient-silver">전체 회차를 빠르게 찾고 흐름을 이어서 보세요</h1>
+          <p className="body-large mt-4 max-w-4xl text-slate-300">
+            최신 회차부터 과거 기록까지 한 번에 조회하고, 특정 회차나 포함 번호 기준으로 원하는 결과를 바로
+            좁혀서 볼 수 있습니다.
+          </p>
         </div>
-        <div className="panel">
-          <p className="eyebrow">Find Round</p>
+
+        <div className="soft-card">
+          <p className="eyebrow">빠른 필터</p>
           <div className="mt-4 grid gap-3">
             <form action="/draws" className="flex flex-col gap-3 sm:flex-row">
               <input type="hidden" name="limit" value={String(limit)} />
@@ -140,7 +144,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
                 name="round"
                 defaultValue={roundQuery}
                 placeholder="예: 1169"
-                className="flex-1 rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
+                className="flex-1 rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white placeholder:text-slate-500"
               />
               <button type="submit" className="cta-button">
                 회차 찾기
@@ -156,20 +160,20 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
                 name="number"
                 defaultValue={numberFilter.raw}
                 placeholder="포함 번호 예: 7"
-                className="flex-1 rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white placeholder:text-slate-500"
+                className="flex-1 rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white placeholder:text-slate-500"
               />
-              <button type="submit" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
-                번호 포함 회차 찾기
+              <button type="submit" className="secondary-button">
+                번호 포함 회차
               </button>
             </form>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+            <div className="kpi-cell">
               <p className="text-sm text-slate-400">최신 회차</p>
               <p className="mt-2 text-2xl font-semibold text-white">{latest ? `${latest.round}회` : "-"}</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-              <p className="text-sm text-slate-400">전체 회차 수</p>
+            <div className="kpi-cell">
+              <p className="text-sm text-slate-400">현재 목록 수</p>
               <p className="mt-2 text-2xl font-semibold text-white">{total}개</p>
             </div>
           </div>
@@ -180,26 +184,23 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         <section className="panel">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="eyebrow">Search Result</p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">회차 바로 찾기 결과</h2>
+              <p className="eyebrow">회차 바로 찾기</p>
+              <h2 className="mt-3 text-2xl font-semibold text-white">검색 결과</h2>
             </div>
             {searchedDraw ? (
-              <Link
-                href={`/draws/${searchedDraw.round}`}
-                className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-              >
+              <Link href={`/draws/${searchedDraw.round}`} className="secondary-button">
                 상세 보기
               </Link>
             ) : null}
           </div>
           {searchedDraw ? (
             <div className="mt-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-              <div>
+              <div className="soft-card">
                 <p className="text-2xl font-semibold text-white">{searchedDraw.round}회</p>
                 <p className="mt-1 text-sm text-slate-400">{searchedDraw.drawDate}</p>
                 <p className="mt-4 text-sm text-slate-300">1등 당첨자 {searchedDraw.winnerCount ?? 0}명</p>
               </div>
-              <div>
+              <div className="soft-card">
                 <NumberSet numbers={searchedDraw.numbers} bonus={searchedDraw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
               </div>
             </div>
@@ -215,12 +216,12 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
         <section className="panel">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="eyebrow">Number Filter</p>
+              <p className="eyebrow">번호 필터</p>
               <h2 className="mt-3 text-2xl font-semibold text-white">
                 {selectedNumber ? `${selectedNumber}번 번호 포함 회차` : "번호 필터 확인 필요"}
               </h2>
             </div>
-            {selectedNumber ? <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">{total}개 회차</div> : null}
+            {selectedNumber ? <div className="secondary-button !px-4 !py-2">{total}개 회차</div> : null}
           </div>
           {selectedNumber ? (
             <p className="mt-4 text-sm text-slate-400">메인 번호 6개 안에 {selectedNumber}번이 포함된 회차만 목록과 페이지 수에 반영합니다.</p>
@@ -242,10 +243,7 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-sm text-slate-400">1등 당첨자 {draw.winnerCount ?? 0}명</div>
-                <Link
-                  href={`/draws/${draw.round}`}
-                  className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                >
+                <Link href={`/draws/${draw.round}`} className="secondary-button !px-4 !py-2">
                   상세 보기
                 </Link>
               </div>
@@ -254,8 +252,8 @@ export default async function DrawsPage({ searchParams }: DrawsPageProps) {
               <NumberSet numbers={draw.numbers} bonus={draw.bonus} hrefBuilder={(value) => `/stats/numbers/${value}`} />
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">총 판매금: {formatWonAmount(draw.totalPrize)}</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">1등 당첨금: {formatWonAmount(draw.firstPrize)}</div>
+              <div className="kpi-cell text-sm text-slate-300">총 판매금: {formatWonAmount(draw.totalPrize)}</div>
+              <div className="kpi-cell text-sm text-slate-300">1등 당첨금: {formatWonAmount(draw.firstPrize)}</div>
             </div>
           </article>
         ))}

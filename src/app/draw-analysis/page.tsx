@@ -58,7 +58,7 @@ export default async function DrawAnalysisHubPage() {
   const copy = content[locale];
   const draws = await drawRepository.getAll();
   const latest = draws[0];
-  const recentDraws = draws.slice(0, 12);
+  const recentDraws = draws.slice(0, 6);
   const siteUrl = getSiteUrl();
   const latestSummary = latest ? buildDrawAnalysisSummary(analyzeDraw(latest, draws)) : null;
 
@@ -79,10 +79,30 @@ export default async function DrawAnalysisHubPage() {
         }}
       />
 
-      <section className="panel">
-        <p className="eyebrow">{copy.eyebrow}</p>
-        <h1 className="mt-4 text-4xl font-semibold text-white">{copy.title}</h1>
-        <p className="mt-4 max-w-3xl leading-8 text-slate-300">{copy.description}</p>
+      <section className="panel hero-panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <div>
+          <p className="eyebrow">{copy.eyebrow}</p>
+          <h1 className="section-title mt-4 max-w-4xl text-gradient-silver">{copy.title}</h1>
+          <p className="body-large mt-5 max-w-3xl text-slate-300">{copy.description}</p>
+        </div>
+
+        <div className="soft-card">
+          <p className="eyebrow">Analysis Lens</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+            <div className="kpi-cell">
+              <p className="text-sm text-slate-400">핵심 기준</p>
+              <p className="mt-2 text-2xl font-semibold text-white">패턴</p>
+            </div>
+            <div className="kpi-cell">
+              <p className="text-sm text-slate-400">읽는 순서</p>
+              <p className="mt-2 text-2xl font-semibold text-white">요약 → 비교</p>
+            </div>
+            <div className="kpi-cell">
+              <p className="text-sm text-slate-400">연결 페이지</p>
+              <p className="mt-2 text-2xl font-semibold text-white">상세 · 통계</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {latest ? (
@@ -91,19 +111,16 @@ export default async function DrawAnalysisHubPage() {
             <p className="eyebrow">{copy.latestLabel}</p>
             <h2 className="mt-4 text-3xl font-semibold text-white">{latest.round}회 분석</h2>
             <p className="mt-2 text-slate-400">{latest.drawDate}</p>
-            <p className="mt-5 text-sm leading-7 text-slate-300">
-              {latestSummary
-                ? `${latestSummary.oddEvenSummary} ${latestSummary.sumSummary} ${latestSummary.trendSummary}`
-                : null}
-            </p>
+            <div className="mt-5 soft-card">
+              <p className="text-sm leading-7 text-slate-300">
+                {latestSummary ? `${latestSummary.oddEvenSummary} ${latestSummary.sumSummary} ${latestSummary.trendSummary}` : null}
+              </p>
+            </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href={`/draw-analysis/${latest.round}`} className="cta-button">
                 {copy.latestButton}
               </Link>
-              <Link
-                href={`/draws/${latest.round}`}
-                className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-              >
+              <Link href={`/draws/${latest.round}`} className="secondary-button">
                 {locale === "ko" ? "회차 상세 보기" : "Round detail"}
               </Link>
             </div>
@@ -111,29 +128,20 @@ export default async function DrawAnalysisHubPage() {
 
           <div className="panel">
             <p className="eyebrow">Shortcut</p>
-            <div className="mt-4 grid gap-4 md:grid-cols-3 lg:grid-cols-1">
-              <Link
-                href="/latest-lotto-results"
-                className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-              >
+            <div className="mt-4 grid gap-4">
+              <Link href="/latest-lotto-results" className="interactive-card">
                 <p className="text-lg font-semibold text-white">{copy.latestResults}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   최신 당첨번호와 최근 회차 목록을 먼저 확인하는 결과 허브입니다.
                 </p>
               </Link>
-              <Link
-                href="/stats"
-                className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-              >
+              <Link href="/stats" className="interactive-card">
                 <p className="text-lg font-semibold text-white">{copy.stats}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   번호 빈도와 패턴을 전체 회차 기준으로 넓게 비교할 수 있습니다.
                 </p>
               </Link>
-              <Link
-                href="/recent-10-draw-analysis"
-                className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-              >
+              <Link href="/recent-10-draw-analysis" className="interactive-card">
                 <p className="text-lg font-semibold text-white">{copy.recent10}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   최근 구간만 따로 모아 흐름을 빠르게 읽고 싶을 때 적합합니다.
@@ -147,18 +155,16 @@ export default async function DrawAnalysisHubPage() {
       <section className="panel">
         <p className="eyebrow">{copy.listLabel}</p>
         <h2 className="mt-4 text-2xl font-semibold text-white">{copy.listTitle}</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">
+          카드 수를 늘리기보다 최근 분석 몇 개를 빠르게 훑고, 더 깊게 보고 싶을 때 회차 조회나 최신 결과 허브로
+          이어지도록 정리했습니다.
+        </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {recentDraws.map((draw) => (
-            <Link
-              key={draw.round}
-              href={`/draw-analysis/${draw.round}`}
-              className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-            >
+            <Link key={draw.round} href={`/draw-analysis/${draw.round}`} className="interactive-card">
               <p className="text-2xl font-semibold text-white">{draw.round}회</p>
               <p className="mt-1 text-sm text-slate-400">{draw.drawDate}</p>
-              <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-500">
-                {copy.summaryLabel}
-              </p>
+              <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-500">{copy.summaryLabel}</p>
               <p className="mt-2 text-sm leading-7 text-slate-300">
                 {(() => {
                   const summary = buildDrawAnalysisSummary(analyzeDraw(draw, draws));
@@ -167,6 +173,14 @@ export default async function DrawAnalysisHubPage() {
               </p>
             </Link>
           ))}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/latest-lotto-results" className="secondary-button">
+            {copy.latestResults}
+          </Link>
+          <Link href="/draws" className="secondary-button">
+            {locale === "ko" ? "전체 회차 보기" : "Open draw archive"}
+          </Link>
         </div>
       </section>
     </div>

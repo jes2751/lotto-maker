@@ -121,40 +121,42 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
 
   return (
     <div className="grid gap-6">
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">대상 회차</p>
-          <p className="mt-3 text-3xl font-semibold text-white">
-            {summary.currentTargetRound ? `${summary.currentTargetRound}회` : "-"}
-          </p>
-          <p className="mt-2 text-sm text-slate-400">지금 공개 생성 기록이 모이는 기준 회차입니다.</p>
-        </article>
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">이번 회차 생성 수</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{summary.currentRecords.length}</p>
-          <p className="mt-2 text-sm text-slate-400">현재 회차를 대상으로 생성된 공개 기록 수입니다.</p>
-        </article>
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">최근 평가 회차</p>
-          <p className="mt-3 text-3xl font-semibold text-white">
-            {summary.latestEvaluatedRound ? `${summary.latestEvaluatedRound}회` : "-"}
-          </p>
-          <p className="mt-2 text-sm text-slate-400">당첨번호와 비교 평가가 끝난 가장 최근 회차입니다.</p>
-        </article>
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">3개 이상 적중</p>
-          <p className="mt-3 text-3xl font-semibold text-white">
-            {summary.evaluatedRecords.filter((record) => record.matchCount >= 3).length}
-          </p>
-          <p className="mt-2 text-sm text-slate-400">최근 평가 회차 기준으로 3개 이상 맞은 기록 수입니다.</p>
-        </article>
+      <section className="panel">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">대상 회차</p>
+            <p className="mt-3 text-3xl font-semibold text-white">
+              {summary.currentTargetRound ? `${summary.currentTargetRound}회` : "-"}
+            </p>
+            <p className="mt-2 text-sm text-slate-400">지금 공개 생성 기록이 모이는 기준 회차입니다.</p>
+          </article>
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">이번 회차 생성 수</p>
+            <p className="mt-3 text-3xl font-semibold text-white">{summary.currentRecords.length}</p>
+            <p className="mt-2 text-sm text-slate-400">현재 회차를 대상으로 생성된 공개 기록 수입니다.</p>
+          </article>
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">최근 평가 회차</p>
+            <p className="mt-3 text-3xl font-semibold text-white">
+              {summary.latestEvaluatedRound ? `${summary.latestEvaluatedRound}회` : "-"}
+            </p>
+            <p className="mt-2 text-sm text-slate-400">당첨번호와 비교 평가가 끝난 가장 최근 회차입니다.</p>
+          </article>
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">3개 이상 적중</p>
+            <p className="mt-3 text-3xl font-semibold text-white">
+              {summary.evaluatedRecords.filter((record) => record.matchCount >= 3).length}
+            </p>
+            <p className="mt-2 text-sm text-slate-400">최근 평가 회차 기준으로 3개 이상 맞은 기록 수입니다.</p>
+          </article>
+        </div>
       </section>
 
       <section className="grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <div className="panel self-start">
           <p className="eyebrow">전략 성과</p>
           <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 어떤 전략이 강했는지 봅니다</h2>
-          <p className="body-small mt-3 text-slate-400">
+          <p className="body-small mt-3 text-slate-300">
             전략별 생성 수, 최고 적중 수, 3개 이상 적중 수를 비교해서 어떤 흐름이 상대적으로 좋았는지
             확인할 수 있습니다.
           </p>
@@ -162,7 +164,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
           {summary.strategyBoard.length > 0 ? (
             <div className="mt-6 grid gap-4">
               {summary.strategyBoard.map((item) => (
-                <article key={item.strategy} className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+                <article key={item.strategy} className="interactive-card">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <p className="text-lg font-semibold text-white">{getStrategyLabel(item.strategy)}</p>
@@ -175,16 +177,36 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                     </span>
                   </div>
 
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between gap-3 text-xs uppercase tracking-[0.16em] text-slate-500">
+                      <span>3개 이상 적중 비율</span>
+                      <span>
+                        {item.totalGenerated > 0 ? Math.round((item.threePlusHits / item.totalGenerated) * 100) : 0}%
+                      </span>
+                    </div>
+                    <div className="progress-track mt-2">
+                      <div
+                        className="progress-fill-teal"
+                        style={{
+                          width: `${Math.max(
+                            item.totalGenerated > 0 ? Math.round((item.threePlusHits / item.totalGenerated) * 100) : 0,
+                            item.threePlusHits > 0 ? 6 : 0
+                          )}%`
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    <div className="kpi-cell">
                       <p className="text-sm text-slate-400">3개 이상</p>
                       <p className="mt-2 text-2xl font-semibold text-white">{item.threePlusHits}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                    <div className="kpi-cell">
                       <p className="text-sm text-slate-400">4개 이상</p>
                       <p className="mt-2 text-2xl font-semibold text-white">{item.fourPlusHits}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                    <div className="kpi-cell">
                       <p className="text-sm text-slate-400">보너스 적중</p>
                       <p className="mt-2 text-2xl font-semibold text-white">{item.bonusHits}</p>
                     </div>
@@ -203,8 +225,11 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
           <p className="eyebrow">현재 회차 현황</p>
           <h2 className="section-subtitle mt-3 text-white">이번 회차 공개 생성 흐름</h2>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+            <div className="soft-card">
               <p className="text-base font-medium text-white">전략 점유율</p>
+              <p className="mt-2 text-sm leading-7 text-slate-400">
+                이번 회차 기준으로 어떤 생성 방식이 많이 쓰이는지 비중으로 봅니다.
+              </p>
               <div className="mt-4 space-y-4">
                 {summary.currentStrategyTotals.length > 0 ? (
                   summary.currentStrategyTotals.map((item) => (
@@ -215,9 +240,9 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                           {item.totalGenerated}세트 · {item.sharePercentage}%
                         </span>
                       </div>
-                      <div className="mt-2 h-2 rounded-full bg-white/10">
+                      <div className="progress-track mt-2">
                         <div
-                          className="h-2 rounded-full bg-teal"
+                          className="progress-fill-teal"
                           style={{ width: `${Math.max(item.sharePercentage, 4)}%` }}
                         />
                       </div>
@@ -229,18 +254,21 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+            <div className="soft-card">
               <p className="text-base font-medium text-white">많이 생성된 번호 TOP 10</p>
+              <p className="mt-2 text-sm leading-7 text-slate-400">
+                생성 기록에서 반복해서 등장하는 번호를 빠르게 추려 봅니다.
+              </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {summary.currentTopNumbers.length > 0 ? (
                   summary.currentTopNumbers.map((item) => (
                     <Link
                       key={item.number}
                       href={`/stats/numbers/${item.number}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
+                      className="chip-link"
                     >
                       <span className="font-semibold text-white">{item.number}</span>
-                      <span className="text-slate-500">{item.count}회</span>
+                      <span className="text-slate-400">{item.count}회</span>
                     </Link>
                   ))
                 ) : (
@@ -256,6 +284,9 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         <div className="panel self-start">
           <p className="eyebrow">적중 분포</p>
           <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 몇 개가 맞았는지 봅니다</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-400">
+            평가가 끝난 생성 기록을 적중 개수별로 묶어 전략 실험 결과를 거칠게 읽는 영역입니다.
+          </p>
           <div className="mt-6 space-y-4">
             {summary.matchDistribution.map((item) => (
               <div key={item.label}>
@@ -265,9 +296,9 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                     {item.count}세트 · {item.percentage}%
                   </span>
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-white/10">
+                <div className="progress-track mt-2">
                   <div
-                    className="h-2 rounded-full bg-accent"
+                    className="progress-fill-amber"
                     style={{ width: `${Math.max(item.percentage, item.count > 0 ? 4 : 0)}%` }}
                   />
                 </div>
@@ -277,15 +308,12 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         </div>
 
         <div className="panel">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="eyebrow">최근 생성 번호</p>
               <h2 className="section-subtitle mt-3 text-white">이번 회차에 공개된 번호 일부</h2>
             </div>
-            <Link
-              href="/generate"
-              className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-            >
+            <Link href="/generate" className="secondary-button w-full sm:w-auto">
               새로 생성하기
             </Link>
           </div>
@@ -300,12 +328,12 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
             </div>
           ) : (
             <div className="mt-6 space-y-4">
-              {summary.currentRecords.slice(0, 8).map((record) => (
-                <article key={record.id} className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+              {summary.currentRecords.slice(0, 6).map((record) => (
+                <article key={record.id} className="interactive-card">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-white">{getStrategyLabel(record.strategy)}</p>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-slate-400">
                         {record.targetRound ? `${record.targetRound}회 대상` : "대상 회차 없음"} · {formatGeneratedAt(record.generatedAt)}
                       </p>
                     </div>
@@ -317,7 +345,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                       hrefBuilder={(value) => `/stats/numbers/${value}`}
                     />
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-slate-400">{record.reason}</p>
+                  <p className="mt-4 text-sm leading-7 text-slate-300">{record.reason}</p>
                 </article>
               ))}
               {summary.currentRecords.length === 0 ? (

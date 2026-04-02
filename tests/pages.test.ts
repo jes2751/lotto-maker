@@ -16,8 +16,8 @@ import NumberDetailPage from "../src/app/stats/numbers/[number]/page";
 test("home page renders focused core sections", async () => {
   const html = renderToStaticMarkup(await HomePage());
 
-  assert.match(html, /LOTTO MAKER LAB/);
-  assert.match(html, /회차 당첨번호/);
+  assert.match(html, /Lotto Maker Lab/i);
+  assert.match(html, /최신 회차|이번 주 컨트롤룸/);
   assert.match(html, /번호 생성하기/);
   assert.match(html, /생성 통계/);
 });

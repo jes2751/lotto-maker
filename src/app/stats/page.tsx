@@ -44,7 +44,7 @@ function buildStatsHref(period: StatsPeriod, top: number) {
 
 function FrequencyCard({ label, stat, href }: { label: string; stat: FrequencyStat; href: string }) {
   return (
-    <Link href={href} className="rounded-3xl border border-white/10 bg-slate-950/50 p-5 transition hover:border-white/30">
+    <Link href={href} className="soft-card transition hover:border-white/20">
       <p className="text-base text-slate-300">{label}</p>
       <div className="mt-4 flex items-end justify-between gap-4">
         <p className="text-4xl font-semibold text-white">{stat.number}</p>
@@ -71,28 +71,28 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
-      <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="panel">
+      <section className="panel hero-panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div>
           <p className="eyebrow">통계 대시보드</p>
-          <h1 className="section-title mt-4 text-white">전체 흐름과 최근 흐름을 한 번에 비교해보세요</h1>
+          <h1 className="section-title mt-4 text-gradient-silver">전체 흐름과 최근 흐름을 한 번에 비교해보세요</h1>
           <p className="body-large mt-4 max-w-4xl text-slate-300">
             전체 회차와 최근 10회 기준으로 자주 나온 번호, 평균 합계, 홀짝 비율, 연속번호 흐름을 비교할 수
             있습니다.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/hot-numbers" className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30">
+            <Link href="/hot-numbers" className="secondary-button">
               자주 나온 번호
             </Link>
-            <Link href="/cold-numbers" className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30">
+            <Link href="/cold-numbers" className="secondary-button">
               적게 나온 번호
             </Link>
-            <Link href="/recent-10-draw-analysis" className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30">
+            <Link href="/recent-10-draw-analysis" className="secondary-button">
               최근 10회 분석
             </Link>
           </div>
         </div>
 
-        <div className="panel">
+        <div className="soft-card">
           <p className="eyebrow">비교 기준</p>
           <div className="mt-5 grid gap-5">
             <div>
@@ -137,27 +137,29 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">{getPeriodLabel(selectedPeriod)}</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{selectedSummary.totalDraws}회</p>
-          <p className="mt-2 text-sm text-slate-400">현재 선택 기준으로 비교 중인 회차 수입니다.</p>
-        </article>
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">평균 합계</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{selectedSummary.averageSum}</p>
-          <p className="mt-2 text-sm text-slate-400">6개 번호 합계의 평균값입니다.</p>
-        </article>
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">대표 홀짝 비율</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{oddEvenLeader}</p>
-          <p className="mt-2 text-sm text-slate-400">가장 자주 나온 홀짝 조합입니다.</p>
-        </article>
-        <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-          <p className="text-base text-slate-300">대표 합계 구간</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{sumRangeLeader}</p>
-          <p className="mt-2 text-sm text-slate-400">가장 많이 나온 합계 구간입니다.</p>
-        </article>
+      <section className="panel">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">{getPeriodLabel(selectedPeriod)}</p>
+            <p className="mt-3 text-3xl font-semibold text-white">{selectedSummary.totalDraws}회</p>
+            <p className="mt-2 text-sm text-slate-400">현재 선택 기준으로 비교 중인 회차 수입니다.</p>
+          </article>
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">평균 합계</p>
+            <p className="mt-3 text-3xl font-semibold text-white">{selectedSummary.averageSum}</p>
+            <p className="mt-2 text-sm text-slate-400">6개 번호 합계의 평균값입니다.</p>
+          </article>
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">대표 홀짝 비율</p>
+            <p className="mt-3 text-3xl font-semibold text-white">{oddEvenLeader}</p>
+            <p className="mt-2 text-sm text-slate-400">가장 자주 나온 홀짝 조합입니다.</p>
+          </article>
+          <article className="kpi-cell">
+            <p className="text-base text-slate-300">대표 합계 구간</p>
+            <p className="mt-3 text-3xl font-semibold text-white">{sumRangeLeader}</p>
+            <p className="mt-2 text-sm text-slate-400">가장 많이 나온 합계 구간입니다.</p>
+          </article>
+        </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
@@ -182,14 +184,14 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           <p className="eyebrow">비교</p>
           <h2 className="section-subtitle mt-3 text-white">{getPeriodLabel(comparisonPeriod)} 기준 비교</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+            <article className="soft-card">
               <p className="text-base text-slate-300">가장 자주 나온 번호</p>
               <p className="mt-3 text-3xl font-semibold text-white">{comparisonSummary.topNumber.number}</p>
               <p className="mt-2 text-sm text-slate-400">
                 {comparisonSummary.topNumber.frequency}회 · {comparisonSummary.topNumber.percentage}%
               </p>
             </article>
-            <article className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+            <article className="soft-card">
               <p className="text-base text-slate-300">평균 합계</p>
               <p className="mt-3 text-3xl font-semibold text-white">{comparisonSummary.averageSum}</p>
               <p className="mt-2 text-sm text-slate-400">{getPeriodLabel(comparisonPeriod)} 기준 평균값입니다.</p>
@@ -216,7 +218,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
                 href={`/stats/numbers/${item.number}`}
                 className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
               >
-                {item.number} <span className="text-slate-500">{item.frequency}회</span>
+                {item.number} <span className="text-slate-400">{item.frequency}회</span>
               </Link>
             ))}
           </div>
@@ -231,7 +233,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
               "홀짝 비율과 합계 구간은 대표 패턴을 보는 기준이고, 번호 통계는 개별 번호의 흐름을 보는 기준입니다.",
               "추천 번호는 참고용이며, 통계는 번호 선택을 돕는 보조 정보로 보는 것이 가장 안전합니다."
             ].map((item) => (
-              <article key={item} className="rounded-3xl border border-white/10 bg-slate-950/50 p-5 text-sm leading-7 text-slate-300">
+              <article key={item} className="soft-card text-sm leading-7 text-slate-300">
                 {item}
               </article>
             ))}

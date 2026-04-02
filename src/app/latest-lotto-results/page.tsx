@@ -92,10 +92,10 @@ export default async function LatestLottoResultsPage() {
         }}
       />
 
-      <section className="panel">
+      <section className="panel hero-panel">
         <p className="eyebrow">{copy.eyebrow}</p>
-        <h1 className="mt-4 text-4xl font-semibold text-white">{copy.title}</h1>
-        <p className="mt-4 leading-8 text-slate-300">{copy.description}</p>
+        <h1 className="section-title mt-4 text-gradient-silver">{copy.title}</h1>
+        <p className="body-large mt-5 text-slate-300">{copy.description}</p>
       </section>
 
       {latest ? (
@@ -120,22 +120,13 @@ export default async function LatestLottoResultsPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href={`/draw-analysis/${latest.round}`}
-              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-            >
+            <Link href={`/draw-analysis/${latest.round}`} className="secondary-button">
               {copy.roundAnalysis}
             </Link>
-            <Link
-              href="/draw-analysis"
-              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-            >
+            <Link href="/draw-analysis" className="secondary-button">
               {copy.analysisHub}
             </Link>
-            <Link
-              href="/recent-10-draw-analysis"
-              className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-            >
+            <Link href="/recent-10-draw-analysis" className="secondary-button">
               {copy.recent10}
             </Link>
           </div>
@@ -148,33 +139,24 @@ export default async function LatestLottoResultsPage() {
             <p className="eyebrow">{copy.recentRounds}</p>
             <h2 className="mt-3 text-2xl font-semibold text-white">{copy.recentTitle}</h2>
           </div>
-          <Link
-            href="/draws"
-            className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-          >
+          <Link href="/draws" className="secondary-button">
             {copy.archive}
           </Link>
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {recentDraws.map((draw) => (
-            <div key={draw.round} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+            <div key={draw.round} className="interactive-card">
               <p className="text-2xl font-semibold text-white">{draw.round}회</p>
               <p className="mt-1 text-sm text-slate-400">{draw.drawDate}</p>
               <p className="mt-4 text-sm text-slate-300">
                 {draw.numbers.join(", ")} + {draw.bonus}
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Link
-                  href={`/draws/${draw.round}`}
-                  className="rounded-full border border-white/10 px-4 py-2 text-xs text-slate-200 transition hover:border-white/30"
-                >
+                <Link href={`/draws/${draw.round}`} className="secondary-button !px-4 !py-2 !text-xs">
                   {copy.drawDetail}
                 </Link>
-                <Link
-                  href={`/draw-analysis/${draw.round}`}
-                  className="rounded-full border border-white/10 px-4 py-2 text-xs text-slate-200 transition hover:border-white/30"
-                >
+                <Link href={`/draw-analysis/${draw.round}`} className="secondary-button !px-4 !py-2 !text-xs">
                   {copy.drawAnalysis}
                 </Link>
               </div>
@@ -188,10 +170,7 @@ export default async function LatestLottoResultsPage() {
         <h2 className="mt-4 text-2xl font-semibold text-white">{copy.guideTitle}</h2>
         <p className="mt-3 text-sm leading-7 text-slate-400">{copy.guideDescription}</p>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <Link
-            href="/stats"
-            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-          >
+          <Link href="/stats" className="interactive-card">
             <p className="text-lg font-semibold text-white">
               {locale === "ko" ? "종합 통계 대시보드" : "Statistics dashboard"}
             </p>
@@ -199,10 +178,7 @@ export default async function LatestLottoResultsPage() {
               전체 회차와 최근 구간의 빈도, 패턴, 반복 번호를 한 번에 비교할 수 있습니다.
             </p>
           </Link>
-          <Link
-            href="/draw-analysis"
-            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-          >
+          <Link href="/draw-analysis" className="interactive-card">
             <p className="text-lg font-semibold text-white">
               {locale === "ko" ? "회차 분석 허브" : "Analysis hub"}
             </p>
@@ -210,10 +186,7 @@ export default async function LatestLottoResultsPage() {
               최근 회차 분석 페이지를 한곳에 모아 빠르게 탐색할 수 있습니다.
             </p>
           </Link>
-          <Link
-            href="/guides"
-            className="rounded-3xl border border-white/10 bg-slate-900/70 p-5 transition hover:border-white/30"
-          >
+          <Link href="/guides" className="interactive-card">
             <p className="text-lg font-semibold text-white">
               {locale === "ko" ? "로또 가이드" : "Lotto guides"}
             </p>

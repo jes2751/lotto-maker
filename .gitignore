@@ -8,6 +8,11 @@ dist
 .open-next
 .wrangler
 cloudflare-env.d.ts
+tsconfig.tsbuildinfo
+.gstack/
+.qa-chrome*/
+.qa-screens/
+.tmp_git_info.ps1
 
 # Large binaries in gstack skills
 .agents/skills/*/bin/

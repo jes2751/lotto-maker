@@ -71,33 +71,32 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-12">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="eyebrow">Draw Detail</p>
-          <h1 className="mt-4 text-4xl font-semibold text-white">{draw.round}회 당첨번호</h1>
-          <p className="mt-3 text-slate-300">
-            {draw.drawDate} 추첨 결과와 기본 요약을 확인하고, 번호별 통계나 회차 분석으로 이어서 탐색할 수 있습니다.
-          </p>
+      <section className="panel hero-panel">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">회차 상세</p>
+            <h1 className="section-title mt-4 text-gradient-silver">{draw.round}회 당첨번호</h1>
+            <p className="mt-4 max-w-3xl text-slate-300">
+              {draw.drawDate} 추첨 결과와 기본 요약을 확인하고, 번호별 통계나 회차 분석으로 이어서 탐색할 수 있습니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/draws" className="secondary-button">
+              전체 회차 보기
+            </Link>
+            <Link href={`/draw-analysis/${draw.round}`} className="cta-button">
+              회차 분석 보기
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/draws"
-            className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
-          >
-            전체 회차 보기
-          </Link>
-          <Link href={`/draw-analysis/${draw.round}`} className="cta-button">
-            회차 분석 보기
-          </Link>
-        </div>
-      </div>
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="panel">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="eyebrow">Winning Numbers</p>
+            <p className="eyebrow">당첨 번호</p>
             {isLatest ? (
-              <span className="rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
+              <span className="status-badge">
                 Latest Round
               </span>
             ) : null}
@@ -112,16 +111,16 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Round</p>
+            <div className="kpi-cell">
+              <p className="text-xs uppercase tracking-[0.22em] text-muted">Round</p>
               <p className="mt-2 text-2xl font-semibold text-white">{draw.round}회</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Draw Date</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{draw.drawDate}</p>
+            <div className="kpi-cell">
+              <p className="text-xs uppercase tracking-[0.22em] text-muted">Draw Date</p>
+              <p className="mt-2 text-lg font-semibold text-white md:text-xl">{draw.drawDate}</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Winners</p>
+            <div className="kpi-cell">
+              <p className="text-xs uppercase tracking-[0.22em] text-muted">Winners</p>
               <p className="mt-2 text-2xl font-semibold text-white">{draw.winnerCount ?? 0}명</p>
             </div>
           </div>
@@ -131,9 +130,9 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
               href={newerDraw ? `/draws/${newerDraw.round}` : "#"}
               aria-disabled={!newerDraw}
               className={[
-                "rounded-2xl border px-4 py-4 text-sm transition",
+                "interactive-card text-sm",
                 newerDraw
-                  ? "border-white/10 bg-slate-950/40 text-slate-200 hover:border-white/30"
+                  ? "text-slate-200 hover:border-white/20"
                   : "cursor-not-allowed border-white/5 bg-slate-950/20 text-slate-600"
               ].join(" ")}
             >
@@ -143,9 +142,9 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
               href={olderDraw ? `/draws/${olderDraw.round}` : "#"}
               aria-disabled={!olderDraw}
               className={[
-                "rounded-2xl border px-4 py-4 text-sm transition",
+                "interactive-card text-sm",
                 olderDraw
-                  ? "border-white/10 bg-slate-950/40 text-slate-200 hover:border-white/30"
+                  ? "text-slate-200 hover:border-white/20"
                   : "cursor-not-allowed border-white/5 bg-slate-950/20 text-slate-600"
               ].join(" ")}
             >
@@ -155,36 +154,27 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
         </div>
 
         <div className="panel">
-          <p className="eyebrow">Summary</p>
+          <p className="eyebrow">요약</p>
           <div className="mt-4 space-y-3">
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Top Prize</p>
+            <div className="kpi-cell">
+              <p className="text-xs uppercase tracking-[0.22em] text-muted">Top Prize</p>
               <p className="mt-2 text-2xl font-semibold text-white">{formatWonAmount(draw.firstPrize)}</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Total Prize</p>
+            <div className="kpi-cell">
+              <p className="text-xs uppercase tracking-[0.22em] text-muted">Total Prize</p>
               <p className="mt-2 text-2xl font-semibold text-white">{formatWonAmount(draw.totalPrize)}</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-7 text-slate-400">
+            <div className="soft-card text-sm leading-7 text-slate-300">
               번호별 통계, 회차 분석, 최신 결과 허브를 함께 보면 이 회차가 최근 흐름에서 어떤 위치에 있는지 더 잘 읽을 수 있습니다.
             </div>
             <div className="flex flex-wrap gap-3 pt-1">
-              <Link
-                href={`/draw-analysis/${draw.round}`}
-                className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
-              >
+              <Link href={`/draw-analysis/${draw.round}`} className="secondary-button">
                 회차 분석 보기
               </Link>
-              <Link
-                href="/draw-analysis"
-                className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
-              >
+              <Link href="/draw-analysis" className="secondary-button">
                 분석 허브
               </Link>
-              <Link
-                href="/latest-lotto-results"
-                className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition hover:border-white/30"
-              >
+              <Link href="/latest-lotto-results" className="secondary-button">
                 최신 결과 허브
               </Link>
             </div>

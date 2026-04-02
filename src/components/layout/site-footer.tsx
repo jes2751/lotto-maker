@@ -35,25 +35,25 @@ const content = {
 
 export function SiteFooter() {
   return (
-    <footer className="relative z-10 mt-20 border-t border-white/5 bg-ink/50 pt-16 backdrop-blur-3xl">
-      <div className="mx-auto max-w-6xl px-6 pb-12">
-        <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
-          <section className="max-w-md">
-            <p className="font-outfit text-sm font-bold uppercase tracking-[0.2em] text-teal/80">
+    <footer className="relative z-10 mt-16 pt-10">
+      <div className="mx-auto max-w-6xl px-6 pb-10">
+        <div className="panel grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+          <section className="max-w-lg">
+            <p className="font-outfit text-[0.78rem] font-bold uppercase tracking-[0.2em] text-teal/85">
               {content.introLabel}
             </p>
-            <h2 className="mt-4 text-lg font-bold leading-snug text-slate-200">{content.introTitle}</h2>
-            <p className="mt-4 text-sm leading-loose text-slate-400">{content.introDescription}</p>
-            <p className="mt-4 text-xs text-slate-500">{content.introNote}</p>
+            <h2 className="mt-3 max-w-md text-xl font-bold leading-snug text-white">{content.introTitle}</h2>
+            <p className="mt-4 text-sm leading-7 text-slate-300">{content.introDescription}</p>
+            <p className="mt-4 text-sm text-slate-400">{content.introNote}</p>
           </section>
 
           {content.linkGroups.map((group) => (
             <nav key={group.title} className="md:ml-auto">
-              <p className="text-sm font-bold text-slate-200">{group.title}</p>
-              <ul className="mt-5 flex flex-col gap-3">
+              <p className="text-sm font-bold text-white">{group.title}</p>
+              <ul className="mt-4 flex flex-col gap-3">
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-sm text-slate-400 transition hover:text-white">
+                    <Link href={link.href} className="text-sm text-slate-300 transition hover:text-white">
                       {link.label}
                     </Link>
                   </li>
@@ -64,10 +64,10 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-white/5 bg-ink/80">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
+      <div className="border-t border-white/5 bg-ink/60">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-xs text-slate-400 md:flex-row md:items-center md:justify-between">
           <p>{content.bottom}</p>
-          <p className="font-outfit font-medium tracking-wider">{siteConfig.domain}</p>
+          <p className="font-outfit font-medium tracking-[0.16em] text-slate-300">{siteConfig.domain}</p>
         </div>
       </div>
     </footer>

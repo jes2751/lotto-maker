@@ -66,8 +66,11 @@ export function TodayVisitBadge() {
   }
 
   return (
-    <p className="text-sm text-slate-400">
-      today's visitor {state.count == null ? "-" : state.count.toLocaleString("ko-KR")}
+    <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-300">
+      <span className="text-slate-400">오늘 방문</span>
+      <span className="font-outfit text-sm text-white">
+        {state.count == null ? "-" : state.count.toLocaleString("ko-KR")}
+      </span>
     </p>
   );
 }

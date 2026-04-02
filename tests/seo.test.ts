@@ -11,7 +11,8 @@ test("robots points to sitemap on official domain", () => {
   assert.equal(result.sitemap, "https://lotto-maker.cloud/sitemap.xml");
   assert.deepEqual(result.rules, {
     userAgent: "*",
-    allow: "/"
+    allow: "/",
+    disallow: ["/api/", "/internal/"]
   });
 });
 
