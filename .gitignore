@@ -8,3 +8,6 @@ dist
 .open-next
 .wrangler
 cloudflare-env.d.ts
+
+# Large binaries in gstack skills
+.agents/skills/*/bin/
