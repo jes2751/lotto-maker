@@ -3,31 +3,38 @@ import type { MetadataRoute } from "next";
 import { drawRepository } from "@/lib/lotto";
 import { getSiteUrl } from "@/lib/site";
 
-const staticRoutes = [
-  "",
-  "/generate",
-  "/draws",
-  "/stats",
-  "/generated-stats",
-  "/draw-analysis",
-  "/lotto-buy-guide",
-  "/latest-lotto-results",
-  "/lotto-number-generator",
-  "/lotto-statistics",
-  "/hot-numbers",
-  "/cold-numbers",
-  "/odd-even-pattern",
-  "/sum-pattern",
-  "/recent-10-draw-analysis",
-  "/guides",
-  "/guides/lotto-number-generator-vs-random",
-  "/guides/recent-20-hot-numbers",
-  "/guides/odd-even-pattern-guide",
-  "/policies/ads",
-  "/privacy",
-  "/terms",
-  "/faq",
-  "/contact"
+interface StaticRoute {
+  path: string;
+  changeFrequency: "daily" | "weekly" | "monthly";
+  priority: number;
+}
+
+const staticRoutes: StaticRoute[] = [
+  { path: "", changeFrequency: "daily", priority: 1.0 },
+  { path: "/generate", changeFrequency: "daily", priority: 0.9 },
+  { path: "/check", changeFrequency: "daily", priority: 0.9 },
+  { path: "/draws", changeFrequency: "daily", priority: 0.85 },
+  { path: "/stats", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/generated-stats", changeFrequency: "daily", priority: 0.75 },
+  { path: "/draw-analysis", changeFrequency: "weekly", priority: 0.75 },
+  { path: "/latest-lotto-results", changeFrequency: "daily", priority: 0.85 },
+  { path: "/lotto-number-generator", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/lotto-statistics", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/hot-numbers", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/cold-numbers", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/odd-even-pattern", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/sum-pattern", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/recent-10-draw-analysis", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/lotto-buy-guide", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/guides", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/guides/lotto-number-generator-vs-random", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/guides/recent-20-hot-numbers", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/guides/odd-even-pattern-guide", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/faq", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/policies/ads", changeFrequency: "monthly", priority: 0.3 },
+  { path: "/privacy", changeFrequency: "monthly", priority: 0.3 },
+  { path: "/terms", changeFrequency: "monthly", priority: 0.3 },
+  { path: "/contact", changeFrequency: "monthly", priority: 0.3 }
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -35,9 +42,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const draws = await drawRepository.getAll();
 
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
-    url: `${siteUrl}${route}`,
-    changeFrequency: route === "" ? "daily" : "weekly",
-    priority: route === "" ? 1 : 0.7
+    url: `${siteUrl}${route.path}`,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority
   }));
 
   const drawEntries: MetadataRoute.Sitemap = draws.map((draw) => ({
