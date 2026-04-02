@@ -249,7 +249,11 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
       const element = document.getElementById(`share-card-${set.id}`);
       if (!element) throw new Error("공유용 이미지를 찾을 수 없습니다.");
 
-      const blob = await toBlob(element, { cacheBust: true, pixelRatio: 2 });
+      const blob = await toBlob(element, { 
+        cacheBust: true, 
+        pixelRatio: 2,
+        backgroundColor: "#020617", // Ensure background isn't transparent
+      });
       if (!blob) throw new Error("이미지 생성에 실패했습니다.");
 
       const file = new File([blob], `lotto-maker-${set.id}.png`, { type: "image/png" });
@@ -503,7 +507,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                       type="button"
                       onClick={() => void shareSet(set)}
                       disabled={sharingId === set.id}
-                      className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
+                      className="whitespace-nowrap rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-widest text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
                     >
                       {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
                     </button>

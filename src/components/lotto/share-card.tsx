@@ -16,9 +16,9 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
       <div
         id={id}
         ref={ref}
-        className="absolute top-[-9999px] left-[-9999px] flex w-[540px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950 p-10 shadow-2xl"
+        className="fixed top-0 left-[-9999px] flex w-[540px] flex-col overflow-hidden rounded-[2rem] border border-white/10 p-10 shadow-2xl"
         style={{
-          // For html-to-image explicitly avoid text-rendering bugs
+          backgroundColor: "#020617", // Force dark background
           fontFamily: "system-ui, sans-serif"
         }}
       >
