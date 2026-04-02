@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { toBlob } from "html-to-image";
 
 import { ShareCard } from "@/components/lotto/share-card";
 
@@ -246,6 +245,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     setSharingId(set.id);
     setError(null);
     try {
+      const { toBlob } = await import("html-to-image");
       const element = document.getElementById(`share-card-${set.id}`);
       if (!element) throw new Error("공유용 이미지를 찾을 수 없습니다.");
 
