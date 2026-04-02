@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { toBlob } from "html-to-image";
+
+import { ShareCard } from "@/components/lotto/share-card";
 
 import { NumberSet } from "@/components/lotto/number-set";
 import { recordGeneratedSets } from "@/lib/generated-stats/client";
@@ -110,6 +113,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
   const [recordStatus, setRecordStatus] = useState<RecordStatus>("idle");
 
   const fixedNumbers = useMemo(() => parseNumberInput(fixedNumbersInput), [fixedNumbersInput]);
@@ -236,6 +240,44 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     const nextSavedSets = savedSets.filter((item) => item.id !== id);
     setSavedSets(nextSavedSets);
     persistSavedSets(nextSavedSets);
+  }
+
+  async function shareSet(set: GeneratedSet) {
+    setSharingId(set.id);
+    setError(null);
+    try {
+      const element = document.getElementById(`share-card-${set.id}`);
+      if (!element) throw new Error("공유용 이미지를 찾을 수 없습니다.");
+
+      const blob = await toBlob(element, { cacheBust: true, pixelRatio: 2 });
+      if (!blob) throw new Error("이미지 생성에 실패했습니다.");
+
+      const file = new File([blob], `lotto-maker-${set.id}.png`, { type: "image/png" });
+
+      if (typeof navigator !== "undefined" && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: "로또 번호 생성 결과",
+          text: formatCopyText(set),
+          files: [file]
+        });
+      } else {
+        // Fallback to PC/legacy download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (caughtError) {
+      if ((caughtError as DOMException)?.name !== "AbortError") {
+        setError(caughtError instanceof Error ? caughtError.message : "이미지 공유에 실패했습니다.");
+      }
+    } finally {
+      setSharingId(null);
+    }
   }
 
   useEffect(() => {
@@ -450,12 +492,21 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {sets.map((set) => (
               <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+                <ShareCard id={`share-card-${set.id}`} set={set} targetRound={targetRound} />
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
                     {set.strategy}
                   </span>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</span>
+                    <button
+                      type="button"
+                      onClick={() => void shareSet(set)}
+                      disabled={sharingId === set.id}
+                      className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
+                    >
+                      {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
+                    </button>
                     <button
                       type="button"
                       onClick={() => void copySet(set)}
@@ -509,10 +560,20 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           <div className="mt-6 space-y-4">
             {savedSets.map((set) => (
               <article key={set.id} className="rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+                <ShareCard id={`share-card-${set.id}`} set={set} targetRound={targetRound} />
                 <div className="flex items-center justify-between gap-3">
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
                     {set.strategy}
                   </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void shareSet(set)}
+                      disabled={sharingId === set.id}
+                      className="hidden sm:inline-block rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
+                    >
+                      {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
+                    </button>
                   <button
                     type="button"
                     onClick={() => removeSavedSet(set.id)}
@@ -520,6 +581,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   >
                     삭제
                   </button>
+                  </div>
                 </div>
                 <div className="mt-4">
                   <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={buildStatsHref} />
