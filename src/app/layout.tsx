@@ -5,7 +5,6 @@ import { Outfit } from "next/font/google";
 
 import "@/app/globals.css";
 import { AdSenseScript } from "@/components/ads/adsense-script";
-import { FirebaseAnalytics } from "@/components/analytics/firebase-analytics";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getRequestPreferences } from "@/lib/server-preferences";
@@ -58,7 +57,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="ko" data-theme="dark">
       <body className={`font-sans ${outfit.variable}`}>
         <AdSenseScript />
-        <FirebaseAnalytics />
         <JsonLd data={structuredData} />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
