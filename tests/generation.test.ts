@@ -59,3 +59,31 @@ test("filter strategy respects fixed and excluded numbers", async () => {
     assert.notEqual(set.numbers[index] - set.numbers[index - 1], 1);
   }
 });
+
+test("filter strategy throws after max attempts for impossible sum ranges", async () => {
+  const service = new StaticGenerationService(seedDraws);
+  
+  await assert.rejects(
+    () =>
+      service.generate({
+        strategy: "filter",
+        count: 1,
+        filters: {
+          sumMax: 15 // 물리적으로 불가능 (최소 1+2+3+4+5+6 = 21)
+        }
+      }),
+    /선택한 필터 조건에 맞는 조합을 찾지 못했습니다/
+  );
+
+  await assert.rejects(
+    () =>
+      service.generate({
+        strategy: "filter",
+        count: 1,
+        filters: {
+          sumMin: 300 // 물리적으로 불가능 (최대 40+41+42+43+44+45 = 255)
+        }
+      }),
+    /선택한 필터 조건에 맞는 조합을 찾지 못했습니다/
+  );
+});

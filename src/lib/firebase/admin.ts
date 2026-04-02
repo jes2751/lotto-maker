@@ -332,6 +332,23 @@ export async function getLatestStoredLottoDraw(): Promise<LottoDrawRecord | null
   return document ? parseDrawDocument(document) : null;
 }
 
+export async function getAllStoredLottoDraws(): Promise<LottoDrawRecord[]> {
+  const response = await firestoreAdminRequest(":runQuery", {
+    method: "POST",
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: LOTTO_DRAWS_COLLECTION }],
+        orderBy: [{ field: { fieldPath: "round" }, direction: "DESCENDING" }]
+      }
+    })
+  });
+
+  const payload = (await response.json()) as Array<{ document?: FirestoreDocument }>;
+  return payload
+    .map((entry) => (entry.document ? parseDrawDocument(entry.document) : null))
+    .filter((entry): entry is LottoDrawRecord => entry !== null);
+}
+
 export async function upsertLottoDrawRecords(draws: Draw[]) {
   if (draws.length === 0) {
     return { written: 0 };

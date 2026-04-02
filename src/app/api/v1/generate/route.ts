@@ -39,7 +39,48 @@ function normalizeFilters(body: GenerateRequestBody["filters"]): GenerationFilte
   };
 }
 
+interface RateLimitEntry {
+  count: number;
+  resetAt: number;
+}
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 50;
+const rateLimitCache = new Map<string, RateLimitEntry>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+
+  if (rateLimitCache.size > 1000) {
+    for (const [key, entry] of rateLimitCache.entries()) {
+      if (entry.resetAt < now) {
+        rateLimitCache.delete(key);
+      }
+    }
+  }
+
+  const entry = rateLimitCache.get(ip);
+
+  if (!entry || entry.resetAt < now) {
+    rateLimitCache.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return true;
+  }
+
+  entry.count += 1;
+  return false;
+}
+
 export async function POST(request: Request) {
+  const ip = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+
+  if (isRateLimited(ip)) {
+    return jsonError("RATE_LIMIT_EXCEEDED", "생성 한도를 초과했습니다. 잠시 후 다시 시도해주세요.", 429);
+  }
+
   let body: GenerateRequestBody;
 
   try {
