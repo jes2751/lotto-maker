@@ -35,41 +35,39 @@ const content = {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-slate-950/85">
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <section className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal/80">{content.introLabel}</p>
-          <h2 className="mt-3 text-lg font-semibold text-white">{content.introTitle}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">{content.introDescription}</p>
-          <p className="mt-2 text-sm text-slate-400">{content.introNote}</p>
-        </section>
+    <footer className="relative z-10 mt-20 border-t border-white/5 bg-slate-950/50 pt-16 backdrop-blur-3xl">
+      <div className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
+          <section className="max-w-md">
+            <p className="font-outfit text-sm font-bold uppercase tracking-[0.2em] text-teal/80">
+              {content.introLabel}
+            </p>
+            <h2 className="mt-4 text-lg font-bold leading-snug text-slate-200">{content.introTitle}</h2>
+            <p className="mt-4 text-sm leading-loose text-slate-400">{content.introDescription}</p>
+            <p className="mt-4 text-xs text-slate-500">{content.introNote}</p>
+          </section>
 
-        <section className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {content.linkGroups.map((group) => (
-              <nav key={group.title}>
-                <p className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">{group.title}</p>
-                <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-                  {group.links.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-sm text-slate-300 transition hover:text-white"
-                    >
+          {content.linkGroups.map((group) => (
+            <nav key={group.title} className="md:ml-auto">
+              <p className="text-sm font-bold text-slate-200">{group.title}</p>
+              <ul className="mt-5 flex flex-col gap-3">
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-slate-400 transition hover:text-white">
                       {link.label}
                     </Link>
-                  ))}
-                </div>
-              </nav>
-            ))}
-          </div>
-        </section>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-4 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+      <div className="border-t border-white/5 bg-slate-950/80">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
           <p>{content.bottom}</p>
-          <p>{siteConfig.domain}</p>
+          <p className="font-outfit font-medium tracking-wider">{siteConfig.domain}</p>
         </div>
       </div>
     </footer>
