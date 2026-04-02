@@ -35,7 +35,7 @@ const content = {
 
 export function SiteFooter() {
   return (
-    <footer className="relative z-10 mt-20 border-t border-white/5 bg-slate-950/50 pt-16 backdrop-blur-3xl">
+    <footer className="relative z-10 mt-20 border-t border-white/5 bg-ink/50 pt-16 backdrop-blur-3xl">
       <div className="mx-auto max-w-6xl px-6 pb-12">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
           <section className="max-w-md">
@@ -64,7 +64,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-white/5 bg-slate-950/80">
+      <div className="border-t border-white/5 bg-ink/80">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
           <p>{content.bottom}</p>
           <p className="font-outfit font-medium tracking-wider">{siteConfig.domain}</p>

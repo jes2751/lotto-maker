@@ -20,7 +20,7 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ theme }: SiteHeaderProps) {
   return (
-    <header className="border-b border-white/10 bg-ink/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-3xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-500 [box-shadow:inset_0_-1px_0_rgba(255,255,255,0.05)]">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="min-w-0">
