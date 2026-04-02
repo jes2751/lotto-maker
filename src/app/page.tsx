@@ -33,7 +33,7 @@ export default async function HomePage() {
         {latestDraw ? (
           <div className="mt-5 grid gap-5 xl:grid-cols-[180px_minmax(0,1fr)_180px] xl:items-center">
             <div>
-              <h2 className="text-5xl font-semibold text-white">{latestDraw.round}회</h2>
+              <h2 className="text-5xl font-semibold text-gradient-silver">{latestDraw.round}회</h2>
               <p className="mt-3 text-xl font-medium text-slate-400">{latestDraw.drawDate}</p>
             </div>
 
@@ -63,7 +63,7 @@ export default async function HomePage() {
 
       <section className="panel">
         <p className="eyebrow">LOTTO MAKER LAB</p>
-        <h1 className="section-title mt-4 text-white">최신 결과를 보고 바로 번호를 만들어보세요</h1>
+        <h1 className="section-title mt-4 text-gradient-silver">최신 결과를 보고 바로 번호를 만들어보세요</h1>
         <p className="body-large mt-4 max-w-5xl text-slate-300">
           최신 당첨번호 확인, 번호 생성, 자주 보는 핵심 통계를 한 화면에서 빠르게 확인할 수 있습니다.
         </p>
