@@ -1,22 +1,40 @@
 import { unstable_cache } from "next/cache";
 
 import { seedDraws } from "@/lib/data/seed-draws";
-import { getAllStoredLottoDraws, hasFirestoreAdminEnv } from "@/lib/firebase/admin";
+import { getAllPublicStoredLottoDraws, getAllStoredLottoDraws, hasFirestoreAdminEnv, hasFirestorePublicEnv } from "@/lib/firebase/admin";
 import type { Draw } from "@/types/lotto";
 
+export async function getConfiguredOfficialDraws(): Promise<Draw[]> {
+  if (hasFirestoreAdminEnv()) {
+    return getAllStoredLottoDraws();
+  }
+
+  if (hasFirestorePublicEnv()) {
+    return getAllPublicStoredLottoDraws();
+  }
+
+  return [];
+}
+
 export const getCachedOfficialDraws = unstable_cache(
-  async () => {
-    if (!hasFirestoreAdminEnv()) {
-      return [];
-    }
-    const stored = await getAllStoredLottoDraws();
-    return stored;
-  },
+  async () => getConfiguredOfficialDraws(),
   ["official-draws-v1"],
   {
     revalidate: 21600 // 6 hours
   }
 );
+
+async function getOfficialDraws() {
+  try {
+    return await getCachedOfficialDraws();
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("incrementalCache missing in unstable_cache")) {
+      return getConfiguredOfficialDraws();
+    }
+
+    throw error;
+  }
+}
 
 function mergeDrawSets(primaryDraws: Draw[], fallbackDraws: Draw[]): Draw[] {
   const drawMap = new Map<number, Draw>();
@@ -38,10 +56,10 @@ export async function getAllAvailableDraws(): Promise<Draw[]> {
   }
 
   try {
-    const cachedDraws = await getCachedOfficialDraws();
+    const cachedDraws = await getOfficialDraws();
     return mergeDrawSets(cachedDraws, seedDraws);
   } catch (error) {
-    console.warn("Failed to fetch official draws from Firestore cache. Falling back to seed.", error);
+    console.warn("Failed to fetch official draws from Firestore. Falling back to seed.", error);
     return [...seedDraws].sort((left, right) => right.round - left.round);
   }
 }

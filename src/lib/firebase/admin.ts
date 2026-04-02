@@ -75,6 +75,10 @@ export function hasFirestoreAdminEnv() {
   );
 }
 
+export function hasFirestorePublicEnv() {
+  return Boolean((process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) && process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+}
+
 function getFirestoreAdminConfig() {
   return {
     projectId: process.env.FIREBASE_ADMIN_PROJECT_ID || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
@@ -314,6 +318,24 @@ function parseDrawDocument(document: FirestoreDocument): LottoDrawRecord {
   };
 }
 
+async function firestorePublicRequest(path: string, init: RequestInit = {}) {
+  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  const apiKey = getEnv("NEXT_PUBLIC_FIREBASE_API_KEY");
+  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}?key=${apiKey}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers ?? {})
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Firestore public request failed with status ${response.status}.`);
+  }
+
+  return response;
+}
+
 export async function getLatestStoredLottoDraw(): Promise<LottoDrawRecord | null> {
   const response = await firestoreAdminRequest(":runQuery", {
     method: "POST",
@@ -334,6 +356,23 @@ export async function getLatestStoredLottoDraw(): Promise<LottoDrawRecord | null
 
 export async function getAllStoredLottoDraws(): Promise<LottoDrawRecord[]> {
   const response = await firestoreAdminRequest(":runQuery", {
+    method: "POST",
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: LOTTO_DRAWS_COLLECTION }],
+        orderBy: [{ field: { fieldPath: "round" }, direction: "DESCENDING" }]
+      }
+    })
+  });
+
+  const payload = (await response.json()) as Array<{ document?: FirestoreDocument }>;
+  return payload
+    .map((entry) => (entry.document ? parseDrawDocument(entry.document) : null))
+    .filter((entry): entry is LottoDrawRecord => entry !== null);
+}
+
+export async function getAllPublicStoredLottoDraws(): Promise<LottoDrawRecord[]> {
+  const response = await firestorePublicRequest(":runQuery", {
     method: "POST",
     body: JSON.stringify({
       structuredQuery: {
