@@ -1,4 +1,4 @@
-# Workflow v1.2
+# Workflow v1.3
 
 ## 1. 기본 원칙
 
@@ -14,12 +14,12 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 ### 2-1. 기획자
 - 범위와 우선순위 결정
 - 제외 범위 명시
-- `plan.md`, `Product_Spec.md` 기준 유지
+- `doc/project/plan.md`, `doc/specs/Product_Spec.md` 기준 유지
 
 ### 2-2. 웹디자이너
 - 화면 구조, CTA, 정보 위계 정리
 - 가독성, 밀도, 반응형 기준 유지
-- `Design_Guide.md` 기준 유지
+- `doc/specs/Design_Guide.md` 기준 유지
 
 ### 2-3. 개발자
 - 화면, API, 데이터 구조 구현
@@ -39,18 +39,18 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 4. 관련 문서 업데이트
 5. `npm test`
 6. `npm run build`
-7. `history.md` 기록
+7. `doc/project/history.md` 기록
 8. 사용자 승인 후 커밋/푸시
 
 ## 4. 문서 우선순위
 
-1. `plan.md`
-2. `Product_Spec.md`
-3. `Design_Guide.md`
-4. `Technical_Spec.md`
-5. `WORKFLOW.md`
-6. `check_list.md`
-7. `history.md`
+1. `doc/project/plan.md`
+2. `doc/specs/Product_Spec.md`
+3. `doc/specs/Design_Guide.md`
+4. `doc/specs/Technical_Spec.md`
+5. `doc/process/WORKFLOW.md`
+6. `doc/process/check_list.md`
+7. `doc/project/history.md`
 
 상위 문서와 충돌하면 상위 문서를 기준으로 코드와 하위 문서를 맞춘다.
 
@@ -62,33 +62,33 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 - 코드가 바뀌면 관련 문서도 같은 턴에 같이 점검한다.
 - 사용자 화면 문구, 정보 구조, CTA, 페이지 역할이 바뀌면 문서 업데이트를 생략하지 않는다.
 - API, 데이터 구조, 저장 방식, 운영 방식이 바뀌면 기술 문서를 함께 갱신한다.
-- 진행 상태가 바뀌면 `check_list.md`와 `history.md`를 함께 갱신한다.
+- 진행 상태가 바뀌면 `doc/process/check_list.md`와 `doc/project/history.md`를 함께 갱신한다.
 
 ### 5-2. 어떤 문서를 같이 바꿀지
 - 기능 범위, 우선순위, 개념 변경:
-  - `plan.md`
+  - `doc/project/plan.md`
 - 사용자 흐름, 페이지 목적, 기능 정의 변경:
-  - `Product_Spec.md`
+  - `doc/specs/Product_Spec.md`
 - 레이아웃, 가독성, 정보 밀도, 버튼 배치, 시각 기준 변경:
-  - `Design_Guide.md`
+  - `doc/specs/Design_Guide.md`
 - API, Firestore, Worker, sync, 로직, 환경변수 변경:
-  - `Technical_Spec.md`
+  - `doc/specs/Technical_Spec.md`
 - 작업 절차, 승인 방식, 커밋/푸시 정책 변경:
-  - `WORKFLOW.md`
+  - `doc/process/WORKFLOW.md`
 - 완료율, 남은 작업, 우선순위 변경:
-  - `check_list.md`
+  - `doc/process/check_list.md`
 - 실제 수행 이력:
-  - `history.md`
+  - `doc/project/history.md`
 
 ### 5-3. 자동 반영 판단 기준
 - 홈이나 핵심 페이지 구조를 다시 짰다:
-  - `Product_Spec.md`, `Design_Guide.md`, `check_list.md`, `history.md`
+  - `doc/specs/Product_Spec.md`, `doc/specs/Design_Guide.md`, `doc/process/check_list.md`, `doc/project/history.md`
 - 생성기 전략이나 기본값을 바꿨다:
-  - `Product_Spec.md`, `Technical_Spec.md`, `check_list.md`, `history.md`
+  - `doc/specs/Product_Spec.md`, `doc/specs/Technical_Spec.md`, `doc/process/check_list.md`, `doc/project/history.md`
 - Firestore, Firebase, Cloudflare Worker 관련 변경이 있다:
-  - `Technical_Spec.md`, `note.md`, `check_list.md`, `history.md`
+  - `doc/specs/Technical_Spec.md`, `doc/project/note.md`, `doc/process/check_list.md`, `doc/project/history.md`
 - 사용자에게 보이는 텍스트 정책이 바뀌었다:
-  - `Product_Spec.md`, `Design_Guide.md`, `history.md`
+  - `doc/specs/Product_Spec.md`, `doc/specs/Design_Guide.md`, `doc/project/history.md`
 
 ## 6. 검증 규칙
 
@@ -104,14 +104,14 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 
 ## 7. 기록 규칙
 
-`history.md`에는 아래 4개를 남긴다.
+`doc/project/history.md`에는 아래 4개를 남긴다.
 
 - 작업
 - 변경
 - 검증
 - 다음
 
-`check_list.md`에는 아래를 반영한다.
+`doc/process/check_list.md`에는 아래를 반영한다.
 
 - 현재 완성도
 - 완료된 항목
@@ -133,7 +133,7 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 - 관련 문서 반영 완료
 - `npm test` 통과
 - `npm run build` 통과
-- `history.md` 기록 완료
+- `doc/project/history.md` 기록 완료
 
 ## 10. 운영 메모
 

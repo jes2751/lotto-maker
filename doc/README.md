@@ -26,17 +26,17 @@ cmd /c npm test
 
 ## 저장소 운영 규칙
 
-* 작업 규칙 문서: `WORKFLOW.md`
-* 작업 기록 파일: `history.md`
-* 범위 기준 문서: `plan.md`
-* 제품 기획 문서: `Product_Spec.md`
-* 디자인 기준 문서: `Design_Guide.md`
-* 기술 기준 문서: `Technical_Spec.md`
+* 작업 규칙 문서: `doc/process/WORKFLOW.md`
+* 작업 기록 파일: `doc/project/history.md`
+* 범위 기준 문서: `doc/project/plan.md`
+* 제품 기획 문서: `doc/specs/Product_Spec.md`
+* 디자인 기준 문서: `doc/specs/Design_Guide.md`
+* 기술 기준 문서: `doc/specs/Technical_Spec.md`
 
 기본 흐름은 다음과 같다.
 
-1. 범위 변경이 있으면 먼저 `plan.md`를 갱신한다.
-2. 코드 작업 후 `history.md`에 변경 내역과 검증 결과를 기록한다.
+1. 범위 변경이 있으면 먼저 `doc/project/plan.md`를 갱신한다.
+2. 코드 작업 후 `doc/project/history.md`에 변경 내역과 검증 결과를 기록한다.
 3. 관련 테스트 또는 최소 실행 확인을 수행한다.
 4. 검증이 통과하면 커밋 후 `main` 브랜치에 푸시한다.
 
@@ -51,10 +51,16 @@ cmd /c npm test
 
 ## 문서 구조
 
-* `plan.md`: 최상위 범위와 우선순위
-* `Product_Spec.md`: 사용자, 기능, 화면, 상태 기획
-* `Design_Guide.md`: UI, 반응형, 상태 표현 기준
-* `Technical_Spec.md`: 생성 로직, API, 데이터, 테스트 기준
-* `WORKFLOW.md`: 역할, 작업 순서, 기록, 커밋/푸시 규칙
-* `history.md`: 실제 작업 로그
+* `project/`: 현재 작업 기준 문서
+* `project/plan.md`: 최상위 범위와 우선순위
+* `project/history.md`: 실제 작업 로그
+* `project/note.md`: 운영 메모, 로컬 실행, 배포/환경 정리
+* `specs/`: 제품, 디자인, 기술 기준 문서
+* `specs/Product_Spec.md`: 사용자, 기능, 화면, 상태 기획
+* `specs/Design_Guide.md`: UI, 반응형, 상태 표현 기준
+* `specs/Technical_Spec.md`: 생성 로직, API, 데이터, 테스트 기준
+* `process/`: 작업 절차와 체크리스트
+* `process/WORKFLOW.md`: 역할, 작업 순서, 기록, 커밋/푸시 규칙
+* `process/check_list.md`: 현재 완성도, 남은 항목, 다음 우선순위
+* `qa/`: QA 보고서와 검토 기록
 * `archive/`: 통합 전 상세 문서 보관

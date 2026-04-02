@@ -1,4 +1,4 @@
-# Design Guide v1.10
+# Design Guide v1.11
 
 ## 1. 방향 (Premium UI/UX)
 
@@ -196,7 +196,7 @@
 
 ## 11. 문서 반영 규칙
 
-- 화면 구조가 바뀌면 `Design_Guide`, `Product_Spec`, `history`를 함께 본다.
+- 화면 구조가 바뀌면 `doc/specs/Design_Guide.md`, `doc/specs/Product_Spec.md`, `doc/project/history.md`를 함께 본다.
 - 디자인 기준이 바뀌면 가이드 문서에 먼저 적고 코드에 맞춘다.
 - 공통 규칙은 문서에 남기지 않으면 완료로 보지 않는다.
 
@@ -287,5 +287,5 @@
 ### 12-6. 검토 후 문서 업데이트 규칙
 
 - 검토 중 새 규칙이 생기면 먼저 이 문서에 추가한다.
-- 실제 수정이 끝나면 `history.md`에 화면 단위로 남긴다.
-- 검토 결과가 플랜 변경까지 이어지면 `plan.md`에도 반영한다.
+- 실제 수정이 끝나면 `doc/project/history.md`에 화면 단위로 남긴다.
+- 검토 결과가 플랜 변경까지 이어지면 `doc/project/plan.md`에도 반영한다.

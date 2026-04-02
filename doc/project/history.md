@@ -1,5 +1,17 @@
 # History
 
+## v1.19 (2026-04-02)
+- **Docs(폴더 구조 정리)**: 문서와 QA 자료를 역할별 하위 폴더로 재배치
+  - [x] `doc/project`, `doc/specs`, `doc/process`, `doc/qa`, `doc/archive` 기준으로 문서 구조 정리
+  - [x] 문서 색인과 워크플로 기준 경로를 새 구조에 맞게 갱신
+  - [x] 아카이브 문서의 기록 경로 참조를 `doc/project/history.md` 기준으로 통일
+
+## v1.18 (2026-04-02)
+- **Docs(QA 자료 분리)**: QA 결과를 따로 모아 볼 수 있게 문서 폴더 구성
+  - [x] `doc/qa/README.md` 추가
+  - [x] `doc/qa/2026-04-02-design-qa.md`에 리디자인 QA 결과 정리
+  - [x] `doc/note.md`에 QA 자료 위치 링크 추가
+
 ## v1.17 (2026-04-02)
 - **QA(모바일 후속 압축)**: 생성 통계 모바일의 세로 밀도를 추가로 정리
   - [x] `generated-stats` 히어로 보조 정보와 상단 KPI를 모바일 다열 구조로 압축
