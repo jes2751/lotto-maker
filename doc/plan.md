@@ -122,36 +122,36 @@
 - 정책/신뢰 페이지 구현 완료
 - 홈/생성기/통계/생성 통계 허브 단순화 진행 완료
 
-## 8. 다음 우선순위 (제품 및 기능)
+## 8. V1 런칭 확정 태스크 (Selective Expansion)
 
-1. Search Console 등록 및 sitemap 제출
-2. UI/레이아웃 단위 모바일/실브라우저 QA
-3. 생성 통계 허브 세부 시각화 보강 (차트/그래프)
-4. 회차 분석 페이지 품질 보강
-5. 후속 고급 통계 확장 (미출현 번호 추적 등)
+### 8-1. 성장 및 리텐션 10x 레버리지 (신규 합의)
+- **바이럴 공유 카드 (Viral Share Card):** 번호 생성 후 결과 화면을 프리미엄 짙은 블랙 티켓 형태의 이미지(Canvas/OG)로 렌더링 후 캡처해 주변에 자랑할 수 있는 기능.
+- **내 당첨 확인기 (QR 스캔/직접 입력):** 구매한 실물 로또의 QR 코드를 찍거나 번호를 직접 입력하면 당첨 여부를 직관적인 V1 UI 테마에 맞게 보여주는 강력한 리텐션 도구.
+- **스토리텔링형 스킨 생성기:** 딱딱한 난수 생성이 아닌 '오늘의 운세', '꿈 키워드' 등 감성적인 테마를 입힌 생성기 UX 모드 추가.
 
-## 9. 엔지니어링 리스크 및 방어 아키텍처 (Technical Debt & Scale)
+### 8-2. 기존 잔여 마감 태스크
+- **동적 OpenGraph 이미지:** 링크 공유 시 최신 회차나 생성 결과 공이 그대로 뜨도록 정적 SEO를 넘어선 동적 SEO 도입.
+- **초경량 시각화:** `생성 통계 허브`와 `회차 분석` 페이지에 무거운 JS 차트 라이브러리 대신, CSS와 DOM 기반의 최소한의 초경량 히스토그램 시각화 탑재 (Bundle Size 폭증 방어).
+- **SEO 및 최적화:** Search Console 등록 및 Sitemap 동적 구성.
+- UI/모바일 기기 엣지 케이스 QA 파이널 체크.
 
-현재 시스템은 빠른 MVP 검증을 위해 최적화되어 있으나, 트래픽 스케일업 및 외부 의존성 보호를 위해 아래의 아키텍처 부채를 우선적으로 해결한다.
+## ~9. 엔지니어링 리스크 및 방어 아키텍처 (Technical Debt & Scale)~ [V1 완료]
 
-### 9-1. 단일 장애점 (SPOF) 해소 (외부 JSON 의존성)
-- **현재:** `smok95.github.io`의 외부 정적 JSON에 애플리케이션의 핵심 1,200+ 회차 Read 로직을 100% 의존하고 있어, 외부 저장소 변화에 취약함.
-- **방어 계획:** 백그라운드 Worker에서 `lotto_draws` Firestore 데이터를 읽어 우리 도메인 관리 하의 독립적인 정적 JSON 버킷(Vercel Blob 또는 Cloudflare R2)으로 배포 (Sovereignty 확보).
-
-### 9-2. Firestore 과금 절벽 및 남용 방어 (Write Limit)
-- **현재:** 홈 화면의 번호 생성 버튼이 클릭될 때마다 Firestore `generated_records`에 직접 Write 수행. 악의적 봇이나 대규모 트래픽 발생 시 무료 티어(20k/day) 소진 및 과금 폭탄 위험.
-- **방어 계획:** 
-  1. API 라우트에 Rate Limiting (예: Upstash Redis 기반 IP당 일일 N회 제한) 추가.
-  2. 트래픽 폭증 시 Firestore 대신 Cloudflare D1 초경량 DB나 Redis 캐시+벌크 비동기 Insert 방식으로 집계 파이프라인 우회.
-
-### 9-3. 핵심 로직 Unit Test 도입 (Zero Defect)
-- **현재:** 모바일 화면 테스트(Visual QA) 위주로 구성되어, 무한 루프나 통계 알고리즘 엣지 케이스 방어 여부를 확인하기 어려움.
-- **방어 계획:** `generation.ts` 등 생성 엔진 함수와 통계 추출 로직에 대해, CI/CD 파이프라인에서 100ms 내로 실행되는 독립적인 순수 로직 Unit Test(`vitest` 또는 `bun test`) 환경 구축.
+현재 시스템은 트래픽 스케일업 및 외부 의존성 보호를 위한 아키텍처가 완전히 확보되었습니다.
+- **[완료] SPOF 해소:** 외부 정적 JSON에 의존하지 않고, 내부 Firestore 데이터를 6시간 주기로 캐시(unstable_cache)하여 Cloudflare 상에서 0ms 수준으로 제공.
+- **[완료] Firestore 남용 방어:** In-Memory Map을 통한 Rate Limiting을 도입하여 분할된 단일 Worker Isolate 당 10분/50회 제한으로 악성 봇 Write 방어 구축.
+- **[완료] Zero Defect 검증:** `node:test` 네이티브 런너를 통해 생성기의 불가능한 수학적 예외 및 무한 루프 엣지 케이스 테스트 통과 완료.
 
 ## 10. 후속 확장
+- 조합 간 궁합 분석, 고급 미출현 마르코프 패턴 통계 등
 
-- 번호 궁합 통계
-- 고급 패턴 통계
-- 그룹 추첨기
-- 오늘의 운세 기반 보조 추천
-- 회차별 분석 콘텐츠 확대
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | DONE | 3대 10x 레버리지(공유 카드, QR 스캐너, 테마 스킨) 채택 완료. OG 및 경량 UI 시각화 스코프 확정. |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | DONE | V1 과금 폭탄 방지 및 SPOF 캐싱 해소 승인 및 구현 완료. |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+
+**VERDICT:** CEO 플랜 리뷰 통과 완료. 최종 런칭을 향한 10x 확장 마일스톤 확정.
