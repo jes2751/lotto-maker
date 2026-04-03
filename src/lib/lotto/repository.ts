@@ -6,14 +6,8 @@ function sortByLatest(draws: Draw[]): Draw[] {
 }
 
 export class HybridDrawRepository implements DrawRepository {
-  private drawsPromise: Promise<Draw[]> | null = null;
-
   private async loadDraws(): Promise<Draw[]> {
-    if (!this.drawsPromise) {
-      this.drawsPromise = getAllAvailableDraws();
-    }
-
-    return this.drawsPromise;
+    return getAllAvailableDraws();
   }
 
   async list(options: ListDrawsOptions = {}): Promise<DrawListResult> {

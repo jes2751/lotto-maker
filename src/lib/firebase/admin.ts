@@ -661,5 +661,68 @@ export async function settleGeneratedRecordsForDraw(draw: Draw) {
     })
   );
 
+
   return { settled: records.length };
+}
+
+export interface CreateGeneratedRecordInput {
+  anonymousId: string;
+  strategy: string;
+  numbers: number[];
+  bonus: number | null;
+  reason: string;
+  generatedAt: string;
+  targetRound: number | null;
+  filters: Record<string, unknown>;
+}
+
+export async function saveGeneratedRecords(records: CreateGeneratedRecordInput[]) {
+  if (records.length === 0) {
+    return { written: 0 };
+  }
+
+  const { projectId } = getFirestoreAdminConfig();
+  const accessToken = await getFirestoreAdminAccessToken();
+  const createdAt = new Date().toISOString();
+
+  const writes = records.map((record) => {
+    const recordId =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2);
+
+    const fields = {
+      ...record,
+      createdAt,
+      createdSource: "generator",
+      matchedRound: null,
+      matchCount: null,
+      bonusMatched: false,
+      settledAt: null
+    };
+
+    return {
+      update: {
+        name: `projects/${projectId}/databases/(default)/documents/${GENERATED_RECORDS_COLLECTION}/${recordId}`,
+        fields: Object.fromEntries(
+          Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
+        )
+      }
+    };
+  });
+
+  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents:commit`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ writes })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Firestore generated records save failed with status ${response.status}: ${await response.text()}`);
+  }
+
+  return { written: records.length };
 }

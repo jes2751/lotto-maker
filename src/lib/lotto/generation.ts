@@ -69,21 +69,25 @@ function pickWeightedUnique(count: number, pool: number[], weights: Map<number, 
 function createBaseNumbers(
   strategy: "random" | "frequency" | "mixed",
   draws: Draw[],
-  pool = createNumberPool()
+  pool = createNumberPool(),
+  count = MAIN_NUMBER_COUNT
 ): number[] {
   if (strategy === "random") {
-    return pickRandomUnique(MAIN_NUMBER_COUNT, pool);
+    return pickRandomUnique(count, pool);
   }
 
   const weights = buildFrequencyWeights(draws);
 
   if (strategy === "frequency") {
-    return pickWeightedUnique(MAIN_NUMBER_COUNT, pool, weights);
+    return pickWeightedUnique(count, pool, weights);
   }
 
-  const weightedHalf = pickWeightedUnique(3, pool, weights);
+  const weightedCount = Math.floor(count / 2);
+  const randomCount = count - weightedCount;
+
+  const weightedHalf = pickWeightedUnique(weightedCount, pool, weights);
   const remainingPool = pool.filter((number) => !weightedHalf.includes(number));
-  const randomHalf = pickRandomUnique(3, remainingPool);
+  const randomHalf = pickRandomUnique(randomCount, remainingPool);
 
   return sortNumbers([...weightedHalf, ...randomHalf]);
 }
@@ -184,10 +188,7 @@ function createFilterNumbers(draws: Draw[], rawFilters?: GenerationFilters): num
   for (let attempt = 0; attempt < 800; attempt += 1) {
     const baseStrategy: "mixed" | "frequency" | "random" =
       attempt % 3 === 0 ? "mixed" : attempt % 3 === 1 ? "frequency" : "random";
-    const generatedPool =
-      baseStrategy === "random"
-        ? pickRandomUnique(missingCount, pool)
-        : createBaseNumbers(baseStrategy, draws, pool).slice(0, missingCount);
+    const generatedPool = createBaseNumbers(baseStrategy, draws, pool, missingCount);
     const numbers = sortNumbers([...filters.fixedNumbers, ...generatedPool]);
 
     if (validateGeneratedNumbers(numbers, filters)) {

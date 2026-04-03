@@ -47,43 +47,7 @@ service cloud.firestore {
 
     match /generated_records/{recordId} {
       allow read: if true;
-
-      allow create: if request.resource.data.keys().hasOnly([
-          "anonymousId",
-          "strategy",
-          "numbers",
-          "bonus",
-          "reason",
-          "generatedAt",
-          "createdAt",
-          "createdSource",
-          "targetRound",
-          "filters",
-          "matchedRound",
-          "matchCount",
-          "bonusMatched",
-          "settledAt"
-        ])
-        && request.resource.data.anonymousId is string
-        && request.resource.data.anonymousId.size() >= 8
-        && isValidStrategy(request.resource.data.strategy)
-        && isValidNumberList(request.resource.data.numbers, 6)
-        && (request.resource.data.bonus == null
-          || (request.resource.data.bonus is int
-            && request.resource.data.bonus >= 1
-            && request.resource.data.bonus <= 45))
-        && request.resource.data.reason is string
-        && request.resource.data.reason.size() > 0
-        && request.resource.data.generatedAt is string
-        && request.resource.data.createdSource == "generator"
-        && (request.resource.data.targetRound == null || request.resource.data.targetRound is int)
-        && isValidFilters(request.resource.data.filters)
-        && request.resource.data.matchedRound == null
-        && request.resource.data.matchCount == null
-        && request.resource.data.bonusMatched is bool
-        && request.resource.data.settledAt == null;
-
-      allow update, delete: if false;
+      allow write: if false;
     }
 
     match /{document=**} {

@@ -52,33 +52,33 @@ export async function recordGeneratedSets({ strategy, sets, filters, targetRound
     return;
   }
 
-  const [{ addDoc, collection, serverTimestamp }, { getFirebaseDb }] = await Promise.all([
-    import("firebase/firestore"),
-    import("@/lib/firebase/client")
-  ]);
-
-  const db = getFirebaseDb();
   const anonymousId = getAnonymousId();
   const normalizedFilters = normalizeFilters(filters);
 
-  await Promise.all(
-    sets.map((set) =>
-      addDoc(collection(db, GENERATED_RECORDS_COLLECTION), {
-        anonymousId,
-        strategy,
-        numbers: set.numbers,
-        bonus: set.bonus ?? null,
-        reason: set.reason,
-        generatedAt: set.generatedAt,
-        createdAt: serverTimestamp(),
-        createdSource: "generator",
-        targetRound: targetRound ?? null,
-        filters: normalizedFilters,
-        matchedRound: null,
-        matchCount: null,
-        bonusMatched: false,
-        settledAt: null
-      })
-    )
-  );
+  const payload = sets.map((set) => ({
+    anonymousId,
+    strategy,
+    numbers: set.numbers,
+    bonus: set.bonus ?? null,
+    reason: set.reason,
+    generatedAt: set.generatedAt,
+    targetRound: targetRound ?? null,
+    filters: normalizedFilters
+  }));
+
+  try {
+    const response = await fetch("/api/v1/generated-records", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      console.error("Failed to record generated sets:", response.status);
+    }
+  } catch (error) {
+    console.error("Error recording generated sets:", error);
+  }
 }

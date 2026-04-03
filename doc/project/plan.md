@@ -190,6 +190,11 @@
 - **SEO 및 최적화:** Search Console 등록 및 Sitemap 동적 구성.
 - UI/모바일 기기 엣지 케이스 QA 파이널 체크.
 
+### 8-3. 긴급 로직 결함 수정 (Eng Review)
+- **생성 확률 편향 버그 픽스:** `generation.ts`의 `createFilterNumbers` 내 정렬 후 슬라이싱 로직으로 인해 혼합/빈도 전략 사용 시 작은 숫자만 추출되는 치명적 확률 붕괴 문제 수정.
+- **캐시 영구화 버그 픽스:** `repository.ts`의 `this.drawsPromise` 싱글톤이 Next.js 서버 환경에서 영구 유지되면서 최신 회차가 실시간 반영되지 않는 문제(SPOF 타파 파편화) 해결.
+- **클라이언트 DB 직결(과금 폭탄) 버그 픽스:** `plan.md`의 Rate Limit 방어 명시와 달리, `client.ts`에서 Client SDK(`addDoc`)를 통해 Firestore에 직접 쓰는 것이 확인됨. 악의적 트래픽에 무방비이며 `firestore.rules`의 취약점 검증도 미비하므로, Next.js API Route로 프록시하여 서버사이드 Rate Limit 적용 후 Admin SDK로 저장하도록 구조 변경.
+
 ## ~9. 엔지니어링 리스크 및 방어 아키텍처 (Technical Debt & Scale)~ [V1 완료]
 
 현재 시스템은 트래픽 스케일업 및 외부 의존성 보호를 위한 아키텍처가 완전히 확보되었습니다.
@@ -206,8 +211,8 @@
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 2 | DONE | 디자인 관점에서 코어는 `신뢰형 로또 컨트롤룸`으로 유지하고, 감성 증폭은 공유 카드 중심으로 제한하기로 정리. |
 | Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | DONE | V1 과금 폭탄 방지 및 SPOF 캐싱 해소 승인 및 구현 완료. |
+| Eng Review | `/review` | Architecture & tests (required) | 2 | DONE | 생성기 확률 편향, 캐시 싱글톤 메모리 누수, 클라이언트 DB 프록시 보안(API 라우트 신설) 3대 구조 버그 수정 및 검증 완료. |
 | Design Review | `/plan-design-review` | UI/UX gaps | 1 | DONE | score: 6/10 → 8/10, 8 decisions. 단일 히어로, 카드 밀도 축소, 보조 텍스트 대비 상향, 헤더 축소, 색 역할 고정 반영. |
 
 **UNRESOLVED:** 0
-**VERDICT:** CEO + ENG + DESIGN CLEARED, 구현은 업데이트된 디자인 방향 기준으로 진행.
+**VERDICT:** 비즈니스/데이터 무결성 결함 완전 해소 및 ALL CLEARED. V1 런칭 대기 완료.
