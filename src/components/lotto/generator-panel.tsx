@@ -308,29 +308,41 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
               type="button"
               onClick={() => setStrategy(item.value)}
               className={[
-                "rounded-2xl border px-4 py-4 text-left transition",
+                "group rounded-[24px] border px-5 py-5 text-left transition duration-300",
                 strategy === item.value
-                  ? "border-accent bg-accent/10 text-white"
-                  : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20"
+                  ? "border-accent bg-[linear-gradient(180deg,rgba(255,143,0,0.14)_0%,rgba(255,143,0,0.04)_100%)] text-white shadow-[0_18px_38px_rgba(255,143,0,0.08)]"
+                  : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.07]"
               ].join(" ")}
             >
-              <div className="font-medium">{item.label}</div>
-              <div className="mt-2 text-sm leading-6 text-slate-400">{item.description}</div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="font-medium text-[1.05rem]">{item.label}</div>
+                <span
+                  className={[
+                    "rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition",
+                    strategy === item.value
+                      ? "bg-accent text-slate-950"
+                      : "border border-white/10 text-slate-500 group-hover:text-slate-300"
+                  ].join(" ")}
+                >
+                  {strategy === item.value ? "현재 선택" : "전략"}
+                </span>
+              </div>
+              <div className="mt-3 text-sm leading-7 text-slate-400">{item.description}</div>
             </button>
           ))}
         </div>
       </section>
 
       <section className="panel">
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
           <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-[0.6fr_0.4fr]">
-              <label className="space-y-2 text-sm text-slate-300">
-                <span>생성 수</span>
+            <div className="grid gap-4 lg:grid-cols-[0.72fr_0.9fr_1fr]">
+              <label className="soft-card space-y-3 text-sm text-slate-300">
+                <span className="eyebrow text-[0.72rem]">생성 수</span>
                 <select
                   value={count}
                   onChange={(event) => setCount(Number(event.target.value))}
-                  className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
+                  className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-lg font-semibold text-white"
                 >
                   {[1, 2, 3, 4, 5].map((option) => (
                     <option key={option} value={option}>
@@ -338,31 +350,51 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                     </option>
                   ))}
                 </select>
+                <p className="text-xs leading-6 text-slate-500">한 번에 1세트부터 5세트까지 생성합니다.</p>
               </label>
 
-              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+              <div className="soft-card">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-white">현재 전략</p>
+                  <p className="eyebrow text-[0.72rem]">현재 전략</p>
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
                     {selectedStrategy?.label ?? strategy}
                   </span>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-slate-400">
+                <p className="mt-3 text-base font-semibold text-white">{selectedStrategy?.label ?? strategy}</p>
+                <p className="mt-2 text-sm leading-7 text-slate-400">
                   {selectedStrategy?.description ?? "현재 전략 설명이 준비되지 않았습니다."}
                 </p>
+              </div>
+
+              <div className="soft-card">
+                <p className="eyebrow text-[0.72rem]">생성 흐름</p>
+                <div className="mt-3 grid gap-3">
+                  {[
+                    "전략 선택",
+                    strategy === "filter" ? "조건 확인" : "바로 생성",
+                    "결과 저장 또는 공유"
+                  ].map((step, index) => (
+                    <div key={step} className="flex items-center gap-3 text-sm text-slate-300">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-semibold text-white">
+                        {index + 1}
+                      </span>
+                      <span>{step}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
             {strategy === "filter" ? (
               <div className="space-y-4">
-                <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                <div className="soft-card">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-sm font-medium text-white">현재 필터 요약</p>
+                    <p className="eyebrow text-[0.72rem]">현재 필터 요약</p>
                     <p className="text-xs text-slate-500">
                       고정수 {fixedNumbers.length}개 / 제외수 {excludedNumbers.length}개
                     </p>
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-slate-400">{filterSummary}</p>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">{filterSummary}</p>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
@@ -427,7 +459,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   </div>
                 </div>
 
-                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+                <label className="soft-card flex items-center gap-3 text-sm text-slate-300">
                   <input
                     type="checkbox"
                     checked={allowConsecutive}
@@ -440,18 +472,39 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-slate-950/30 p-5">
-            <div>
-              <p className="text-sm font-medium text-white">생성 기준</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+          <div className="soft-card flex flex-col gap-5 rounded-[26px] bg-slate-950/30">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="eyebrow text-[0.72rem]">생성 기준</p>
+                <h3 className="mt-3 text-2xl font-semibold text-white">이번 회차 기준으로 바로 생성합니다</h3>
+              </div>
+              <span className="status-badge whitespace-nowrap">Ready</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="kpi-cell">
+                <p className="text-sm text-slate-400">대상 회차</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{targetRound ? `${targetRound}회` : "준비 중"}</p>
+              </div>
+              <div className="kpi-cell">
+                <p className="text-sm text-slate-400">저장 방식</p>
+                <p className="mt-2 text-2xl font-semibold text-white">익명 반영</p>
+              </div>
+            </div>
+            <div className="rounded-[22px] border border-white/10 bg-white/[0.03] px-5 py-4">
+              <p className="text-sm leading-7 text-slate-300">
                 {targetRound ? `${targetRound}회 대상 번호로 기록됩니다.` : "다음 회차 기준을 계산 중입니다."}
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-2 text-sm leading-7 text-slate-400">
                 생성 결과는 참고용이며 공개 생성 통계에도 익명으로 반영됩니다.
               </p>
             </div>
 
-            <button type="button" onClick={() => void generate()} className="cta-button mt-auto w-full" disabled={loading}>
+            <button
+              type="button"
+              onClick={() => void generate()}
+              className="cta-button mt-auto h-14 w-full text-base"
+              disabled={loading}
+            >
               {loading ? "번호 생성 중..." : "번호 생성하기"}
             </button>
           </div>
@@ -474,13 +527,13 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           </div>
 
           {targetRound ? (
-            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+            <div className="mt-4 rounded-[22px] border border-white/10 bg-white/5 px-5 py-4 text-sm text-slate-300">
               현재 생성 결과는 <strong>{targetRound}회</strong> 대상 번호로 기록됩니다.
             </div>
           ) : null}
 
           {recordStatus !== "idle" ? (
-            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+            <div className="mt-4 rounded-[22px] border border-white/10 bg-white/5 px-5 py-4 text-sm text-slate-300">
               {recordStatus === "recording" && "생성 통계에 반영 중입니다."}
               {recordStatus === "recorded" && "생성 통계에 반영됐습니다."}
               {recordStatus === "failed" && "번호는 생성됐지만 생성 통계 기록에는 실패했습니다."}
@@ -550,8 +603,11 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           </div>
 
           {!error && sets.length === 0 ? (
-            <div className="mt-6 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-              아직 생성된 결과가 없습니다. 전략을 선택하고 번호를 생성해보세요.
+            <div className="mt-6 rounded-3xl border border-dashed border-white/15 bg-slate-950/40 px-6 py-7">
+              <p className="text-base font-semibold text-white">아직 생성된 결과가 없습니다.</p>
+              <p className="mt-2 text-sm leading-7 text-slate-400">
+                위에서 전략을 선택하고 번호를 생성하면, 이 영역에 결과와 저장·공유 동작이 함께 나타납니다.
+              </p>
             </div>
           ) : null}
         </section>
@@ -595,8 +651,12 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
             ))}
 
             {savedSets.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 p-5 text-sm text-slate-400">
-                저장된 번호가 없습니다. 생성 결과에서 저장 버튼을 눌러 보관할 수 있습니다.
+              <div className="rounded-3xl border border-dashed border-white/15 bg-slate-950/40 px-6 py-7">
+                <p className="text-base font-semibold text-white">저장된 번호가 없습니다.</p>
+                <p className="mt-2 text-sm leading-7 text-slate-400">
+                  생성 결과에서 저장 버튼을 누르면 자주 다시 보고 싶은 번호를 이곳에 최대 8세트까지 보관할 수
+                  있습니다.
+                </p>
               </div>
             ) : null}
           </div>

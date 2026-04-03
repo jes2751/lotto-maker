@@ -37,6 +37,33 @@ html {
   scroll-behavior: smooth;
 }
 
+@keyframes driftPulse {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.42;
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) scale(1.04);
+    opacity: 0.85;
+  }
+}
+
+@keyframes scanSweep {
+  0% {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
 body {
   min-height: 100vh;
   background:
@@ -126,6 +153,23 @@ p {
     color: var(--text-main);
   }
 
+  .nav-pill-primary {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 100%),
+      rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .utility-link {
+    @apply inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] transition;
+    color: var(--text-muted);
+  }
+
+  .utility-link:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
   .kpi-cell {
     @apply rounded-[20px] px-4 py-4 md:px-5;
     background: rgba(255, 255, 255, 0.028);
@@ -184,6 +228,58 @@ p {
     border: 1px solid rgba(65, 201, 192, 0.3);
     background: rgba(65, 201, 192, 0.1);
     color: #7ce5dd;
+  }
+
+  .signal-chip {
+    @apply rounded-[18px] px-4 py-3;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 100%),
+      rgba(255, 255, 255, 0.025);
+  }
+
+  .signal-chip-label {
+    @apply block text-[0.72rem] font-semibold uppercase tracking-[0.16em];
+    color: var(--text-muted);
+  }
+
+  .signal-chip-value {
+    @apply mt-2 block text-base font-semibold;
+    color: var(--text-main);
+  }
+
+  .signal-link-card {
+    @apply rounded-[18px] px-4 py-4 transition;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .signal-link-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .signal-link-title {
+    @apply block text-sm font-semibold text-white;
+  }
+
+  .signal-link-body {
+    @apply mt-1 block text-xs uppercase tracking-[0.16em];
+    color: var(--text-muted);
+  }
+
+  .signal-row {
+    @apply flex items-start gap-3 rounded-[16px] px-4 py-3 text-sm leading-7 text-slate-300;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .signal-row-dot {
+    @apply mt-2 h-2.5 w-2.5 rounded-full;
+    flex: 0 0 auto;
+    background: linear-gradient(180deg, rgba(65, 201, 192, 0.9) 0%, rgba(255, 143, 0, 0.92) 100%);
+    box-shadow: 0 0 0 5px rgba(65, 201, 192, 0.08);
   }
 
   .progress-track {
@@ -251,6 +347,57 @@ p {
   color: var(--text-muted);
 }
 
+.hero-signal-field {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-signal-field::after {
+  content: "";
+  position: absolute;
+  left: -5%;
+  top: 18%;
+  width: 42%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 143, 0, 0.28) 50%, transparent 100%);
+  animation: scanSweep 7.4s ease-in-out infinite;
+}
+
+.hero-signal {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 0.6;
+  animation: driftPulse 7.8s ease-in-out infinite;
+}
+
+.hero-signal-one {
+  right: -4rem;
+  top: -4rem;
+  height: 11rem;
+  width: 11rem;
+  background: radial-gradient(circle, rgba(255, 143, 0, 0.24) 0%, rgba(255, 143, 0, 0) 70%);
+}
+
+.hero-signal-two {
+  right: 2rem;
+  bottom: -3rem;
+  height: 8rem;
+  width: 8rem;
+  animation-delay: 1.8s;
+  background: radial-gradient(circle, rgba(65, 201, 192, 0.18) 0%, rgba(65, 201, 192, 0) 72%);
+}
+
+.hero-signal-three {
+  left: 45%;
+  top: 24%;
+  height: 5rem;
+  width: 5rem;
+  animation-delay: 3.2s;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 74%);
+}
+
 :root[data-theme="light"] .bg-ink\/80,
 :root[data-theme="light"] .bg-slate-950,
 :root[data-theme="light"] .bg-slate-950\/80,
@@ -307,4 +454,11 @@ p {
 :root[data-theme="light"] .shadow-black\/15,
 :root[data-theme="light"] .shadow-black\/20 {
   --tw-shadow-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+:root[data-theme="light"] .utility-link:hover,
+:root[data-theme="light"] .signal-link-card,
+:root[data-theme="light"] .signal-row,
+:root[data-theme="light"] .signal-chip {
+  background: rgba(255, 255, 255, 0.84);
 }

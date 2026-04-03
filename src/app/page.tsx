@@ -32,7 +32,10 @@ export default async function HomePage() {
       <section className="panel hero-panel grid gap-8 xl:grid-cols-[1.1fr_0.9fr] xl:items-stretch">
         <div className="flex flex-col justify-between gap-8">
           <div>
-            <p className="eyebrow">이번 주 컨트롤룸</p>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <p className="eyebrow">이번 주 컨트롤룸</p>
+              <span className="status-badge">Live Sync</span>
+            </div>
             <h1 className="section-title mt-4 max-w-3xl text-gradient-silver">
               최신 회차를 보고, 바로 다음 번호를 만들고, 핵심 흐름까지 한 번에 보세요
             </h1>
@@ -40,6 +43,19 @@ export default async function HomePage() {
               Lotto Maker Lab은 매주 가장 먼저 확인하는 최신 회차, 가장 빠르게 실행하는 번호 생성, 계속
               참고하게 되는 핵심 통계를 하나의 흐름으로 묶습니다.
             </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                { label: "생성기", value: "4 전략" },
+                { label: "조회", value: "전체 회차" },
+                { label: "통계", value: "장기 + 최근" }
+              ].map((item) => (
+                <div key={item.label} className="signal-chip">
+                  <span className="signal-chip-label">{item.label}</span>
+                  <span className="signal-chip-value">{item.value}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -70,9 +86,19 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="soft-card flex flex-col justify-between gap-6">
+        <div className="soft-card relative overflow-hidden flex flex-col justify-between gap-6">
+          <div className="hero-signal-field" aria-hidden="true">
+            <span className="hero-signal hero-signal-one" />
+            <span className="hero-signal hero-signal-two" />
+            <span className="hero-signal hero-signal-three" />
+          </div>
           <div>
-            <p className="eyebrow">최신 회차</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="eyebrow">최신 회차</p>
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                Weekly Draw
+              </span>
+            </div>
             {latestDraw ? (
               <>
                 <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
@@ -93,6 +119,19 @@ export default async function HomePage() {
                     wrap={false}
                     className="min-w-max"
                   />
+                </div>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {[
+                    { href: "/generate", title: "다음 번호 생성", body: "지금 바로 시작" },
+                    { href: "/draw-analysis", title: "회차 해석 보기", body: "이번 흐름 읽기" },
+                    { href: "/stats", title: "핵심 통계 이동", body: "장기/최근 비교" }
+                  ].map((item) => (
+                    <Link key={item.href} href={item.href} className="signal-link-card">
+                      <span className="signal-link-title">{item.title}</span>
+                      <span className="signal-link-body">{item.body}</span>
+                    </Link>
+                  ))}
                 </div>
               </>
             ) : (

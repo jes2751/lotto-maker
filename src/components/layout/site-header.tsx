@@ -2,35 +2,60 @@ import Link from "next/link";
 
 import { siteConfig } from "@/lib/site";
 
-const navigation = [
-  { href: "/", label: "홈" },
-  { href: "/guides", label: "가이드" },
-  { href: "/generate", label: "번호 생성기" },
+const primaryNavigation = [
   { href: "/check", label: "당첨 확인" },
+  { href: "/generate", label: "번호 생성" },
   { href: "/draws", label: "회차 조회" },
-  { href: "/stats", label: "통계" },
-  { href: "/generated-stats", label: "생성 통계" }
+  { href: "/stats", label: "통계 허브" },
+  { href: "/generated-stats", label: "공개 실험실" }
+] as const;
+
+const utilityNavigation = [
+  { href: "/", label: "홈" },
+  { href: "/guides", label: "가이드" }
 ] as const;
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/80 backdrop-blur-2xl shadow-[0_14px_40px_rgba(0,0,0,0.22)]">
       <div className="mx-auto max-w-6xl px-5 py-3 md:px-6">
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0">
-              <p className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal/90">Lotto Control Room</p>
-              <Link href="/" className="mt-1 block text-[1.45rem] font-semibold tracking-[0.02em] text-mist md:text-[1.9rem]">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal/90">Lotto Control Room</p>
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                  Generate • Check • Analyze
+                </span>
+              </div>
+              <Link
+                href="/"
+                className="mt-2 block text-[1.45rem] font-semibold tracking-[0.02em] text-mist md:text-[1.9rem]"
+              >
                 {siteConfig.logoName}
               </Link>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
-                최신 회차 확인, 번호 생성, 핵심 통계를 가장 빠르게 보는 로또 컨트롤룸.
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                최신 회차를 확인하고, 바로 생성하고, 핵심 흐름까지 이어보는 로또 컨트롤룸.
               </p>
             </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/generate" className="secondary-button">
+                지금 생성
+              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                {utilityNavigation.map((item) => (
+                  <Link key={item.href} href={item.href} className="utility-link">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
-          <nav className="flex flex-wrap gap-2">
-            {navigation.map((item) => (
-              <Link key={item.href} href={item.href} className="nav-pill">
+
+          <nav className="flex flex-wrap gap-2.5">
+            {primaryNavigation.map((item) => (
+              <Link key={item.href} href={item.href} className="nav-pill nav-pill-primary">
                 {item.label}
               </Link>
             ))}
