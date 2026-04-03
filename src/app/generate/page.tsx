@@ -39,7 +39,7 @@ export default async function GeneratePage() {
               복잡한 설명이 아니라 빠른 선택과 즉시 생성입니다.
             </p>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="mt-6 hidden gap-3 md:grid md:grid-cols-3">
               {[
                 { label: "혼합 추천", value: "균형형" },
                 { label: "빈도 추천", value: "데이터형" },

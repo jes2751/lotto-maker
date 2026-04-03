@@ -44,7 +44,7 @@ export default async function HomePage() {
               참고하게 되는 핵심 통계를 하나의 흐름으로 묶습니다.
             </p>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="mt-6 hidden gap-3 md:grid md:grid-cols-3">
               {[
                 { label: "생성기", value: "4 전략" },
                 { label: "조회", value: "전체 회차" },
