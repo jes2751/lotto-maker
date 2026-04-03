@@ -24,7 +24,7 @@ export function SiteHeader() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
                 <p className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal/90">Lotto Control Room</p>
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                <span className="hidden sm:inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
                   Generate • Check • Analyze
                 </span>
               </div>
@@ -43,7 +43,7 @@ export function SiteHeader() {
               <Link href="/generate" className="secondary-button">
                 지금 생성
               </Link>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="hidden sm:flex flex-wrap items-center gap-2">
                 {utilityNavigation.map((item) => (
                   <Link key={item.href} href={item.href} className="utility-link">
                     {item.label}
