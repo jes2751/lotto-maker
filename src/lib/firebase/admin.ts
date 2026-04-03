@@ -5,7 +5,6 @@ const FIRESTORE_SCOPE = "https://www.googleapis.com/auth/datastore";
 const FIRESTORE_BASE_URL = "https://firestore.googleapis.com/v1";
 const LOTTO_DRAWS_COLLECTION = "lotto_draws";
 const GENERATED_RECORDS_COLLECTION = "generated_records";
-const SITE_METRICS_COLLECTION = "site_metrics";
 
 type FirestorePrimitive =
   | string
@@ -47,12 +46,6 @@ export interface GeneratedRecordSettlement {
   bonusMatched: boolean;
   matchedRound: number;
   settledAt: string;
-}
-
-export interface DailyVisitMetric {
-  dateKey: string;
-  count: number;
-  updatedAt: string | null;
 }
 
 let tokenCache: GoogleAccessTokenCache | null = null;
@@ -544,93 +537,6 @@ async function patchFirestoreDocument(
   if (!response.ok) {
     throw new Error(`Firestore generated record patch failed with status ${response.status}.`);
   }
-}
-
-async function getFirestoreDocument(path: string) {
-  const { projectId } = getFirestoreAdminConfig();
-  const accessToken = await getFirestoreAdminAccessToken();
-  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    }
-  });
-
-  if (response.status === 404) {
-    return null;
-  }
-
-  if (!response.ok) {
-    throw new Error(`Firestore admin request failed with status ${response.status}.`);
-  }
-
-  return (await response.json()) as FirestoreDocument;
-}
-
-function parseDailyVisitMetric(document: FirestoreDocument): DailyVisitMetric {
-  const fields = Object.fromEntries(
-    Object.entries(document.fields ?? {}).map(([key, value]) => [key, fromFirestoreValue(value)])
-  ) as Record<string, FirestorePrimitive>;
-
-  return {
-    dateKey: String(fields.dateKey ?? ""),
-    count: Number(fields.count ?? 0),
-    updatedAt: fields.updatedAt == null ? null : String(fields.updatedAt)
-  };
-}
-
-export async function getDailyVisitMetric(dateKey: string): Promise<DailyVisitMetric> {
-  const document = await getFirestoreDocument(`/${SITE_METRICS_COLLECTION}/daily-${dateKey}`);
-
-  if (!document) {
-    return {
-      dateKey,
-      count: 0,
-      updatedAt: null
-    };
-  }
-
-  return parseDailyVisitMetric(document);
-}
-
-export async function incrementDailyVisitMetric(dateKey: string) {
-  const current = await getDailyVisitMetric(dateKey);
-  const nextCount = current.count + 1;
-  const { projectId } = getFirestoreAdminConfig();
-  const accessToken = await getFirestoreAdminAccessToken();
-  const documentName = `projects/${projectId}/databases/(default)/documents/${SITE_METRICS_COLLECTION}/daily-${dateKey}`;
-  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents:commit`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      writes: [
-        {
-          update: {
-            name: documentName,
-            fields: {
-              type: { stringValue: "daily_visit" },
-              dateKey: { stringValue: dateKey },
-              count: { integerValue: String(nextCount) },
-              updatedAt: { timestampValue: new Date().toISOString() }
-            }
-          }
-        }
-      ]
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Firestore daily visit commit failed with status ${response.status}.`);
-  }
-
-  return {
-    dateKey,
-    count: nextCount
-  };
 }
 
 export async function settleGeneratedRecordsForDraw(draw: Draw) {

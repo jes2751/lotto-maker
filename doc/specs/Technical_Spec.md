@@ -103,17 +103,7 @@
   - 한국어 제목/설명
 - 공식 도메인 canonical 유지
 
-## 8. 방문 수 카운트
-
-- 헤더 우측에 `오늘 방문`을 보조 정보 수준으로 노출
-- KST 기준 일별 카운트 사용
-- 같은 브라우저에서는 하루에 한 번만 증가하도록 localStorage 키로 중복 증가를 막음
-- 데이터는 Firestore `site_metrics`에 저장
-- 공개 API:
-  - `GET /api/visits/today`
-  - `POST /api/visits/today`
-
-## 9. 검증 규칙
+## 8. 검증 규칙
 
 - `npm test`
 - `npm run build`

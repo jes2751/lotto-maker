@@ -8,4 +8,3 @@ import "./draw-sync.test";
 import "./firestore-draw-sync.test";
 import "./remote-draws.test";
 import "./seo.test";
-import "./site-visits.test";

@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { TodayVisitBadge } from "@/components/layout/today-visit-badge";
 import { siteConfig } from "@/lib/site";
 
 const navigation = [
@@ -22,14 +21,11 @@ export function SiteHeader() {
             <div className="min-w-0">
               <p className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal/90">Lotto Control Room</p>
               <Link href="/" className="mt-1 block text-[1.45rem] font-semibold tracking-[0.02em] text-mist md:text-[1.9rem]">
-              {siteConfig.logoName}
+                {siteConfig.logoName}
               </Link>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
                 최신 회차 확인, 번호 생성, 핵심 통계를 가장 빠르게 보는 로또 컨트롤룸.
               </p>
-            </div>
-            <div className="flex items-center">
-              <TodayVisitBadge />
             </div>
           </div>
           <nav className="flex flex-wrap gap-2">
