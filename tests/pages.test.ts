@@ -12,6 +12,9 @@ import LottoBuyGuidePage from "../src/app/lotto-buy-guide/page";
 import HomePage from "../src/app/page";
 import StatsPage from "../src/app/stats/page";
 import NumberDetailPage from "../src/app/stats/numbers/[number]/page";
+import { localDraws } from "../src/lib/data/local-draws";
+
+const latestRound = String(localDraws[0]?.round ?? "");
 
 test("home page renders focused core sections", async () => {
   const html = renderToStaticMarkup(await HomePage());
@@ -41,28 +44,28 @@ test("generated stats page renders public stats copy", async () => {
 test("draw analysis hub page renders recent analysis cards", async () => {
   const html = renderToStaticMarkup(await DrawAnalysisHubPage());
 
-  assert.match(html, /1169/);
+  assert.match(html, new RegExp(latestRound));
   assert.match(html, /분석|Analysis/);
 });
 
 test("draw analysis page renders article style content", async () => {
-  const html = renderToStaticMarkup(await DrawAnalysisPage({ params: { round: "1169" } as never }));
+  const html = renderToStaticMarkup(await DrawAnalysisPage({ params: { round: latestRound } as never }));
 
-  assert.match(html, /1169/);
+  assert.match(html, new RegExp(latestRound));
   assert.match(html, /홀짝|Odd \/ Even|Trend Note/);
 });
 
 test("draws page renders draw list", async () => {
   const html = renderToStaticMarkup(await DrawsPage({ searchParams: {} as never }));
 
-  assert.match(html, /1169/);
+  assert.match(html, new RegExp(latestRound));
   assert.match(html, /회차|Find Round|Draws/);
 });
 
 test("draw detail page renders requested round", async () => {
-  const html = renderToStaticMarkup(await DrawDetailPage({ params: { round: "1169" } as never }));
+  const html = renderToStaticMarkup(await DrawDetailPage({ params: { round: latestRound } as never }));
 
-  assert.match(html, /1169/);
+  assert.match(html, new RegExp(latestRound));
   assert.match(html, /당첨번호|Winning Numbers|Analysis/);
 });
 

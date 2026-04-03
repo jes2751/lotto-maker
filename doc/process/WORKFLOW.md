@@ -1,4 +1,4 @@
-# Workflow v1.3
+# Workflow v1.4
 
 ## 1. 기본 원칙
 
@@ -8,6 +8,9 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 - `main` 반영은 배포 가능한 수준일 때만 진행한다.
 - 사용자 화면에 보이는 변경은 코드와 문서가 함께 맞아야 한다.
 - 문서는 참고용이 아니라 실제 작업 규칙으로 사용한다.
+- 모든 작업은 시작 전에 반드시 `doc/project/plan.md`를 먼저 확인하고 시작한다.
+- 여러 AI가 번갈아 작업할 수 있으므로, 문서는 `내가 아는 것`이 아니라 `다음 작업자가 바로 이어받을 수 있는 상태`로 써야 한다.
+- 문서가 약하면 코드가 맞아도 다음 작업에서 쉽게 흔들린다. 그래서 문서 품질도 구현 품질의 일부로 본다.
 
 ## 2. 역할
 
@@ -34,13 +37,39 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 ## 3. 표준 작업 순서
 
 1. 작업 목적 확인
-2. 관련 문서 확인
-3. 코드 수정
-4. 관련 문서 업데이트
-5. `npm test`
-6. `npm run build`
-7. `doc/project/history.md` 기록
-8. 사용자 승인 후 커밋/푸시
+2. `doc/project/plan.md` 먼저 확인
+3. 관련 문서 확인
+4. 코드 수정
+5. 관련 문서 업데이트
+6. `npm test`
+7. `npm run build`
+8. `doc/project/history.md` 기록
+9. 사용자 승인 후 커밋/푸시
+
+## 3-1. 작업 시작 전 필수 확인
+
+- 어떤 작업이든 먼저 `doc/project/plan.md`를 읽고 현재 목표, 우선순위, 제외 범위를 맞춘다.
+- `plan.md`와 실제 코드/화면이 어긋나 있으면, 무시하고 진행하지 말고 문서와 코드 중 무엇을 기준으로 맞출지 먼저 정리한다.
+- 관련 문서는 `필요하면 본다`가 아니라, 영향 범위가 보이면 먼저 열어본다.
+  - 제품 흐름: `doc/specs/Product_Spec.md`
+  - 디자인: `doc/specs/Design_Guide.md`
+  - 기술 구조: `doc/specs/Technical_Spec.md`
+  - 절차: `doc/process/WORKFLOW.md`
+
+## 3-2. 문서 작성 품질 규칙
+
+- 문서는 여러 AI와 사람이 같이 보는 인수인계 수단이다.
+- 따라서 문서는 아래 기준을 만족해야 한다.
+  - 현재 결정이 무엇인지 바로 보일 것
+  - 왜 그렇게 정했는지 짧게라도 남길 것
+  - 다음에 무엇을 이어서 해야 하는지 보일 것
+  - 코드와 충돌하는 오래된 설명을 남기지 않을 것
+- 애매한 표현은 줄인다.
+  - `아마`, `추후`, `필요시`, `나중에` 같은 말만 있고 기준이 없으면 문서 품질이 낮은 상태다.
+- 기능을 바꿨는데 문서가 예전 설명을 유지하면 미반영으로 본다.
+- 화면 구조, 데이터 소스, 운영 방식이 바뀌었으면 문서도 같은 턴에 같이 끝내야 한다.
+- 문서 목적은 설명이 아니라 정렬이다.
+  - 다음 AI가 `뭘 해야 하는지`, `뭘 하면 안 되는지`, `어디까지 끝났는지` 바로 이해해야 한다.
 
 ## 4. 문서 우선순위
 
@@ -89,6 +118,8 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
   - `doc/specs/Technical_Spec.md`, `doc/project/note.md`, `doc/process/check_list.md`, `doc/project/history.md`
 - 사용자에게 보이는 텍스트 정책이 바뀌었다:
   - `doc/specs/Product_Spec.md`, `doc/specs/Design_Guide.md`, `doc/project/history.md`
+- 여러 작업자가 헷갈릴 수 있는 결정 규칙을 새로 만들었다:
+  - `doc/project/plan.md`, `doc/process/WORKFLOW.md`, `doc/project/history.md`
 
 ## 6. 검증 규칙
 
@@ -131,6 +162,7 @@ Lotto Maker Lab은 `로컬 작업 -> 검증 -> 문서 반영 -> 사용자 승인
 
 - 코드 반영 완료
 - 관련 문서 반영 완료
+- `doc/project/plan.md` 기준과 충돌 없음
 - `npm test` 통과
 - `npm run build` 통과
 - `doc/project/history.md` 기록 완료
