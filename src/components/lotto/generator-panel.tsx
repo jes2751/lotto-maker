@@ -16,26 +16,61 @@ import type {
 
 const STORAGE_KEY = "lotto-lab-saved-sets";
 
-const strategies: Array<{ value: GenerationStrategy; label: string; description: string }> = [
+const strategies: Array<{
+  value: GenerationStrategy;
+  label: string;
+  tone: string;
+  flavor: string;
+  cue: string;
+  description: string;
+  accent: string;
+  selectedAccent: string;
+  signal: string[];
+}> = [
   {
     value: "mixed",
     label: "혼합 추천",
+    tone: "빠른 기본값",
+    flavor: "START",
+    cue: "처음 한 번 눌러보기 좋은 균형형",
     description: "전체 빈도와 최근 흐름을 함께 참고해 균형 있게 번호를 만듭니다."
+,
+    accent: "border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(15,23,42,0.92)_100%)]",
+    selectedAccent: "border-accent bg-[linear-gradient(180deg,rgba(255,143,0,0.22)_0%,rgba(255,143,0,0.06)_100%)] shadow-[0_18px_38px_rgba(255,143,0,0.12)]",
+    signal: ["바로 시작", "균형형", "기본 추천"]
   },
   {
     value: "frequency",
     label: "빈도 추천",
-    description: "과거 당첨 데이터에서 자주 나온 번호 흐름을 더 강하게 반영합니다."
+    tone: "통계 몰입형",
+    flavor: "DATA",
+    cue: "자주 나온 흐름을 더 세게 반영",
+    description: "과거 당첨 데이터에서 자주 나온 번호 흐름을 더 강하게 반영합니다.",
+    accent: "border-teal/20 bg-[linear-gradient(180deg,rgba(45,212,191,0.10)_0%,rgba(15,23,42,0.92)_100%)]",
+    selectedAccent: "border-teal bg-[linear-gradient(180deg,rgba(45,212,191,0.22)_0%,rgba(45,212,191,0.05)_100%)] shadow-[0_18px_38px_rgba(45,212,191,0.12)]",
+    signal: ["공식 기준", "자주 나온 번호", "통계 우선"]
   },
   {
     value: "random",
     label: "랜덤 추천",
-    description: "1부터 45까지 중복 없이 무작위로 번호를 생성합니다."
+    tone: "가볍게 시작",
+    flavor: "QUICK",
+    cue: "생각 없이 눌러도 되는 즉시형",
+    description: "1부터 45까지 중복 없이 무작위로 번호를 생성합니다.",
+    accent: "border-sky-400/20 bg-[linear-gradient(180deg,rgba(56,189,248,0.10)_0%,rgba(15,23,42,0.92)_100%)]",
+    selectedAccent: "border-sky-400 bg-[linear-gradient(180deg,rgba(56,189,248,0.22)_0%,rgba(56,189,248,0.05)_100%)] shadow-[0_18px_38px_rgba(56,189,248,0.12)]",
+    signal: ["즉시 생성", "생각 없이", "빠른 스타트"]
   },
   {
     value: "filter",
     label: "필터 추천",
-    description: "고정수, 제외수, 홀짝, 합계, 연속번호 조건을 넣어 맞춤형으로 생성합니다."
+    tone: "직접 설계",
+    flavor: "CRAFT",
+    cue: "조건을 걸고 맞춤형으로 조정",
+    description: "고정수, 제외수, 홀짝, 합계, 연속번호 조건을 넣어 맞춤형으로 생성합니다.",
+    accent: "border-fuchsia-400/20 bg-[linear-gradient(180deg,rgba(217,70,239,0.10)_0%,rgba(15,23,42,0.92)_100%)]",
+    selectedAccent: "border-fuchsia-400 bg-[linear-gradient(180deg,rgba(217,70,239,0.22)_0%,rgba(217,70,239,0.05)_100%)] shadow-[0_18px_38px_rgba(217,70,239,0.12)]",
+    signal: ["조건 직접 설정", "덜 겹치게 설계", "맞춤형"]
   }
 ];
 
@@ -293,8 +328,8 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
       <section className="panel">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="eyebrow">생성 설정</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">전략을 고르고 바로 번호를 만들어보세요</h2>
+            <p className="eyebrow">전략 무대</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">오늘 어떤 방식으로 뽑을지 먼저 고르세요</h2>
           </div>
           <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300">
             보너스 번호는 항상 포함됩니다.
@@ -310,12 +345,20 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
               className={[
                 "group rounded-[24px] border px-5 py-5 text-left transition duration-300",
                 strategy === item.value
-                  ? "border-accent bg-[linear-gradient(180deg,rgba(255,143,0,0.14)_0%,rgba(255,143,0,0.04)_100%)] text-white shadow-[0_18px_38px_rgba(255,143,0,0.08)]"
-                  : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.07]"
+                  ? `${item.selectedAccent} text-white`
+                  : `${item.accent} text-slate-300 hover:border-white/25 hover:bg-white/[0.07]`
               ].join(" ")}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="font-medium text-[1.05rem]">{item.label}</div>
+                <div>
+                  <div className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 transition group-hover:text-slate-300">
+                    {item.flavor}
+                  </div>
+                  <div className="mt-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500 transition group-hover:text-slate-300">
+                    {item.tone}
+                  </div>
+                  <div className="mt-3 font-medium text-[1.1rem]">{item.label}</div>
+                </div>
                 <span
                   className={[
                     "rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition",
@@ -327,7 +370,18 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   {strategy === item.value ? "현재 선택" : "전략"}
                 </span>
               </div>
-              <div className="mt-3 text-sm leading-7 text-slate-400">{item.description}</div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {item.signal.map((signal) => (
+                  <span
+                    key={signal}
+                    className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-slate-300"
+                  >
+                    {signal}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-4 text-sm font-medium text-slate-200">{item.cue}</div>
+              <div className="mt-2 text-sm leading-7 text-slate-400">{item.description}</div>
             </button>
           ))}
         </div>
@@ -361,6 +415,9 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   </span>
                 </div>
                 <p className="mt-3 text-base font-semibold text-white">{selectedStrategy?.label ?? strategy}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-teal">
+                  {selectedStrategy?.tone ?? "빠른 선택"}
+                </p>
                 <p className="mt-2 text-sm leading-7 text-slate-400">
                   {selectedStrategy?.description ?? "현재 전략 설명이 준비되지 않았습니다."}
                 </p>
@@ -370,9 +427,9 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                 <p className="eyebrow text-[0.72rem]">생성 흐름</p>
                 <div className="mt-3 grid gap-3">
                   {[
-                    "전략 선택",
-                    strategy === "filter" ? "조건 확인" : "바로 생성",
-                    "결과 저장 또는 공유"
+                    "전략 고르기",
+                    strategy === "filter" ? "조건 다듬기" : "바로 생성",
+                    "통계/저장으로 이어보기"
                   ].map((step, index) => (
                     <div key={step} className="flex items-center gap-3 text-sm text-slate-300">
                       <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-semibold text-white">
@@ -495,7 +552,8 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                 {targetRound ? `${targetRound}회 대상 번호로 기록됩니다.` : "다음 회차 기준을 계산 중입니다."}
               </p>
               <p className="mt-2 text-sm leading-7 text-slate-400">
-                생성 결과는 참고용이며 공개 생성 통계에도 익명으로 반영됩니다.
+                생성 결과는 참고용이며 공개 생성 통계에도 익명으로 반영됩니다. 먼저 뽑고, 그 다음 통계로
+                읽는 흐름을 전제로 설계했습니다.
               </p>
             </div>
 

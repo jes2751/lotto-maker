@@ -1,4 +1,4 @@
-# Technical Spec v1.6
+# Technical Spec v1.7
 
 ## 1. 핵심 기술 구성
 
@@ -56,6 +56,10 @@
 - 첫 진입 시 자동 생성하지 않는다
 - `filter` 전략일 때만 필터 입력 UI를 노출한다
 - 생성 직후 Firestore `generated_records`에 비동기로 저장한다
+- 저장 경로는 `public Firestore create -> API fallback` 순서로 시도한다
+  - 기본 저장은 브라우저 Firebase client write
+  - 실패 시 `/api/v1/generated-records` admin write fallback
+  - `generated_records`는 create-only public rule을 사용하고, 정산 update는 admin 경로가 담당한다
 
 ## 4. 생성 통계 계산 규칙
 

@@ -6,8 +6,8 @@ const primaryNavigation = [
   { href: "/check", label: "당첨 확인" },
   { href: "/generate", label: "번호 생성" },
   { href: "/draws", label: "회차 조회" },
-  { href: "/stats", label: "통계 허브" },
-  { href: "/generated-stats", label: "공개 실험실" }
+  { href: "/stats", label: "과거 1등 데이터" },
+  { href: "/generated-stats", label: "우리 유저 데이터" }
 ] as const;
 
 const utilityNavigation = [
@@ -35,7 +35,7 @@ export function SiteHeader() {
                 {siteConfig.logoName}
               </Link>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                최신 회차를 확인하고, 바로 생성하고, 핵심 흐름까지 이어보는 로또 컨트롤룸.
+                최신 회차를 확인하고, 공식 당첨 흐름과 유저 군중 흐름을 같이 보며 더 덜 겹치는 선택까지 생각하는 로또 플레이보드.
               </p>
             </div>
 

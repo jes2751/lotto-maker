@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   ...createPageMetadata({
     locale: "ko",
     path: "/",
-    titleKo: "최신 결과, 번호 생성, 핵심 통계",
+    titleKo: "공식 흐름과 유저 흐름으로 보는 번호 선택",
     titleEn: "Latest result, generator, and core statistics",
     descriptionKo:
-      "최신 당첨번호를 확인하고, 번호를 생성하고, 자주 보는 핵심 통계를 빠르게 볼 수 있습니다.",
+      "최신 당첨번호를 확인하고, 번호를 생성하고, 공식 당첨 흐름과 유저 군중 흐름을 함께 보며 번호를 고를 수 있습니다.",
     descriptionEn:
       "Check the latest draw, generate a new set, and review the core statistics most visitors need first."
   })
@@ -26,6 +26,44 @@ export default async function HomePage() {
   const allHotNumbers = computeFrequencyStats(draws, "all").slice(0, 5);
   const recentHotNumbers = computeFrequencyStats(draws, "recent_10").slice(0, 5);
   const oddEvenLeader = summary.oddEvenBreakdown[0]?.label ?? "-";
+  const officialVsCrowd = [
+    {
+      href: "/stats",
+      eyebrow: "공식 당첨 흐름",
+      title: "과거 1등 데이터",
+      body: "장기/최근 당첨 기록으로 실제로 반복된 번호와 패턴을 먼저 봅니다.",
+      detail: "공식 당첨 기록 기준",
+      points: ["실제로 나온 번호", "장기 + 최근 흐름", "번호별 출현 기록"]
+    },
+    {
+      href: "/generated-stats",
+      eyebrow: "유저 군중 흐름",
+      title: "우리 유저 데이터",
+      body: "사람들이 실제로 어떤 번호와 전략에 몰리는지 공개 생성 기록으로 봅니다.",
+      detail: "실제 생성 기록 기준",
+      points: ["사람들이 몰린 번호", "전략 점유율", "대중적 조합 힌트"]
+    }
+  ] as const;
+  const playCards = [
+    {
+      href: "/generate",
+      kicker: "지금 시작",
+      title: "바로 번호 뽑기",
+      body: "생각 오래 하지 말고 먼저 5세트를 뽑은 뒤 흐름을 붙여 봅니다."
+    },
+    {
+      href: "/stats",
+      kicker: "공식 기준",
+      title: "과거 1등 흐름 보기",
+      body: "실제로 나온 번호와 패턴을 먼저 보고 기준을 잡습니다."
+    },
+    {
+      href: "/generated-stats",
+      kicker: "군중 흐름",
+      title: "유저 몰림 보기",
+      body: "사람들이 어디에 몰리는지 보고 더 대중적인 조합인지 판단합니다."
+    }
+  ] as const;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
@@ -33,55 +71,82 @@ export default async function HomePage() {
         <div className="flex flex-col justify-between gap-8">
           <div>
             <div className="flex flex-wrap items-center gap-2.5">
-              <p className="eyebrow">이번 주 컨트롤룸</p>
-              <span className="status-badge">Live Sync</span>
+              <p className="eyebrow">군중 회피 플레이보드</p>
+              <span className="status-badge">Official + Crowd</span>
             </div>
             <h1 className="section-title mt-4 max-w-3xl text-gradient-silver">
-              최신 회차를 보고, 바로 다음 번호를 만들고, 핵심 흐름까지 한 번에 보세요
+              먼저 뽑고, 그 번호가 얼마나 대중적인지 바로 확인하세요
             </h1>
             <p className="body-large mt-5 max-w-2xl text-slate-300">
-              Lotto Maker Lab은 매주 가장 먼저 확인하는 최신 회차, 가장 빠르게 실행하는 번호 생성, 계속
-              참고하게 되는 핵심 통계를 하나의 흐름으로 묶습니다.
+              Lotto Maker Lab은 단순 생성기보다 한 단계 더 갑니다. 먼저 번호를 만들고, 그다음 공식 당첨
+              흐름과 우리 유저들의 실제 선택 흐름을 따로 보며 남들도 많이 고를 조합인지 같이 판단하게
+              만듭니다.
             </p>
 
-            <div className="mt-6 hidden gap-3 md:grid md:grid-cols-3">
+            <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-3">
               {[
-                { label: "생성기", value: "4 전략" },
-                { label: "조회", value: "전체 회차" },
-                { label: "통계", value: "장기 + 최근" }
+                {
+                  title: "1. 먼저 생성",
+                  body: "혼합 추천으로 바로 뽑기"
+                },
+                {
+                  title: "2. 공식 기준 확인",
+                  body: "과거 1등 흐름과 최근 10회 비교"
+                },
+                {
+                  title: "3. 군중 흐름 확인",
+                  body: "우리 유저들이 실제로 몰린 번호 보기"
+                }
               ].map((item) => (
-                <div key={item.label} className="signal-chip">
-                  <span className="signal-chip-label">{item.label}</span>
-                  <span className="signal-chip-value">{item.value}</span>
+                <div key={item.title} className="soft-card rounded-[22px] px-4 py-4">
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-teal">{item.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{item.body}</p>
                 </div>
+              ))}
+            </div>
+
+            <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-[1.1fr_0.9fr_0.9fr]">
+              {playCards.map((item, index) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={[
+                    "play-card",
+                    index === 0 ? "border-accent/40 bg-[linear-gradient(180deg,rgba(255,143,0,0.16)_0%,rgba(255,143,0,0.05)_100%)]" : ""
+                  ].join(" ")}
+                >
+                  <span className="play-card-kicker">{item.kicker}</span>
+                  <span className="play-card-title">{item.title}</span>
+                  <span className="play-card-body">{item.body}</span>
+                </Link>
               ))}
             </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link href="/generate" className="cta-button w-full sm:w-auto">
-              번호 생성하기
+              지금 번호 뽑기
             </Link>
             <Link href="/stats" className="secondary-button w-full sm:w-auto">
-              통계 먼저 보기
+              공식 당첨 흐름 보기
             </Link>
             <Link href="/draws" className="secondary-button hidden sm:inline-flex">
               회차 전체 조회
             </Link>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div className="kpi-cell">
-              <p className="text-xs uppercase tracking-[0.14em] text-muted">Latest</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{latestDraw ? `${latestDraw.round}회` : "-"}</p>
+              <p className="text-xs uppercase tracking-[0.14em] text-muted">지금 할 일</p>
+              <p className="mt-2 text-2xl font-semibold text-white">먼저 생성</p>
             </div>
             <div className="kpi-cell">
-              <p className="text-xs uppercase tracking-[0.14em] text-muted">Next Target</p>
+              <p className="text-xs uppercase tracking-[0.14em] text-muted">비교 축</p>
+              <p className="mt-2 text-2xl font-semibold text-white">공식 + 유저</p>
+            </div>
+            <div className="kpi-cell col-span-2 sm:col-span-1">
+              <p className="text-xs uppercase tracking-[0.14em] text-muted">다음 회차</p>
               <p className="mt-2 text-2xl font-semibold text-white">{nextRound ? `${nextRound}회` : "-"}</p>
-            </div>
-            <div className="kpi-cell">
-              <p className="text-xs uppercase tracking-[0.14em] text-muted">Core Pattern</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{oddEvenLeader}</p>
             </div>
           </div>
         </div>
@@ -111,22 +176,33 @@ export default async function HomePage() {
                   </Link>
                 </div>
 
-                <div className="mt-6 overflow-x-auto">
+                <div className="mt-6">
                   <NumberSet
                     numbers={latestDraw.numbers}
                     bonus={latestDraw.bonus}
                     hrefBuilder={(value) => `/stats/numbers/${value}`}
                     wrap={false}
-                    className="min-w-max"
+                    compact
                   />
                 </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2">
+                  <div className="signal-row">
+                    <span className="signal-row-dot" />
+                    <span>이번 회차는 {oddEvenLeader} 홀짝 흐름이 중심이었습니다.</span>
+                  </div>
+                  <div className="signal-row hidden sm:flex">
+                    <span className="signal-row-dot" />
+                    <span>다음 타깃은 {nextRound ? `${nextRound}회` : "다음 회차"} 기준으로 바로 생성됩니다.</span>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-3">
                   {[
-                    { href: "/generate", title: "다음 번호 생성", body: "지금 바로 시작" },
-                    { href: "/draw-analysis", title: "회차 해석 보기", body: "이번 흐름 읽기" },
-                    { href: "/stats", title: "핵심 통계 이동", body: "장기/최근 비교" }
-                  ].map((item) => (
+                    { href: "/generate", title: "바로 생성", body: "이번 주 번호 바로 뽑기" },
+                    { href: "/stats", title: "공식 기준 보기", body: "과거 1등 흐름 붙여 보기" },
+                    { href: "/generated-stats", title: "군중 흐름 보기", body: "유저 몰림과 비교하기" }
+                  ].map((item, index) => (
                     <Link key={item.href} href={item.href} className="signal-link-card">
                       <span className="signal-link-title">{item.title}</span>
                       <span className="signal-link-body">{item.body}</span>
@@ -139,7 +215,7 @@ export default async function HomePage() {
             )}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div className="kpi-cell">
               <p className="text-sm text-slate-400">평균 합계</p>
               <p className="mt-2 text-2xl font-semibold text-white">{summary.averageSum}</p>
@@ -148,9 +224,60 @@ export default async function HomePage() {
               <p className="text-sm text-slate-400">연속번호 비율</p>
               <p className="mt-2 text-2xl font-semibold text-white">{summary.consecutiveSummary.percentage}%</p>
             </div>
-            <div className="kpi-cell">
+            <div className="kpi-cell col-span-2 sm:col-span-1">
               <p className="text-sm text-slate-400">대표 홀짝</p>
               <p className="mt-2 text-2xl font-semibold text-white">{oddEvenLeader}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="panel">
+        <p className="eyebrow">두 가지 데이터 축</p>
+        <h2 className="section-subtitle mt-4 text-white">번호를 고를 때 공식 흐름과 유저 흐름을 따로 봅니다</h2>
+        <div className="mt-5 grid gap-4 md:mt-6 lg:grid-cols-[1fr_1fr_0.86fr]">
+          {officialVsCrowd.map((item) => (
+            <Link key={item.title} href={item.href} className="interactive-card">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">{item.eyebrow}</p>
+              <h3 className="mt-3 text-xl font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">{item.body}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {item.points.map((point, index) => (
+                  <span
+                    key={point}
+                    className={
+                      index > 1
+                        ? "hidden rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-300 md:inline-flex"
+                        : "rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-300"
+                    }
+                  >
+                    {point}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-5 flex items-center justify-between gap-3">
+                <span className="hidden text-xs uppercase tracking-[0.18em] text-slate-500 md:inline">
+                  {item.detail}
+                </span>
+                <span className="subtle-link text-white">바로 보기</span>
+              </div>
+            </Link>
+          ))}
+
+          <div className="soft-card md:block">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">바로 실행</p>
+            <h3 className="mt-3 text-xl font-semibold text-white">먼저 생성하고 두 흐름에 붙여보세요</h3>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              지금 번호를 만든 뒤, 공식 당첨 흐름과 유저 군중 흐름 양쪽으로 바로 이어보는 것이 이 서비스의
+              기본 흐름입니다.
+            </p>
+            <div className="mt-6 flex flex-col gap-3">
+              <Link href="/generate" className="cta-button w-full">
+                생성기 열기
+              </Link>
+              <Link href="/generated-stats" className="secondary-button w-full">
+                유저 군중 흐름 보기
+              </Link>
             </div>
           </div>
         </div>
@@ -160,13 +287,14 @@ export default async function HomePage() {
         <p className="eyebrow">빠른 시작</p>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <Link href="/generate" className="interactive-card">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">Primary Action</p>
-            <h2 className="section-subtitle mt-3 text-white">번호 생성기부터 시작하세요</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">First Move</p>
+            <h2 className="section-subtitle mt-3 text-white">번호부터 뽑고, 그 다음 공식 흐름과 군중 흐름을 보세요</h2>
             <p className="body-medium mt-3 max-w-xl text-slate-300">
-              혼합 추천, 빈도 추천, 랜덤 추천, 필터 추천을 한 자리에서 비교하고 바로 결과를 확인할 수 있습니다.
+              혼합, 빈도, 랜덤, 필터를 한 자리에서 눌러보고, 나온 결과를 공식 당첨 흐름과 유저 생성 흐름으로
+              바로 이어볼 수 있습니다.
             </p>
             <div className="mt-6">
-              <span className="subtle-link text-white">다음 회차 번호 만들기</span>
+              <span className="subtle-link text-white">바로 생성 무대로 이동</span>
             </div>
           </Link>
 
@@ -175,17 +303,17 @@ export default async function HomePage() {
               {
                 href: "/draws",
                 title: "회차 조회",
-                body: "전체 회차를 빠르게 찾고 당첨번호 상세를 바로 확인합니다."
+                body: "전체 회차를 빠르게 찾고, 특정 번호가 포함된 회차를 바로 파고듭니다."
               },
               {
                 href: "/stats",
-                title: "통계 보기",
-                body: "자주 나온 번호와 최근 흐름을 비교해봅니다."
+                title: "과거 1등 데이터",
+                body: "장기 인기 번호, 최근 10회 흐름, 번호별 출현 기록을 봅니다."
               },
               {
                 href: "/generated-stats",
-                title: "생성 통계",
-                body: "사람들이 실제로 어떤 전략으로 생성했는지 관측합니다."
+                title: "우리 유저 데이터",
+                body: "사람들이 실제로 어떤 번호와 전략을 고르는지 공개 흐름으로 봅니다."
               }
             ].map((item) => (
               <Link key={item.href} href={item.href} className="interactive-card">
@@ -203,8 +331,8 @@ export default async function HomePage() {
       </section>
 
       <section className="panel">
-        <p className="eyebrow">핵심 요약</p>
-        <h2 className="section-subtitle mt-4 text-white">지금 가장 많이 참고하는 숫자 흐름</h2>
+        <p className="eyebrow">과거 1등 데이터</p>
+        <h2 className="section-subtitle mt-4 text-white">공식 당첨 기록으로 먼저 보는 숫자 흐름</h2>
 
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <Link href="/sum-pattern" className="kpi-cell transition hover:border-white/20">
@@ -279,16 +407,16 @@ export default async function HomePage() {
           </div>
 
           <div>
-            <p className="eyebrow">서비스 안내</p>
-            <h2 className="section-subtitle mt-4 text-white">처음 방문했다면 여기부터 보세요</h2>
+            <p className="eyebrow">우리 유저 데이터</p>
+            <h2 className="section-subtitle mt-4 text-white">공식 당첨 기록 다음엔 실제 유저 흐름을 보세요</h2>
             <p className="mt-3 text-sm leading-7 text-slate-400">
-              구매, 결과, 분석, FAQ까지 처음 방문자의 탐색 흐름을 짧게 연결했습니다.
+              사람들이 실제로 어떤 전략을 쓰는지, 어떤 번호에 몰리는지, 공개 생성 통계에서 이어서 볼 수 있습니다.
             </p>
             <div className="mt-5 grid gap-3">
               {[
-                { href: "/lotto-buy-guide", label: "온라인 구매 안내" },
+                { href: "/generated-stats", label: "우리 유저 데이터 보기" },
+                { href: "/generate", label: "지금 번호 생성하기" },
                 { href: "/latest-lotto-results", label: "최신 결과 보기" },
-                { href: "/draw-analysis", label: "회차 분석 보기" },
                 { href: "/faq", label: "자주 묻는 질문" }
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="link-list-item">

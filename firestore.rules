@@ -18,6 +18,41 @@ service cloud.firestore {
         && numbers.size() <= maxSize;
     }
 
+    function isValidGeneratedRecord(data) {
+      return data.keys().hasOnly([
+          "anonymousId",
+          "strategy",
+          "numbers",
+          "bonus",
+          "reason",
+          "generatedAt",
+          "targetRound",
+          "filters",
+          "createdAt",
+          "createdSource",
+          "matchedRound",
+          "matchCount",
+          "bonusMatched",
+          "settledAt"
+        ])
+        && data.anonymousId is string
+        && data.anonymousId.size() > 0
+        && isValidStrategy(data.strategy)
+        && isValidNumberList(data.numbers, 6)
+        && (data.bonus == null || (data.bonus is int && data.bonus >= 1 && data.bonus <= 45))
+        && data.reason is string
+        && data.generatedAt is string
+        && (data.targetRound == null || data.targetRound is int)
+        && isValidFilters(data.filters)
+        && data.createdAt is string
+        && data.createdSource == "generator"
+        && data.matchedRound == null
+        && data.matchCount == null
+        && data.bonusMatched is bool
+        && data.bonusMatched == false
+        && data.settledAt == null;
+    }
+
     function isValidFilters(filters) {
       return filters is map
         && filters.keys().hasOnly([
@@ -47,7 +82,8 @@ service cloud.firestore {
 
     match /generated_records/{recordId} {
       allow read: if true;
-      allow write: if false;
+      allow create: if isValidGeneratedRecord(request.resource.data);
+      allow update, delete: if false;
     }
 
     match /{document=**} {

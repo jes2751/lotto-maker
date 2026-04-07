@@ -178,11 +178,11 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
 
       <section className="grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <div className="panel self-start">
-          <p className="eyebrow">전략 성과</p>
-          <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 어떤 전략이 강했는지 봅니다</h2>
+          <p className="eyebrow">우리 유저 전략 성과</p>
+          <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 유저들이 어떤 전략으로 더 잘 맞았는지 봅니다</h2>
           <p className="body-small mt-3 text-slate-300">
-            전략별 생성 수, 최고 적중 수, 3개 이상 적중 수를 비교해서 어떤 흐름이 상대적으로 좋았는지
-            확인할 수 있습니다.
+            유저 생성 기록 기준으로 전략별 생성 수, 최고 적중 수, 3개 이상 적중 수를 비교해서 어떤 흐름이
+            상대적으로 좋았는지 확인할 수 있습니다.
           </p>
 
           {summary.strategyBoard.length > 0 ? (
@@ -246,13 +246,20 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         </div>
 
         <div className="panel">
-          <p className="eyebrow">현재 회차 현황</p>
-          <h2 className="section-subtitle mt-3 text-white">이번 회차 공개 생성 흐름</h2>
+          <p className="eyebrow">현재 유저 흐름</p>
+          <h2 className="section-subtitle mt-3 text-white">이번 회차에 유저들이 실제로 만드는 번호 흐름</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {["실제 생성 기록", "전략 점유율", "많이 고른 번호", "공식 흐름과 비교"].map((item, index) => (
+              <span key={item} className={index > 1 ? "spark-pill hidden md:inline-flex" : "spark-pill"}>
+                {item}
+              </span>
+            ))}
+          </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <div className="soft-card">
               <p className="text-base font-medium text-white">전략 점유율</p>
               <p className="mt-2 text-sm leading-7 text-slate-400">
-                이번 회차 기준으로 어떤 생성 방식이 많이 쓰이는지 비중으로 봅니다.
+                이번 회차 기준으로 우리 유저들이 어떤 생성 방식을 많이 쓰는지 비중으로 봅니다.
               </p>
               <div className="mt-4 space-y-4">
                 {summary.currentStrategyTotals.length > 0 ? (
@@ -281,7 +288,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
             <div className="soft-card">
               <p className="text-base font-medium text-white">많이 생성된 번호 TOP 10</p>
               <p className="mt-2 text-sm leading-7 text-slate-400">
-                생성 기록에서 반복해서 등장하는 번호를 빠르게 추려 봅니다.
+                유저 생성 기록에서 반복해서 등장하는 번호를 빠르게 추려 봅니다.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {summary.currentTopNumbers.length > 0 ? (
@@ -301,15 +308,23 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
               </div>
             </div>
           </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/stats" className="secondary-button">
+              공식 당첨 흐름과 비교
+            </Link>
+            <Link href="/generate" className="secondary-button">
+              새 번호 생성하기
+            </Link>
+          </div>
         </div>
       </section>
 
       <section className="grid items-start gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <div className="panel self-start">
-          <p className="eyebrow">적중 분포</p>
-          <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 몇 개가 맞았는지 봅니다</h2>
+          <p className="eyebrow">유저 적중 분포</p>
+          <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 유저 조합이 몇 개 맞았는지 봅니다</h2>
           <p className="mt-3 text-sm leading-7 text-slate-400">
-            평가가 끝난 생성 기록을 적중 개수별로 묶어 전략 실험 결과를 거칠게 읽는 영역입니다.
+            평가가 끝난 유저 생성 기록을 적중 개수별로 묶어 전략 실험 결과를 거칠게 읽는 영역입니다.
           </p>
           <div className="mt-6 space-y-4">
             {summary.matchDistribution.map((item) => (
@@ -334,8 +349,8 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         <div className="panel">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="eyebrow">최근 생성 번호</p>
-              <h2 className="section-subtitle mt-3 text-white">이번 회차에 공개된 번호 일부</h2>
+              <p className="eyebrow">최근 유저 번호</p>
+              <h2 className="section-subtitle mt-3 text-white">이번 회차에 유저들이 공개 생성한 번호 일부</h2>
             </div>
             <Link href="/generate" className="secondary-button w-full sm:w-auto">
               새로 생성하기
@@ -352,7 +367,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
             </div>
           ) : (
             <div className="mt-6 space-y-4">
-              {summary.currentRecords.slice(0, 6).map((record) => (
+              {summary.currentRecords.slice(0, 4).map((record) => (
                 <article key={record.id} className="interactive-card">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>

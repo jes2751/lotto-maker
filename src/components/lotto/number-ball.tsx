@@ -1,6 +1,7 @@
 interface NumberBallProps {
   value: number;
   bonus?: boolean;
+  size?: "default" | "compact";
 }
 
 function getBallColor(value: number): string {
@@ -23,11 +24,13 @@ function getBallColor(value: number): string {
   return "bg-gradient-to-br from-[#b39ddf] via-[#7553b0] to-[#34225e] text-white shadow-[inset_-3px_-3px_8px_rgba(0,0,0,0.34),inset_2px_3px_7px_rgba(255,255,255,0.34),0_6px_14px_rgba(52,34,94,0.22)]";
 }
 
-export function NumberBall({ value, bonus = false }: NumberBallProps) {
+export function NumberBall({ value, bonus = false, size = "default" }: NumberBallProps) {
+  const sizeClass = size === "compact" ? "h-10 w-10 text-[1rem]" : "h-11 w-11 text-[1.1rem]";
+
   return (
     <span
       className={[
-        "relative inline-flex h-11 w-11 items-center justify-center rounded-full font-outfit text-[1.1rem] font-bold transition-all duration-300 hover:scale-[1.03] hover:brightness-105",
+        `relative inline-flex items-center justify-center rounded-full font-outfit font-bold transition-all duration-300 hover:scale-[1.03] hover:brightness-105 ${sizeClass}`,
         getBallColor(value),
         bonus ? "ring-[3px] ring-accent/70 ring-offset-2 ring-offset-transparent" : ""
       ].join(" ")}
