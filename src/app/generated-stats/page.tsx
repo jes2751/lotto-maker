@@ -137,7 +137,7 @@ export default async function GeneratedStatsPage() {
 
         <div className="soft-card border-accent/20 bg-[linear-gradient(180deg,rgba(255,143,0,0.14)_0%,rgba(15,23,42,0.94)_100%)]">
           <p className="eyebrow">{locale === "ko" ? "군중 관측판" : "Crowd Board"}</p>
-          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-1 xl:grid-cols-3">
+          <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="kpi-cell px-3 py-3 md:px-5 md:py-4">
               <p className="text-xs text-slate-400">{locale === "ko" ? "현재 대상" : "Target"}</p>
               <p className="mt-2 text-lg font-semibold text-white md:text-2xl">
@@ -148,28 +148,16 @@ export default async function GeneratedStatsPage() {
               <p className="text-xs text-slate-400">{locale === "ko" ? "해석 방식" : "Mode"}</p>
               <p className="mt-2 text-lg font-semibold text-white md:text-2xl">{locale === "ko" ? "공개 흐름" : "Public flow"}</p>
             </div>
-            <div className="kpi-cell col-span-2 px-3 py-3 md:col-span-1 md:px-5 md:py-4">
-              <p className="text-xs text-slate-400">{locale === "ko" ? "비교축" : "Axis"}</p>
-              <p className="mt-2 text-lg font-semibold text-white md:text-2xl">{locale === "ko" ? "전략 성과" : "Strategy"}</p>
-            </div>
           </div>
-          <div className="mt-5 grid gap-3">
-            {(
-              locale === "ko"
-                ? [
-                    "이 화면은 사람들이 실제로 만든 번호 흐름을 보는 곳입니다.",
-                    "좋아 보이는 흐름이어도 예측이 아니라 군중 편향으로 읽어야 합니다."
-                  ]
-                : [
-                    "This page shows what users actually generated.",
-                    "Treat this as public generation bias, not prediction."
-                  ]
-            ).map((item) => (
-              <div key={item} className="signal-row">
-                <span className="signal-row-dot" />
-                <span>{item}</span>
-              </div>
-            ))}
+          <div className="mt-5">
+            <div className="signal-row">
+              <span className="signal-row-dot" />
+              <span>
+                {locale === "ko"
+                  ? "좋아 보이는 흐름이어도 예측이 아니라 군중 편향으로 읽어야 합니다."
+                  : "Treat this as public generation bias, not prediction."}
+              </span>
+            </div>
           </div>
         </div>
       </section>
