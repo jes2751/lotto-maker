@@ -83,28 +83,6 @@ export default async function HomePage() {
               만듭니다.
             </p>
 
-            <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-3">
-              {[
-                {
-                  title: "1. 먼저 생성",
-                  body: "혼합 추천으로 바로 뽑기"
-                },
-                {
-                  title: "2. 공식 기준 확인",
-                  body: "과거 1등 흐름과 최근 10회 비교"
-                },
-                {
-                  title: "3. 군중 흐름 확인",
-                  body: "우리 유저들이 실제로 몰린 번호 보기"
-                }
-              ].map((item) => (
-                <div key={item.title} className="soft-card rounded-[22px] px-4 py-4">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-teal">{item.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">{item.body}</p>
-                </div>
-              ))}
-            </div>
-
             <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-[1.1fr_0.9fr_0.9fr]">
               {playCards.map((item, index) => (
                 <Link
