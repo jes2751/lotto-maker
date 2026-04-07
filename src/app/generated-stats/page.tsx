@@ -25,24 +25,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const content = {
   ko: {
     eyebrow: "우리 유저 데이터",
-    title: "우리 유저들이 이번 회차에 어디로 몰리는지 바로 보세요",
+    title: "우리 유저들이 이번 회차에 어디로 몰리는지 보세요",
     description:
-      "이 화면은 대화형 커뮤니티가 아니라, 우리 유저들의 공개 생성 흐름을 읽는 군중 관측판입니다. 이번 회차 생성 수, 전략 점유율, 최근 생성 번호, 최근 평가 회차 기준 전략 성과를 한 번에 보여줍니다.",
+      "우리 유저들의 공개 생성 흐름을 읽는 군중 관측판입니다. 이번 회차 생성 수, 전략 점유율, 번호 쏠림을 빠르게 확인합니다.",
     links: [
       { href: "/generate", label: "번호 생성하러 가기", primary: true },
-      { href: "/stats", label: "공식 당첨 흐름" },
-      { href: "/latest-lotto-results", label: "최신 결과 보기" }
+      { href: "/stats", label: "공식 당첨 흐름" }
     ]
   },
   en: {
     eyebrow: "Public Lab",
     title: "See how visitors are creating sets for the current round at a glance",
     description:
-      "This page is not a discussion board. It is a public control board for current-round generation volume, strategy share, recent sets, and recent evaluated performance.",
+      "A public crowd board for current-round generation volume, strategy share, and number concentration.",
     links: [
       { href: "/generate", label: "Open generator", primary: true },
-      { href: "/stats", label: "Open stats" },
-      { href: "/latest-lotto-results", label: "Latest results" }
+      { href: "/stats", label: "Open stats" }
     ]
   }
 } as const;
@@ -62,16 +60,10 @@ export default async function GeneratedStatsPage() {
             body: "과거 1등 기록으로 장기 흐름과 최근 흐름을 확인합니다."
           },
           {
-            href: "/generated-stats",
-            kicker: "우리 유저 흐름",
-            title: "사람들이 어디로 몰리는지 본다",
-            body: "실제 생성 기록으로 전략 점유율과 번호 쏠림을 확인합니다."
-          },
-          {
             href: "/generate",
             kicker: "바로 실행",
-            title: "뽑고 나서 두 흐름에 붙여본다",
-            body: "생성 결과를 공식 흐름과 유저 흐름 양쪽에서 비교합니다."
+            title: "생성 후 두 흐름에 붙여본다",
+            body: "내 번호를 다시 뽑고 공식 흐름과 함께 비교합니다."
           }
         ]
       : [
@@ -82,16 +74,10 @@ export default async function GeneratedStatsPage() {
             body: "Review long-term and recent winning history."
           },
           {
-            href: "/generated-stats",
-            kicker: "User crowd flow",
-            title: "See where people are clustering",
-            body: "Review strategy share and number concentration."
-          },
-          {
             href: "/generate",
             kicker: "Action",
             title: "Generate, then compare both views",
-            body: "Use both axes to judge your set."
+            body: "Create another set and compare it with the official flow."
           }
         ];
 
@@ -116,44 +102,20 @@ export default async function GeneratedStatsPage() {
         <div>
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="section-title mt-4 max-w-4xl text-gradient-silver">{copy.title}</h1>
-          <p className="body-large mt-5 max-w-4xl text-slate-300">{copy.description}</p>
+          <p className="body-large mt-5 max-w-3xl text-slate-300">{copy.description}</p>
           <div className="mt-5 flex flex-wrap gap-2 md:mt-6 md:gap-2.5">
             {(locale === "ko"
-              ? ["유저 전략 점유율", "번호 쏠림", "군중 흐름", "공식 기준과 비교"]
-              : ["strategy share", "number concentration", "compare with official flow", "overlap hints"]
+              ? ["유저 전략 점유율", "번호 쏠림", "공식 기준과 비교"]
+              : ["strategy share", "number concentration", "compare with official flow"]
             ).map((item, index) => (
-              <span key={item} className={index > 1 ? "spark-pill hidden md:inline-flex" : "spark-pill"}>
+              <span key={item} className={index > 1 ? "spark-pill hidden sm:inline-flex" : "spark-pill"}>
                 {item}
               </span>
             ))}
           </div>
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {(
-              locale === "ko"
-                ? [
-                    { title: "1. 사람들 몰림 보기", body: "실제 생성된 전략과 번호 쏠림 확인" },
-                    { title: "2. 공식 기준과 비교", body: "실제로 나온 번호 흐름과 분리해서 읽기" },
-                    { title: "3. 다시 생성하기", body: "내 번호를 다시 뽑고 두 흐름에 붙여 보기" }
-                  ]
-                : [
-                    { title: "1. Crowd flow", body: "Check actual strategy and number concentration" },
-                    { title: "2. Compare", body: "Read this separately from official draws" },
-                    { title: "3. Generate again", body: "Create another set and compare both axes" }
-                  ]
-            ).map((item) => (
-              <div key={item.title} className="soft-card rounded-[22px] px-4 py-4">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-accent">{item.title}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{item.body}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-3">
-            {compareCards.map((item, index) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className={index > 1 ? "play-card hidden md:flex" : "play-card"}
-              >
+          <div className="mt-6 grid gap-3 md:grid-cols-2">
+            {compareCards.map((item) => (
+              <Link key={item.title} href={item.href} className="play-card">
                 <span className="play-card-kicker">{item.kicker}</span>
                 <span className="play-card-title">{item.title}</span>
                 <span className="play-card-body">{item.body}</span>
@@ -165,10 +127,7 @@ export default async function GeneratedStatsPage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={[
-                  "primary" in item && item.primary ? "cta-button" : "secondary-button",
-                  item.href === "/latest-lotto-results" ? "hidden sm:inline-flex" : "w-full sm:w-auto"
-                ].join(" ")}
+                className={["primary" in item && item.primary ? "cta-button" : "secondary-button", "w-full sm:w-auto"].join(" ")}
               >
                 {item.label}
               </Link>
@@ -199,16 +158,14 @@ export default async function GeneratedStatsPage() {
               locale === "ko"
                 ? [
                     "이 화면은 사람들이 실제로 만든 번호 흐름을 보는 곳입니다.",
-                    "공식 당첨 기록 자체는 과거 1등 데이터에서 따로 보는 편이 정확합니다.",
                     "좋아 보이는 흐름이어도 예측이 아니라 군중 편향으로 읽어야 합니다."
                   ]
                 : [
                     "This page shows what users actually generated.",
-                    "Use the official stats page for the actual winning record.",
                     "Treat this as public generation bias, not prediction."
                   ]
-            ).map((item, index) => (
-              <div key={item} className={index > 0 ? "signal-row hidden sm:flex" : "signal-row"}>
+            ).map((item) => (
+              <div key={item} className="signal-row">
                 <span className="signal-row-dot" />
                 <span>{item}</span>
               </div>
