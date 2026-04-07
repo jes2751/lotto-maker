@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/lib/site";
 
@@ -16,6 +19,16 @@ const utilityNavigation = [
 ] as const;
 
 export function SiteHeader() {
+  const pathname = usePathname();
+
+  function isActive(href: string) {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/80 backdrop-blur-2xl shadow-[0_14px_40px_rgba(0,0,0,0.22)]">
       <div className="mx-auto max-w-6xl px-5 py-3 md:px-6">
@@ -55,7 +68,12 @@ export function SiteHeader() {
 
           <nav className="flex flex-wrap gap-2.5">
             {primaryNavigation.map((item) => (
-              <Link key={item.href} href={item.href} className="nav-pill nav-pill-primary">
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={isActive(item.href) ? "nav-pill nav-pill-primary nav-pill-active" : "nav-pill nav-pill-primary"}
+              >
                 {item.label}
               </Link>
             ))}
