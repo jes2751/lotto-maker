@@ -1,0 +1,47 @@
+name: Update Local Draw Archive
+
+on:
+  schedule:
+    - cron: "15 1 * * SUN"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-local-draws:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm clean-install --progress=false
+
+      - name: Update local draw archive
+        run: npm run sync:draws
+
+      - name: Run tests
+        run: npm test
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet -- src/lib/data/local-draws.ts; then
+            echo "No local draw archive changes detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/data/local-draws.ts
+          git commit -m "chore: update local draw archive"
+          git push

@@ -72,7 +72,7 @@ test("draw detail page renders requested round", async () => {
 test("stats page renders simplified dashboard sections", async () => {
   const html = renderToStaticMarkup(await StatsPage({ searchParams: Promise.resolve({}) }));
 
-  assert.match(html, /통계 대시보드|Statistics Dashboard/);
+  assert.match(html, /과거 1등 데이터|공식 당첨 기록|Statistics Dashboard/);
   assert.match(html, /핵심 번호|핵심 요약|Core Summary/);
   assert.match(html, /최근 10회에서 반복된 번호|자주 나온 번호|Hot numbers/i);
 });

@@ -183,7 +183,7 @@ export function shouldRunSundaySync(date = new Date(), timeZone = "Asia/Seoul"):
   return formatter.format(date) === "Sun";
 }
 
-export function serializeSeedDrawsModule(draws: Draw[]): string {
+export function serializeDrawsModule(draws: Draw[], exportName = "seedDraws"): string {
   const lines = draws.map((draw) => {
     const optionalFields = [
       draw.totalPrize != null ? `totalPrize: ${draw.totalPrize}` : null,
@@ -198,5 +198,9 @@ export function serializeSeedDrawsModule(draws: Draw[]): string {
     return `  { id: ${draw.id}, round: ${draw.round}, drawDate: "${draw.drawDate}", numbers: [${draw.numbers.join(", ")}], bonus: ${draw.bonus}${suffix} }`;
   });
 
-  return `import type { Draw } from "@/types/lotto";\n\nexport const seedDraws: Draw[] = [\n${lines.join(",\n")}\n];\n`;
+  return `import type { Draw } from "@/types/lotto";\n\nexport const ${exportName}: Draw[] = [\n${lines.join(",\n")}\n];\n`;
+}
+
+export function serializeSeedDrawsModule(draws: Draw[]): string {
+  return serializeDrawsModule(draws, "seedDraws");
 }

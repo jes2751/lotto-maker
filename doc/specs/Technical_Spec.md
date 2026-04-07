@@ -5,8 +5,10 @@
 - Frontend: Next.js App Router
 - Analytics: Firebase Analytics
 - Generated stats storage: Firebase Firestore
-- Draw storage: Firebase Firestore `lotto_draws`
-- Weekly sync: Cloudflare Worker cron
+- Official draw read source: 로컬 아카이브 `src/lib/data/local-draws.ts`
+- Draw settlement storage: Firebase Firestore `lotto_draws`
+- Weekly local archive update: GitHub Actions cron
+- Weekly settlement sync: Cloudflare Worker cron
 
 ## 2. 데이터 구조
 
@@ -26,11 +28,17 @@
   - `settledAt`
 
 ### 2-2. `lotto_draws`
-- 당첨 회차 저장
-- 1회부터 최신 회차까지 적재
+- 생성 통계 정산용 당첨 회차 저장
+- 사용자 회차 조회의 기준 소스는 아님
 - 주간 sync 시 신규 회차만 추가
 
-### 2-3. `site_metrics`
+### 2-3. `local-draws.ts`
+- 회차 조회, 통계, 상세 페이지가 직접 읽는 공식 당첨 아카이브
+- Git에 체크인된 로컬 데이터 파일
+- 최신 회차가 나오면 공식 API 응답을 기준으로 파일을 직접 갱신
+- GitHub Actions가 주 1회 갱신 후 커밋/푸시
+
+### 2-4. `site_metrics`
 - 사이트 운영 지표 저장
 - 현재 사용 필드:
   - `type`
@@ -64,15 +72,19 @@
 
 ## 5. 당첨번호 동기화
 
-- 전체 seed:
-  - `npm run firestore:draws:seed`
-- 신규 sync:
-  - 내부 sync API 호출
-  - 신규 회차만 Firestore에 저장
-  - 같은 회차를 대상으로 생성된 기록을 자동 마감
-- 주간 자동 실행:
-  - Cloudflare Worker cron
+- 로컬 아카이브 갱신:
+  - `npm run sync:draws`
+  - 현재 `local-draws.ts`의 최신 회차 이후 공식 결과를 직접 조회
+  - 새 회차가 있으면 `local-draws.ts`를 바로 갱신
+- 로컬 아카이브 자동 실행:
+  - GitHub Actions cron
   - 매주 일요일 실행
+  - 변경이 있으면 `local-draws.ts` 커밋 후 push
+- Firestore 정산 sync:
+  - 내부 sync API 호출
+  - 신규 회차만 Firestore `lotto_draws`에 저장
+  - 같은 회차를 대상으로 생성된 기록을 자동 마감
+  - Cloudflare Worker cron이 주간 실행
 
 ## 6. 온라인 구매 안내 페이지 구현 기준
 
