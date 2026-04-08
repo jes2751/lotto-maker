@@ -1,8 +1,18 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
+function getRequiredPublicEnv(name: string) {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Missing required Firebase public env: ${name}`);
+  }
+
+  return value;
+}
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyA2M7QFuxsyxwo3skr5fMVEyPxZwI0MHEM",
+  apiKey: getRequiredPublicEnv("NEXT_PUBLIC_FIREBASE_API_KEY"),
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "lotto-maker-lab.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "lotto-maker-lab",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "lotto-maker-lab.firebasestorage.app",
