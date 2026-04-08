@@ -31,10 +31,10 @@ export function SiteHeader() {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal/90 md:text-[0.72rem] md:tracking-[0.18em]">
-                Lotto Control Room
+                로또 통계 플레이보드
               </p>
-              <span className="hidden md:inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                Generate • Check • Analyze
+              <span className="hidden md:inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold tracking-[0.08em] text-slate-300">
+                번호 생성 · 당첨 확인 · 통계 비교
               </span>
             </div>
             <Link
@@ -44,7 +44,7 @@ export function SiteHeader() {
               {siteConfig.logoName}
             </Link>
             <p className="mt-1 hidden max-w-4xl text-sm leading-6 text-slate-400 sm:block">
-              최신 회차 확인, 번호 생성, 공식 통계와 유저 흐름 비교를 한 곳에서 보는 로또 플레이보드.
+              최신 로또 당첨번호 확인, 번호 생성, 공식 통계와 사람들 선택 비교를 한 곳에서 보는 로또 서비스.
             </p>
           </div>
 

@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   ...createPageMetadata({
     locale: "ko",
     path: "/",
-    titleKo: "공식 흐름과 유저 흐름으로 보는 번호 선택",
+    titleKo: "로또 번호 생성기와 당첨번호 통계를 함께 보는 곳",
     titleEn: "Latest result, generator, and core statistics",
     descriptionKo:
-      "최신 당첨번호를 확인하고, 번호를 생성하고, 공식 당첨 흐름과 유저 군중 흐름을 함께 보며 번호를 고를 수 있습니다.",
+      "최신 로또 당첨번호를 확인하고, 로또 번호를 생성한 뒤, 공식 당첨 통계와 사람들 선택 흐름을 함께 보며 조합을 고를 수 있습니다.",
     descriptionEn:
       "Check the latest draw, generate a new set, and review the core statistics most visitors need first."
   })
@@ -77,8 +77,8 @@ export default async function HomePage() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="eyebrow">최신 회차</p>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                Weekly Draw
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.7rem] font-semibold tracking-[0.08em] text-slate-300">
+                최신 당첨번호
               </span>
             </div>
             {latestDraw ? (
@@ -150,13 +150,13 @@ export default async function HomePage() {
           <div>
             <div className="flex flex-wrap items-center gap-2.5">
               <p className="eyebrow">군중 회피 플레이보드</p>
-              <span className="status-badge">Official + Crowd</span>
+              <span className="status-badge">공식 통계 + 사람들 선택</span>
             </div>
             <h1 className="section-title mt-4 max-w-3xl text-gradient-silver">
-              먼저 뽑고, 그 번호가 얼마나 대중적인지 바로 확인하세요
+              로또 번호를 먼저 뽑고, 사람들이 많이 고를 조합인지 바로 확인하세요
             </h1>
             <p className="body-large mt-5 max-w-2xl text-slate-300">
-              번호를 먼저 만들고, 공식 당첨 흐름과 유저 흐름을 따로 붙여 더 대중적인 조합인지 바로 판단합니다.
+              번호를 먼저 만들고, 공식 당첨 통계와 사람들 선택 흐름을 따로 붙여 더 대중적인 조합인지 바로 판단합니다.
             </p>
 
             <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-2 xl:grid-cols-3">
@@ -199,7 +199,7 @@ export default async function HomePage() {
 
       <section className="panel">
         <p className="eyebrow">두 가지 데이터 축</p>
-        <h2 className="section-subtitle mt-4 text-white">번호를 고를 때 공식 흐름과 유저 흐름을 따로 봅니다</h2>
+        <h2 className="section-subtitle mt-4 text-white">번호를 고를 때 공식 통계와 사람들 선택을 따로 봅니다</h2>
         <div className="mt-5 grid gap-4 md:mt-6 lg:grid-cols-[1fr_1fr_0.86fr]">
           {officialVsCrowd.map((item) => (
             <Link key={item.title} href={item.href} className="interactive-card">
@@ -252,10 +252,10 @@ export default async function HomePage() {
         <p className="eyebrow">빠른 시작</p>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <Link href="/generate" className="interactive-card">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent">First Move</p>
-            <h2 className="section-subtitle mt-3 text-white">번호부터 뽑고, 그 다음 공식 흐름과 군중 흐름을 보세요</h2>
+            <p className="text-sm font-semibold tracking-[0.08em] text-accent">먼저 해볼 일</p>
+            <h2 className="section-subtitle mt-3 text-white">번호부터 뽑고, 그 다음 공식 통계와 사람들 선택을 보세요</h2>
             <p className="body-medium mt-3 max-w-xl text-slate-300">
-              혼합, 빈도, 랜덤, 필터를 한 자리에서 눌러보고, 나온 결과를 공식 당첨 흐름과 유저 생성 흐름으로
+              혼합, 빈도, 랜덤, 필터를 한 자리에서 눌러보고, 나온 결과를 공식 당첨 통계와 사람들 선택 흐름으로
               바로 이어볼 수 있습니다.
             </p>
             <div className="mt-6">

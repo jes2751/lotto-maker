@@ -7,7 +7,8 @@ export const siteConfig = {
   logoName: "LOTTO MAKER LAB",
   domain: "lotto-maker.cloud",
   defaultUrl: "https://lotto-maker.cloud",
-  descriptionKo: "과거 당첨 데이터 기반 추천, 회차 조회, 통계, 생성 통계를 제공하는 무료 로또 웹 서비스입니다.",
+  descriptionKo:
+    "로또 당첨번호 조회, 로또 번호 생성기, 공식 통계, 사람들 선택 흐름 비교를 제공하는 무료 로또 웹 서비스입니다.",
   descriptionEn:
     "Free Lotto web service with historical-data-based recommendations, draw lookup, statistics, and generated stats."
 };
