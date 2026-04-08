@@ -98,7 +98,7 @@ export default async function GeneratedStatsPage() {
         }}
       />
 
-      <section className="panel hero-panel grid gap-6 lg:grid-cols-[1.12fr_0.88fr]">
+      <section className="panel hero-panel grid gap-6">
         <div>
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="section-title mt-4 max-w-4xl text-gradient-silver">{copy.title}</h1>
@@ -113,7 +113,7 @@ export default async function GeneratedStatsPage() {
               </span>
             ))}
           </div>
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
+          <div className="mt-6 grid gap-3 lg:grid-cols-2">
             {compareCards.map((item) => (
               <Link key={item.title} href={item.href} className="play-card">
                 <span className="play-card-kicker">{item.kicker}</span>
@@ -137,7 +137,7 @@ export default async function GeneratedStatsPage() {
 
         <div className="soft-card border-accent/20 bg-[linear-gradient(180deg,rgba(255,143,0,0.14)_0%,rgba(15,23,42,0.94)_100%)]">
           <p className="eyebrow">{locale === "ko" ? "군중 관측판" : "Crowd Board"}</p>
-          <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="mt-5 grid gap-3 lg:max-w-xl lg:grid-cols-2">
             <div className="kpi-cell px-3 py-3 md:px-5 md:py-4">
               <p className="text-xs text-slate-400">{locale === "ko" ? "현재 대상" : "Target"}</p>
               <p className="mt-2 text-lg font-semibold text-white md:text-2xl">

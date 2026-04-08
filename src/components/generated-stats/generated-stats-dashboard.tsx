@@ -176,7 +176,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         </div>
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+      <section className="grid items-start gap-6">
         <div className="panel self-start">
           <p className="eyebrow">우리 유저 전략 성과</p>
           <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 유저들이 어떤 전략으로 더 잘 맞았는지 봅니다</h2>
@@ -319,7 +319,7 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
         </div>
       </section>
 
-      <section className="grid items-start gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+      <section className="grid items-start gap-6">
         <div className="panel self-start">
           <p className="eyebrow">유저 적중 분포</p>
           <h2 className="section-subtitle mt-3 text-white">최근 평가 회차에서 유저 조합이 몇 개 맞았는지 봅니다</h2>

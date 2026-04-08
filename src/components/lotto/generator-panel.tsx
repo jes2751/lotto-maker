@@ -403,38 +403,44 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
           </div>
 
           <div className="soft-card">
-            <div className="grid gap-6 xl:grid-cols-[0.78fr_0.72fr_1.2fr]">
-              <div className="space-y-3 text-sm text-slate-300">
-                <span className="eyebrow text-[0.72rem]">기준</span>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                  <div className="kpi-cell">
-                    <p className="text-sm text-slate-400">대상 회차</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">{targetRound ? `${targetRound}회` : "준비 중"}</p>
-                  </div>
-                  <div className="kpi-cell">
-                    <p className="text-sm text-slate-400">저장 방식</p>
-                    <p className="mt-2 text-2xl font-semibold text-white">익명 반영</p>
+            <div className="grid gap-6 xl:grid-cols-[0.92fr_1.18fr]">
+              <div className="space-y-5 text-sm text-slate-300">
+                <div>
+                  <span className="eyebrow text-[0.72rem]">기준</span>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="kpi-cell">
+                      <p className="text-sm text-slate-400">대상 회차</p>
+                      <p className="mt-2 text-2xl font-semibold text-white">{targetRound ? `${targetRound}회` : "준비 중"}</p>
+                    </div>
+                    <div className="kpi-cell">
+                      <p className="text-sm text-slate-400">저장 방식</p>
+                      <p className="mt-2 text-2xl font-semibold text-white">익명 반영</p>
+                    </div>
                   </div>
                 </div>
+
+                <label className="block text-sm text-slate-300">
+                  <span className="eyebrow text-[0.72rem]">설정</span>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,0.82fr)_minmax(0,1fr)] sm:items-start">
+                    <select
+                      value={count}
+                      onChange={(event) => setCount(Number(event.target.value))}
+                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-lg font-semibold text-white"
+                    >
+                      {[1, 2, 3, 4, 5].map((option) => (
+                        <option key={option} value={option}>
+                          {option}세트
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs leading-6 text-slate-500">
+                      한 번에 1세트부터 5세트까지 생성합니다.
+                    </p>
+                  </div>
+                </label>
               </div>
 
-              <label className="border-t border-white/8 pt-1 text-sm text-slate-300 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
-                <span className="eyebrow text-[0.72rem]">설정</span>
-                <select
-                  value={count}
-                  onChange={(event) => setCount(Number(event.target.value))}
-                  className="mt-3 w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-lg font-semibold text-white"
-                >
-                  {[1, 2, 3, 4, 5].map((option) => (
-                    <option key={option} value={option}>
-                      {option}세트
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-3 text-xs leading-6 text-slate-500">한 번에 1세트부터 5세트까지 생성합니다.</p>
-              </label>
-
-              <div className="border-t border-white/8 pt-1 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
+              <div className="border-t border-white/8 pt-1 xl:border-t-0 xl:pt-0">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="eyebrow text-[0.72rem]">현재 전략</p>

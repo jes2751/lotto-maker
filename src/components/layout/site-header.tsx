@@ -7,15 +7,10 @@ import { siteConfig } from "@/lib/site";
 
 const primaryNavigation = [
   { href: "/check", label: "당첨 확인" },
-  { href: "/generate", label: "번호 생성" },
-  { href: "/draws", label: "회차 조회" },
-  { href: "/stats", label: "과거 1등 데이터" },
-  { href: "/generated-stats", label: "우리 유저 데이터" }
-] as const;
-
-const utilityNavigation = [
-  { href: "/", label: "홈" },
-  { href: "/guides", label: "가이드" }
+  { href: "/generate", label: "생성기" },
+  { href: "/draws", label: "회차" },
+  { href: "/stats", label: "공식 통계" },
+  { href: "/generated-stats", label: "사람들 선택" }
 ] as const;
 
 export function SiteHeader() {
@@ -33,46 +28,37 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/80 backdrop-blur-2xl shadow-[0_14px_40px_rgba(0,0,0,0.22)]">
       <div className="mx-auto max-w-6xl px-5 py-3 md:px-6">
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-3">
-                <p className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal/90">Lotto Control Room</p>
-                <span className="hidden sm:inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  Generate • Check • Analyze
-                </span>
-              </div>
-              <Link
-                href="/"
-                className="mt-2 block text-[1.45rem] font-semibold tracking-[0.02em] text-mist md:text-[1.9rem]"
-              >
-                {siteConfig.logoName}
-              </Link>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                최신 회차를 확인하고, 공식 당첨 흐름과 유저 군중 흐름을 같이 보며 더 덜 겹치는 선택까지 생각하는 로또 플레이보드.
-              </p>
-            </div>
-
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">
-              <Link href="/generate" className="secondary-button">
-                지금 생성
-              </Link>
-              <div className="hidden sm:flex flex-wrap items-center gap-2">
-                {utilityNavigation.map((item) => (
-                  <Link key={item.href} href={item.href} className="utility-link">
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal/90 md:text-[0.72rem] md:tracking-[0.18em]">
+                Lotto Control Room
+              </p>
+              <span className="hidden md:inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                Generate • Check • Analyze
+              </span>
             </div>
+            <Link
+              href="/"
+              className="mt-2 block text-[1.25rem] font-semibold tracking-[0.02em] text-mist sm:text-[1.35rem] md:text-[1.9rem]"
+            >
+              {siteConfig.logoName}
+            </Link>
+            <p className="mt-1 hidden max-w-4xl text-sm leading-6 text-slate-400 sm:block">
+              최신 회차 확인, 번호 생성, 공식 통계와 유저 흐름 비교를 한 곳에서 보는 로또 플레이보드.
+            </p>
           </div>
 
-          <nav className="flex flex-wrap gap-2.5">
+          <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
             {primaryNavigation.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-current={isActive(item.href) ? "page" : undefined}
-                className={isActive(item.href) ? "nav-pill nav-pill-primary nav-pill-active" : "nav-pill nav-pill-primary"}
+                className={
+                  isActive(item.href)
+                    ? "nav-pill nav-pill-primary nav-pill-active whitespace-nowrap px-4"
+                    : "nav-pill nav-pill-primary whitespace-nowrap px-4"
+                }
               >
                 {item.label}
               </Link>
