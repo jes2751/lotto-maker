@@ -387,16 +387,43 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
         </div>
       </section>
 
-      <section className="panel">
-        <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="space-y-6">
-            <div className="grid gap-4 lg:grid-cols-[0.72fr_0.9fr_1fr]">
-              <label className="soft-card space-y-3 text-sm text-slate-300">
-                <span className="eyebrow text-[0.72rem]">생성 수</span>
+      <section className="panel hero-panel">
+        <div className="space-y-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow text-[0.72rem]">생성 기준</p>
+              <h3 className="mt-3 text-2xl font-semibold text-white">이번 회차 기준으로 바로 생성합니다</h3>
+              <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-400">
+                {strategy === "filter"
+                  ? "조건을 다듬은 뒤 생성하고, 결과는 통계와 저장으로 바로 이어집니다."
+                  : "지금 전략으로 바로 생성하고, 나온 결과를 공식 흐름과 유저 흐름으로 이어 봅니다."}
+              </p>
+            </div>
+            <span className="status-badge whitespace-nowrap">Ready</span>
+          </div>
+
+          <div className="soft-card">
+            <div className="grid gap-6 xl:grid-cols-[0.78fr_0.72fr_1.2fr]">
+              <div className="space-y-3 text-sm text-slate-300">
+                <span className="eyebrow text-[0.72rem]">기준</span>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  <div className="kpi-cell">
+                    <p className="text-sm text-slate-400">대상 회차</p>
+                    <p className="mt-2 text-2xl font-semibold text-white">{targetRound ? `${targetRound}회` : "준비 중"}</p>
+                  </div>
+                  <div className="kpi-cell">
+                    <p className="text-sm text-slate-400">저장 방식</p>
+                    <p className="mt-2 text-2xl font-semibold text-white">익명 반영</p>
+                  </div>
+                </div>
+              </div>
+
+              <label className="border-t border-white/8 pt-1 text-sm text-slate-300 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
+                <span className="eyebrow text-[0.72rem]">설정</span>
                 <select
                   value={count}
                   onChange={(event) => setCount(Number(event.target.value))}
-                  className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-lg font-semibold text-white"
+                  className="mt-3 w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-lg font-semibold text-white"
                 >
                   {[1, 2, 3, 4, 5].map((option) => (
                     <option key={option} value={option}>
@@ -404,163 +431,160 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs leading-6 text-slate-500">한 번에 1세트부터 5세트까지 생성합니다.</p>
+                <p className="mt-3 text-xs leading-6 text-slate-500">한 번에 1세트부터 5세트까지 생성합니다.</p>
               </label>
 
-              <div className="soft-card">
+              <div className="border-t border-white/8 pt-1 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="eyebrow text-[0.72rem]">현재 전략</p>
+                  <div>
+                    <p className="eyebrow text-[0.72rem]">현재 전략</p>
+                    <p className="mt-3 text-base font-semibold text-white">{selectedStrategy?.label ?? strategy}</p>
+                  </div>
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
-                    {selectedStrategy?.label ?? strategy}
+                    {selectedStrategy?.flavor ?? "MODE"}
                   </span>
                 </div>
-                <p className="mt-3 text-base font-semibold text-white">{selectedStrategy?.label ?? strategy}</p>
                 <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-teal">
                   {selectedStrategy?.tone ?? "빠른 선택"}
                 </p>
-                <p className="mt-2 text-sm leading-7 text-slate-400">
+                <p className="mt-3 text-sm font-medium leading-7 text-slate-200">
+                  {selectedStrategy?.cue ?? "지금 전략의 성격을 먼저 보고 바로 생성합니다."}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(selectedStrategy?.signal ?? []).slice(0, 2).map((signal) => (
+                    <span
+                      key={signal}
+                      className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-slate-300"
+                    >
+                      {signal}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      추천 포인트
+                    </p>
+                    <p className="mt-2 text-sm text-slate-200">
+                      {selectedStrategy?.signal?.[0] ?? "바로 생성"}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      읽는 방식
+                    </p>
+                    <p className="mt-2 text-sm text-slate-200">
+                      {selectedStrategy?.signal?.[1] ?? "공식 기준 비교"}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-7 text-slate-400">
                   {selectedStrategy?.description ?? "현재 전략 설명이 준비되지 않았습니다."}
                 </p>
               </div>
-
-              <div className="soft-card">
-                <p className="eyebrow text-[0.72rem]">생성 흐름</p>
-                <div className="mt-3 grid gap-3">
-                  {[
-                    "전략 고르기",
-                    strategy === "filter" ? "조건 다듬기" : "바로 생성",
-                    "통계/저장으로 이어보기"
-                  ].map((step, index) => (
-                    <div key={step} className="flex items-center gap-3 text-sm text-slate-300">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-semibold text-white">
-                        {index + 1}
-                      </span>
-                      <span>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
-
-            {strategy === "filter" ? (
-              <div className="space-y-4">
-                <div className="soft-card">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="eyebrow text-[0.72rem]">현재 필터 요약</p>
-                    <p className="text-xs text-slate-500">
-                      고정수 {fixedNumbers.length}개 / 제외수 {excludedNumbers.length}개
-                    </p>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-slate-300">{filterSummary}</p>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="space-y-2 text-sm text-slate-300">
-                    <span>고정수 입력</span>
-                    <input
-                      value={fixedNumbersInput}
-                      onChange={(event) => setFixedNumbersInput(event.target.value)}
-                      placeholder="예: 3, 11, 27"
-                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-                    />
-                    <p className="text-xs text-slate-500">숫자는 최대 5개까지 넣을 수 있습니다.</p>
-                  </label>
-
-                  <label className="space-y-2 text-sm text-slate-300">
-                    <span>제외수 입력</span>
-                    <input
-                      value={excludedNumbersInput}
-                      onChange={(event) => setExcludedNumbersInput(event.target.value)}
-                      placeholder="예: 1, 2, 45"
-                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-                    />
-                    <p className="text-xs text-slate-500">제외수는 최대 35개까지 넣을 수 있습니다.</p>
-                  </label>
-
-                  <label className="space-y-2 text-sm text-slate-300">
-                    <span>홀짝 조건</span>
-                    <select
-                      value={oddEven}
-                      onChange={(event) => setOddEven(event.target.value as OddEvenFilter)}
-                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
-                    >
-                      {oddEvenOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="space-y-2 text-sm text-slate-300">
-                      <span>합계 최소값</span>
-                      <input
-                        value={sumMin}
-                        onChange={(event) => setSumMin(event.target.value)}
-                        inputMode="numeric"
-                        placeholder="예: 90"
-                        className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-                      />
-                    </label>
-                    <label className="space-y-2 text-sm text-slate-300">
-                      <span>합계 최대값</span>
-                      <input
-                        value={sumMax}
-                        onChange={(event) => setSumMax(event.target.value)}
-                        inputMode="numeric"
-                        placeholder="예: 170"
-                        className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <label className="soft-card flex items-center gap-3 text-sm text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={allowConsecutive}
-                    onChange={(event) => setAllowConsecutive(event.target.checked)}
-                    className="h-4 w-4 accent-accent"
-                  />
-                  연속번호 허용
-                </label>
-              </div>
-            ) : null}
           </div>
 
-          <div className="soft-card flex flex-col gap-5 rounded-[26px] bg-slate-950/30">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="eyebrow text-[0.72rem]">생성 기준</p>
-                <h3 className="mt-3 text-2xl font-semibold text-white">이번 회차 기준으로 바로 생성합니다</h3>
+          {strategy === "filter" ? (
+            <div className="space-y-4">
+              <div className="soft-card">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="eyebrow text-[0.72rem]">현재 필터 요약</p>
+                  <p className="text-xs text-slate-500">
+                    고정수 {fixedNumbers.length}개 / 제외수 {excludedNumbers.length}개
+                  </p>
+                </div>
+                <p className="mt-3 text-sm leading-7 text-slate-300">{filterSummary}</p>
               </div>
-              <span className="status-badge whitespace-nowrap">Ready</span>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-2 text-sm text-slate-300">
+                  <span>고정수 입력</span>
+                  <input
+                    value={fixedNumbersInput}
+                    onChange={(event) => setFixedNumbersInput(event.target.value)}
+                    placeholder="예: 3, 11, 27"
+                    className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                  />
+                  <p className="text-xs text-slate-500">숫자는 최대 5개까지 넣을 수 있습니다.</p>
+                </label>
+
+                <label className="space-y-2 text-sm text-slate-300">
+                  <span>제외수 입력</span>
+                  <input
+                    value={excludedNumbersInput}
+                    onChange={(event) => setExcludedNumbersInput(event.target.value)}
+                    placeholder="예: 1, 2, 45"
+                    className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                  />
+                  <p className="text-xs text-slate-500">제외수는 최대 35개까지 넣을 수 있습니다.</p>
+                </label>
+
+                <label className="space-y-2 text-sm text-slate-300">
+                  <span>홀짝 조건</span>
+                  <select
+                    value={oddEven}
+                    onChange={(event) => setOddEven(event.target.value as OddEvenFilter)}
+                    className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white"
+                  >
+                    {oddEvenOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="space-y-2 text-sm text-slate-300">
+                    <span>합계 최소값</span>
+                    <input
+                      value={sumMin}
+                      onChange={(event) => setSumMin(event.target.value)}
+                      inputMode="numeric"
+                      placeholder="예: 90"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                    />
+                  </label>
+                  <label className="space-y-2 text-sm text-slate-300">
+                    <span>합계 최대값</span>
+                    <input
+                      value={sumMax}
+                      onChange={(event) => setSumMax(event.target.value)}
+                      inputMode="numeric"
+                      placeholder="예: 170"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-3 text-white placeholder:text-slate-500"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <label className="soft-card flex items-center gap-3 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={allowConsecutive}
+                  onChange={(event) => setAllowConsecutive(event.target.checked)}
+                  className="h-4 w-4 accent-accent"
+                />
+                연속번호 허용
+              </label>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="kpi-cell">
-                <p className="text-sm text-slate-400">대상 회차</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{targetRound ? `${targetRound}회` : "준비 중"}</p>
-              </div>
-              <div className="kpi-cell">
-                <p className="text-sm text-slate-400">저장 방식</p>
-                <p className="mt-2 text-2xl font-semibold text-white">익명 반영</p>
-              </div>
-            </div>
-            <div className="rounded-[22px] border border-white/10 bg-white/[0.03] px-5 py-4">
-              <p className="text-sm leading-7 text-slate-300">
-                {targetRound ? `${targetRound}회 대상 번호로 기록됩니다.` : "다음 회차 기준을 계산 중입니다."}
-              </p>
-              <p className="mt-2 text-sm leading-7 text-slate-400">
-                생성 결과는 참고용이며 공개 생성 통계에도 익명으로 반영됩니다. 먼저 뽑고, 그 다음 통계로
-                읽는 흐름을 전제로 설계했습니다.
-              </p>
+          ) : null}
+
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="signal-row lg:flex-1">
+              <span className="signal-row-dot" />
+              <span>
+                {targetRound
+                  ? `${targetRound}회 대상 번호로 기록되며, 생성 결과는 공개 생성 통계에도 익명으로 반영됩니다.`
+                  : "다음 회차 기준을 계산한 뒤 생성 결과를 기록합니다."}
+              </span>
             </div>
 
             <button
               type="button"
               onClick={() => void generate()}
-              className="cta-button mt-auto h-14 w-full text-base"
+              className="cta-button h-14 w-full text-base lg:w-[18rem]"
               disabled={loading}
             >
               {loading ? "번호 생성 중..." : "번호 생성하기"}
