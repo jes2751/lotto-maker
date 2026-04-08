@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { JsonLd } from "@/components/seo/json-ld";
-import { getRequestPreferences } from "@/lib/server-preferences";
 import { getSiteUrl, siteConfig } from "@/lib/site";
 
 const guideEntries = {
@@ -42,50 +41,27 @@ const guideEntries = {
   ]
 } as const;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = await getRequestPreferences();
-
-  return locale === "ko"
-    ? {
-        title: "로또 가이드 | 설명형 콘텐츠 허브",
-        description: "번호 생성기 설명, 최근 자주 나온 번호 요약, 패턴 읽는 법까지 검색 유입용 로또 가이드를 모아둔 콘텐츠 허브입니다.",
-        alternates: { canonical: "/guides" }
-      }
-    : {
-        title: "Lotto guides | Search-first content hub",
-        description: "Browse Lotto guides built for search entry, including number-generator tips, recent hot-number summaries, and pattern-reading basics.",
-        alternates: { canonical: "/guides" }
-      };
-}
+export const metadata: Metadata = {
+  title: "로또 가이드 | 번호 생성기와 통계를 이해하는 글",
+  description: "로또 번호 생성기 설명, 최근 자주 나온 번호, 홀짝 패턴 읽는 법까지 한국어 로또 가이드를 모아둔 콘텐츠 허브입니다.",
+  alternates: { canonical: "/guides" }
+};
 
 export default async function GuidesHubPage() {
-  const { locale } = await getRequestPreferences();
+  const locale = "ko" as const;
   const siteUrl = getSiteUrl();
   const entries = guideEntries[locale];
-  const copy =
-    locale === "ko"
-      ? {
-          name: "로또 가이드",
-          description: "검색 유입과 재방문을 위한 설명형 로또 콘텐츠 허브",
-          eyebrow: "가이드",
-          title: "검색 유입과 재방문을 위한 로또 가이드",
-          intro:
-            "이 가이드 허브는 검색 유입에 도움이 되는 설명형 콘텐츠를 모아둔 공간입니다. 각 글은 하나의 로또 질문에 답한 뒤 추천기, 회차 조회, 통계 흐름으로 자연스럽게 이어지도록 구성했습니다.",
-          next: "다음 단계",
-          generator: "생성기 랜딩 열기",
-          stats: "통계 허브 열기"
-        }
-      : {
-          name: "Lotto Guides",
-          description: "Guide hub for explanation-first Lotto content aimed at search entry and repeat visits.",
-          eyebrow: "Guides",
-          title: "Lotto guides for search entry and repeat visits",
-          intro:
-            "This guide hub collects explanation-first pages that support search traffic. Each article is written to answer a specific Lotto question and then lead visitors into the generator, draw lookup, and statistics flows.",
-          next: "Next Step",
-          generator: "Open generator landing",
-          stats: "Open statistics hub"
-        };
+  const copy = {
+    name: "로또 가이드",
+    description: "번호 생성기와 통계를 이해하는 한국어 로또 가이드 허브",
+    eyebrow: "가이드",
+    title: "번호 생성기와 통계를 이해하는 로또 가이드",
+    intro:
+      "이 가이드 허브는 한국어 검색 유입에 맞춰 로또 번호 생성기, 자주 나온 번호, 패턴 읽는 법을 설명하는 글을 모아둔 공간입니다. 각 글은 하나의 질문에 답한 뒤 추천기, 회차 조회, 통계 흐름으로 자연스럽게 이어지도록 구성했습니다.",
+    next: "다음 단계",
+    generator: "번호 생성기 열기",
+    stats: "통계 허브 열기"
+  };
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-12">

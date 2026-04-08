@@ -6,14 +6,12 @@ import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = await getRequestPreferences();
-
   return createPageMetadata({
-    locale,
+    locale: "ko",
     path: "/lotto-statistics",
     titleKo: "로또 통계 허브",
     titleEn: "Lotto statistics hub",
-    descriptionKo: "자주 나온 번호, 적게 나온 번호, 홀짝 패턴, 합계 패턴, 최근 10회 분석으로 이동하는 통계 허브입니다.",
+    descriptionKo: "자주 나온 번호, 적게 나온 번호, 홀짝 패턴, 합계 패턴, 최근 10회 분석으로 이동하는 한국어 로또 통계 허브입니다.",
     descriptionEn: "Use the Lotto statistics hub to move into hot numbers, cold numbers, odd-even patterns, sum patterns, and recent draw analysis."
   });
 }
@@ -31,12 +29,12 @@ const cards = [
   },
   {
     href: "/odd-even-pattern",
-    title: "Odd-even pattern",
+    title: "홀짝 패턴",
     description: "홀짝 비율이 어떤 조합으로 자주 나왔는지 확인합니다."
   },
   {
     href: "/sum-pattern",
-    title: "Sum pattern",
+    title: "합계 패턴",
     description: "번호 합계 구간이 어떻게 분포되는지 확인합니다."
   },
   {
@@ -61,11 +59,8 @@ export default async function LottoStatisticsLandingPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: locale === "ko" ? "로또 통계 허브" : "Lotto statistics hub",
-          description:
-            locale === "ko"
-              ? "자주 나온 번호, 적게 나온 번호, 홀짝 패턴, 합계 패턴, 최근 10회 분석으로 이동하는 통계 허브"
-              : "Statistics hub for Lotto hot numbers, cold numbers, odd-even patterns, and recent draw analysis.",
+          name: "로또 통계 허브",
+          description: "자주 나온 번호, 적게 나온 번호, 홀짝 패턴, 합계 패턴, 최근 10회 분석으로 이동하는 통계 허브",
           url: `${siteUrl}/lotto-statistics`,
           isPartOf: {
             "@type": "WebSite",
@@ -76,11 +71,11 @@ export default async function LottoStatisticsLandingPage() {
       />
 
       <section className="panel">
-        <p className="eyebrow">Lotto Statistics Hub</p>
+        <p className="eyebrow">로또 통계 허브</p>
         <h1 className="mt-4 text-4xl font-semibold text-white">한눈에 들어오는 로또 통계 허브</h1>
         <p className="mt-4 leading-8 text-slate-300">
-          통계를 작은 주제별로 나눠서 빠르게 이동할 수 있도록 정리한 페이지입니다. 자주 나온 번호부터 Odd-even,
-          Sum pattern, 최근 10회 분석까지 연결됩니다.
+          통계를 작은 주제별로 나눠서 빠르게 이동할 수 있도록 정리한 페이지입니다. 자주 나온 번호부터 홀짝 패턴,
+          합계 패턴, 최근 10회 분석까지 이어집니다.
         </p>
       </section>
 

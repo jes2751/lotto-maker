@@ -6,14 +6,12 @@ import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale } = await getRequestPreferences();
-
   return createPageMetadata({
-    locale,
+    locale: "ko",
     path: "/lotto-number-generator",
     titleKo: "로또 번호 생성기",
     titleEn: "Lotto Number Generator",
-    descriptionKo: "과거 당첨 데이터 기반 추천 전략과 필터 추첨기를 함께 소개하는 로또 번호 생성기 랜딩 페이지입니다.",
+    descriptionKo: "로또 번호 생성기 전략, 필터 추첨기, 과거 당첨 데이터 기반 추천 흐름을 설명하는 한국어 랜딩 페이지입니다.",
     descriptionEn: "Search landing page for the Lotto number generator, filter generator, and historical-data-based recommendation strategies."
   });
 }
@@ -25,7 +23,7 @@ const content = {
     eyebrow: "로또 번호 생성기",
     title: "과거 당첨 데이터 기반 로또 번호 생성기",
     description:
-      "mixed, frequency, random, filter 전략을 비교하고 자신에게 맞는 추천 흐름으로 바로 이동할 수 있는 설명형 랜딩 페이지입니다.",
+      "혼합 추천, 빈도 추천, 랜덤 추천, 필터 추천 전략을 비교하고 자신에게 맞는 로또 번호 생성 흐름으로 바로 이동할 수 있는 설명형 랜딩 페이지입니다.",
     strategies: [
       ["mixed", "혼합 추천", "전체 흐름과 최근 패턴을 함께 참고하는 기본 추천 전략입니다."],
       ["frequency", "빈도 기반 추천", "자주 나온 번호 흐름을 중심으로 참고할 때 적합합니다."],
