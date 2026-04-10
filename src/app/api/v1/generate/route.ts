@@ -1,11 +1,14 @@
 import { jsonError, jsonSuccess } from "@/lib/http";
+import { saveGeneratedRecords } from "@/lib/firebase/admin";
 import { generationService } from "@/lib/lotto";
 import { isValidStrategy } from "@/lib/lotto/shared";
+import { drawRepository } from "@/lib/lotto/repository";
 import type { GenerationFilters, OddEvenFilter } from "@/types/lotto";
 
 interface GenerateRequestBody {
   strategy?: string;
   count?: number;
+  anonymous_id?: string;
   filters?: {
     fixed_numbers?: number[];
     excluded_numbers?: number[];
@@ -124,7 +127,41 @@ export async function POST(request: Request) {
       filters
     });
 
-    return jsonSuccess({ sets });
+    const anonymousId = typeof body.anonymous_id === "string" ? body.anonymous_id.trim() : "";
+    const latestDraw = await drawRepository.getLatest();
+    const targetRound = latestDraw ? latestDraw.round + 1 : null;
+    let statsRecorded = false;
+
+    if (anonymousId) {
+      const recordFilters: Record<string, unknown> = {
+        fixedNumbers: filters.fixedNumbers,
+        excludedNumbers: filters.excludedNumbers,
+        oddEven: filters.oddEven,
+        sumMin: filters.sumMin,
+        sumMax: filters.sumMax,
+        allowConsecutive: filters.allowConsecutive
+      };
+
+      try {
+        await saveGeneratedRecords(
+          sets.map((set) => ({
+            anonymousId,
+            strategy,
+            numbers: set.numbers,
+            bonus: set.bonus ?? null,
+            reason: set.reason,
+            generatedAt: set.generatedAt,
+            targetRound,
+            filters: recordFilters
+          }))
+        );
+        statsRecorded = true;
+      } catch (recordError) {
+        console.error("Failed to record generated stats during generate route:", recordError);
+      }
+    }
+
+    return jsonSuccess({ sets, statsRecorded, targetRound });
   } catch (error) {
     return jsonError("GENERATION_ERROR", error instanceof Error ? error.message : "추천 번호를 생성하지 못했습니다.");
   }

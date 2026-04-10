@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ShareCard } from "@/components/lotto/share-card";
 
 import { NumberSet } from "@/components/lotto/number-set";
-import { recordGeneratedSets } from "@/lib/generated-stats/client";
+import { getAnonymousId, recordGeneratedSets } from "@/lib/generated-stats/client";
 import type {
   GeneratedSet,
   GenerationFilters,
@@ -201,6 +201,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     setLoading(true);
     setError(null);
     setRecordStatus("idle");
+    const anonymousId = getAnonymousId();
 
     try {
       const response = await fetch("/api/v1/generate", {
@@ -209,6 +210,7 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
         body: JSON.stringify({
           strategy,
           count,
+          anonymous_id: anonymousId,
           filters: {
             fixed_numbers: filters.fixedNumbers,
             excluded_numbers: filters.excludedNumbers,
@@ -227,19 +229,27 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
       }
 
       const nextSets = payload.data.sets as GeneratedSet[];
+      const recordedByApi = payload.data.statsRecorded === true;
+      const effectiveTargetRound =
+        typeof payload.data.targetRound === "number" ? (payload.data.targetRound as number) : targetRound;
       setSets(nextSets);
       setCopiedId(null);
       setSavedId(null);
-      setRecordStatus("recording");
 
-      void recordGeneratedSets({
-        strategy,
-        sets: nextSets,
-        filters,
-        targetRound
-      })
-        .then(() => setRecordStatus("recorded"))
-        .catch(() => setRecordStatus("failed"));
+      if (recordedByApi) {
+        setRecordStatus("recorded");
+      } else {
+        setRecordStatus("recording");
+
+        void recordGeneratedSets({
+          strategy,
+          sets: nextSets,
+          filters,
+          targetRound: effectiveTargetRound
+        })
+          .then(() => setRecordStatus("recorded"))
+          .catch(() => setRecordStatus("failed"));
+      }
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "번호 생성에 실패했습니다.");
     } finally {

@@ -61,6 +61,8 @@ test("generate api returns requested set count", async () => {
 
   assert.equal(response.status, 200);
   assert.equal(payload.data.sets.length, 2);
+  assert.equal(payload.data.statsRecorded, false);
+  assert.equal(typeof payload.data.targetRound, "number");
   assert.ok(payload.data.sets.every((set: { bonus?: number; numbers: number[] }) => typeof set.bonus === "number"));
 });
 
