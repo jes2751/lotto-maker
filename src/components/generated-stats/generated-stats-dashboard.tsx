@@ -25,12 +25,11 @@ function isValidRecordShape(value: unknown): value is Omit<StoredGeneratedRecord
 
   const record = value as Record<string, unknown>;
 
+  // Relax validations to guarantee valid records aren't dropped
   return (
     typeof record.anonymousId === "string" &&
     typeof record.strategy === "string" &&
-    Array.isArray(record.numbers) &&
-    typeof record.reason === "string" &&
-    typeof record.generatedAt === "string"
+    Array.isArray(record.numbers)
   );
 }
 
@@ -95,9 +94,9 @@ export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardP
                   bonus: typeof data.bonus === "number" ? data.bonus : null,
                   reason: data.reason,
                   generatedAt: data.generatedAt,
-                  targetRound: typeof data.targetRound === "number" ? data.targetRound : null,
-                  matchedRound: typeof data.matchedRound === "number" ? data.matchedRound : null,
-                  matchCount: typeof data.matchCount === "number" ? data.matchCount : null,
+                  targetRound: typeof data.targetRound === "number" ? data.targetRound : (typeof data.targetRound === "string" ? parseInt(data.targetRound, 10) : null),
+                  matchedRound: typeof data.matchedRound === "number" ? data.matchedRound : (typeof data.matchedRound === "string" ? parseInt(data.matchedRound, 10) : null),
+                  matchCount: typeof data.matchCount === "number" ? data.matchCount : (typeof data.matchCount === "string" ? parseInt(data.matchCount, 10) : null),
                   bonusMatched: data.bonusMatched === true,
                   settledAt: typeof data.settledAt === "string" ? data.settledAt : null,
                   filters: {
