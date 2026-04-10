@@ -19,10 +19,10 @@ const latestRound = String(localDraws[0]?.round ?? "");
 test("home page renders focused core sections", async () => {
   const html = renderToStaticMarkup(await HomePage());
 
-  assert.match(html, /Lotto Maker Lab/i);
-  assert.match(html, /최신 회차|이번 주 컨트롤룸/);
-  assert.match(html, /번호 생성하기/);
-  assert.match(html, /생성 통계/);
+  assert.match(html, /최신 회차|최신 당첨번호/);
+  assert.match(html, /지금 번호 뽑기|바로 번호 뽑기/);
+  assert.match(html, /공식 당첨 흐름 보기|공식 기준 보기/);
+  assert.match(html, /사람들 선택|우리 유저 데이터/);
 });
 
 test("generate page renders generator overview", async () => {
@@ -36,7 +36,7 @@ test("generate page renders generator overview", async () => {
 test("generated stats page renders public stats copy", async () => {
   const html = renderToStaticMarkup(await GeneratedStatsPage());
 
-  assert.match(html, /생성 통계/);
+  assert.match(html, /우리 유저 데이터|공개 생성 흐름/);
   assert.match(html, /전략 성과/);
   assert.match(html, /새로 생성하기/);
 });

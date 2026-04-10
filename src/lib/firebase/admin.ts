@@ -579,25 +579,21 @@ export interface CreateGeneratedRecordInput {
   reason: string;
   generatedAt: string;
   targetRound: number | null;
-  filters: Record<string, unknown>;
+  filters: Record<string, FirestorePrimitive>;
 }
 
-export async function saveGeneratedRecords(records: CreateGeneratedRecordInput[]) {
-  if (records.length === 0) {
-    return { written: 0 };
-  }
+interface PreparedGeneratedRecordWrite {
+  recordId: string;
+  fields: Record<string, FirestorePrimitive>;
+}
 
-  const { projectId } = getFirestoreAdminConfig();
-  const accessToken = await getFirestoreAdminAccessToken();
-  const createdAt = new Date().toISOString();
-
-  const writes = records.map((record) => {
-    const recordId =
+function buildGeneratedRecordWrites(records: CreateGeneratedRecordInput[], createdAt: string): PreparedGeneratedRecordWrite[] {
+  return records.map((record) => ({
+    recordId:
       typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
         ? crypto.randomUUID()
-        : Math.random().toString(36).slice(2);
-
-    const fields = {
+        : Math.random().toString(36).slice(2),
+    fields: {
       ...record,
       createdAt,
       createdSource: "generator",
@@ -605,17 +601,13 @@ export async function saveGeneratedRecords(records: CreateGeneratedRecordInput[]
       matchCount: null,
       bonusMatched: false,
       settledAt: null
-    };
+    }
+  }));
+}
 
-    return {
-      update: {
-        name: `projects/${projectId}/databases/(default)/documents/${GENERATED_RECORDS_COLLECTION}/${recordId}`,
-        fields: Object.fromEntries(
-          Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
-        )
-      }
-    };
-  });
+async function saveGeneratedRecordsWithAdmin(writes: PreparedGeneratedRecordWrite[]) {
+  const { projectId } = getFirestoreAdminConfig();
+  const accessToken = await getFirestoreAdminAccessToken();
 
   const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents:commit`, {
     method: "POST",
@@ -623,12 +615,58 @@ export async function saveGeneratedRecords(records: CreateGeneratedRecordInput[]
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ writes })
+    body: JSON.stringify({
+      writes: writes.map(({ recordId, fields }) => ({
+        update: {
+          name: `projects/${projectId}/databases/(default)/documents/${GENERATED_RECORDS_COLLECTION}/${recordId}`,
+          fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
+        }
+      }))
+    })
   });
 
   if (!response.ok) {
     throw new Error(`Firestore generated records save failed with status ${response.status}: ${await response.text()}`);
   }
+}
+
+async function saveGeneratedRecordsWithPublic(writes: PreparedGeneratedRecordWrite[]) {
+  await Promise.all(
+    writes.map(({ recordId, fields }) =>
+      firestorePublicRequest(`/${GENERATED_RECORDS_COLLECTION}?documentId=${encodeURIComponent(recordId)}`, {
+        method: "POST",
+        body: JSON.stringify({
+          fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
+        })
+      })
+    )
+  );
+}
+
+export async function saveGeneratedRecords(records: CreateGeneratedRecordInput[]) {
+  if (records.length === 0) {
+    return { written: 0 };
+  }
+
+  const createdAt = new Date().toISOString();
+  const writes = buildGeneratedRecordWrites(records, createdAt);
+
+  try {
+    if (hasFirestoreAdminEnv()) {
+      await saveGeneratedRecordsWithAdmin(writes);
+      return { written: records.length };
+    }
+  } catch (error) {
+    if (!hasFirestorePublicEnv()) {
+      throw error;
+    }
+  }
+
+  if (!hasFirestorePublicEnv()) {
+    throw new Error("Firestore generated records save requires either admin credentials or public Firebase config.");
+  }
+
+  await saveGeneratedRecordsWithPublic(writes);
 
   return { written: records.length };
 }

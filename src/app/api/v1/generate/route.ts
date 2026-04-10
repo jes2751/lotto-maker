@@ -133,13 +133,13 @@ export async function POST(request: Request) {
     let statsRecorded = false;
 
     if (anonymousId) {
-      const recordFilters: Record<string, unknown> = {
-        fixedNumbers: filters.fixedNumbers,
-        excludedNumbers: filters.excludedNumbers,
-        oddEven: filters.oddEven,
-        sumMin: filters.sumMin,
-        sumMax: filters.sumMax,
-        allowConsecutive: filters.allowConsecutive
+      const recordFilters = {
+        fixedNumbers: filters.fixedNumbers ?? [],
+        excludedNumbers: filters.excludedNumbers ?? [],
+        oddEven: filters.oddEven ?? "any",
+        sumMin: filters.sumMin ?? null,
+        sumMax: filters.sumMax ?? null,
+        allowConsecutive: filters.allowConsecutive ?? true
       };
 
       try {

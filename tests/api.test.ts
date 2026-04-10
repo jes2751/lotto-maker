@@ -66,6 +66,67 @@ test("generate api returns requested set count", async () => {
   assert.ok(payload.data.sets.every((set: { bonus?: number; numbers: number[] }) => typeof set.bonus === "number"));
 });
 
+test("generate api records stats through public firestore fallback", async () => {
+  const originalFetch = global.fetch;
+  const originalProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const originalApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  const originalAdminProjectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
+  const originalServiceEmail = process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+  const originalPrivateKey = process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = "lotto-maker-lab";
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "test-public-key";
+  delete process.env.FIREBASE_ADMIN_PROJECT_ID;
+  delete process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+  delete process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+
+  let requestUrl = "";
+  let requestMethod = "";
+
+  global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    requestUrl = String(input);
+    requestMethod = init?.method ?? "GET";
+
+    return new Response(JSON.stringify({ name: "projects/lotto-maker-lab/databases/(default)/documents/generated_records/test" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  }) as typeof fetch;
+
+  try {
+    const response = await postGenerate(
+      new Request("http://localhost/api/v1/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ strategy: "mixed", count: 1, anonymous_id: "anon-test" })
+      })
+    );
+    const payload = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(payload.data.statsRecorded, true);
+    assert.equal(requestMethod, "POST");
+    assert.match(requestUrl, /generated_records\?documentId=.*key=test-public-key/);
+  } finally {
+    global.fetch = originalFetch;
+
+    if (originalProjectId === undefined) delete process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    else process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = originalProjectId;
+
+    if (originalApiKey === undefined) delete process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    else process.env.NEXT_PUBLIC_FIREBASE_API_KEY = originalApiKey;
+
+    if (originalAdminProjectId === undefined) delete process.env.FIREBASE_ADMIN_PROJECT_ID;
+    else process.env.FIREBASE_ADMIN_PROJECT_ID = originalAdminProjectId;
+
+    if (originalServiceEmail === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+    else process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL = originalServiceEmail;
+
+    if (originalPrivateKey === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+    else process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY = originalPrivateKey;
+  }
+});
+
 test("generate api validates overlapping fixed and excluded numbers", async () => {
   const response = await postGenerate(
     new Request("http://localhost/api/v1/generate", {
