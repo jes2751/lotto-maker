@@ -1,3 +1,1 @@
-# Replace this placeholder with your real AdSense publisher information before production.
-# Example:
-# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-6506537379678422, DIRECT, f08c47fec0942fa0
