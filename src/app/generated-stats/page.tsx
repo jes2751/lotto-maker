@@ -3,9 +3,12 @@ import Link from "next/link";
 
 import { GeneratedStatsDashboard } from "@/components/generated-stats/generated-stats-dashboard";
 import { JsonLd } from "@/components/seo/json-ld";
+import { listGeneratedRecords } from "@/lib/firebase/admin";
 import { drawRepository } from "@/lib/lotto";
 import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { locale } = await getRequestPreferences();
@@ -50,6 +53,7 @@ export default async function GeneratedStatsPage() {
   const copy = content[locale];
   const siteUrl = getSiteUrl();
   const latestDraw = await drawRepository.getLatest();
+  const records = await listGeneratedRecords();
   const compareCards =
     locale === "ko"
       ? [
@@ -162,7 +166,7 @@ export default async function GeneratedStatsPage() {
         </div>
       </section>
 
-      <GeneratedStatsDashboard latestDraw={latestDraw} />
+      <GeneratedStatsDashboard latestDraw={latestDraw} records={records} />
     </div>
   );
 }

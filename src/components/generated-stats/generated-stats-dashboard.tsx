@@ -13,6 +13,7 @@ import type { Draw } from "@/types/lotto";
 
 interface GeneratedStatsDashboardProps {
   latestDraw: Draw | null;
+  records: StoredGeneratedRecord[];
 }
 
 const GENERATED_RECORDS_COLLECTION = "generated_records";
@@ -48,9 +49,9 @@ function formatGeneratedAt(value: string) {
   });
 }
 
-export function GeneratedStatsDashboard({ latestDraw }: GeneratedStatsDashboardProps) {
-  const [records, setRecords] = useState<StoredGeneratedRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+export function GeneratedStatsDashboard({ latestDraw, records: initialRecords }: GeneratedStatsDashboardProps) {
+  const [records, setRecords] = useState<StoredGeneratedRecord[]>(initialRecords);
+  const [loading, setLoading] = useState(initialRecords.length === 0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

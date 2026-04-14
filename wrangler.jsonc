@@ -4,6 +4,9 @@
   "name": "lotto-maker",
   "compatibility_date": "2025-12-01",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "NEXT_PUBLIC_ADSENSE_CLIENT_ID": "ca-pub-6506537379678422"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

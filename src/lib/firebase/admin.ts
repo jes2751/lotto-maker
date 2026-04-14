@@ -1,3 +1,4 @@
+import type { StoredGeneratedRecord } from "@/lib/generated-stats/shared";
 import type { Draw } from "@/types/lotto";
 
 const GOOGLE_OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -466,6 +467,33 @@ interface FirestoreGeneratedRecordDocument {
   targetRound: number | null;
 }
 
+function toNumberOrNull(value: FirestorePrimitive | undefined) {
+  return typeof value === "number" ? value : typeof value === "string" ? Number.parseInt(value, 10) : null;
+}
+
+function toNumberList(value: FirestorePrimitive | undefined) {
+  return Array.isArray(value) ? value.filter((item): item is number => typeof item === "number") : [];
+}
+
+function toFiltersMap(value: FirestorePrimitive | undefined): StoredGeneratedRecord["filters"] {
+  const filters = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+  return {
+    fixedNumbers: toNumberList((filters as Record<string, FirestorePrimitive>).fixedNumbers),
+    excludedNumbers: toNumberList((filters as Record<string, FirestorePrimitive>).excludedNumbers),
+    oddEven:
+      typeof (filters as Record<string, FirestorePrimitive>).oddEven === "string"
+        ? ((filters as Record<string, FirestorePrimitive>).oddEven as string)
+        : "any",
+    sumMin: toNumberOrNull((filters as Record<string, FirestorePrimitive>).sumMin),
+    sumMax: toNumberOrNull((filters as Record<string, FirestorePrimitive>).sumMax),
+    allowConsecutive:
+      typeof (filters as Record<string, FirestorePrimitive>).allowConsecutive === "boolean"
+        ? ((filters as Record<string, FirestorePrimitive>).allowConsecutive as boolean)
+        : true
+  };
+}
+
 function parseGeneratedRecordDocument(document: FirestoreDocument): FirestoreGeneratedRecordDocument {
   const fields = Object.fromEntries(
     Object.entries(document.fields ?? {}).map(([key, value]) => [key, fromFirestoreValue(value)])
@@ -477,6 +505,28 @@ function parseGeneratedRecordDocument(document: FirestoreDocument): FirestoreGen
     numbers: Array.isArray(fields.numbers) ? fields.numbers.map((value) => Number(value)) : [],
     bonus: fields.bonus == null ? null : Number(fields.bonus),
     targetRound: fields.targetRound == null ? null : Number(fields.targetRound)
+  };
+}
+
+function parseStoredGeneratedRecordDocument(document: FirestoreDocument): StoredGeneratedRecord {
+  const fields = Object.fromEntries(
+    Object.entries(document.fields ?? {}).map(([key, value]) => [key, fromFirestoreValue(value)])
+  ) as Record<string, FirestorePrimitive>;
+
+  return {
+    id: document.name.split("/").at(-1) ?? "",
+    anonymousId: typeof fields.anonymousId === "string" ? fields.anonymousId : "",
+    strategy: typeof fields.strategy === "string" ? fields.strategy : "mixed",
+    numbers: toNumberList(fields.numbers),
+    bonus: toNumberOrNull(fields.bonus),
+    reason: typeof fields.reason === "string" ? fields.reason : "",
+    generatedAt: typeof fields.generatedAt === "string" ? fields.generatedAt : "",
+    targetRound: toNumberOrNull(fields.targetRound),
+    matchedRound: toNumberOrNull(fields.matchedRound),
+    matchCount: toNumberOrNull(fields.matchCount),
+    bonusMatched: fields.bonusMatched === true,
+    settledAt: typeof fields.settledAt === "string" ? fields.settledAt : null,
+    filters: toFiltersMap(fields.filters)
   };
 }
 
@@ -514,6 +564,46 @@ export async function listUnsettledGeneratedRecordsForRound(round: number) {
   return payload
     .map((entry) => (entry.document ? parseGeneratedRecordDocument(entry.document) : null))
     .filter((entry): entry is FirestoreGeneratedRecordDocument => entry !== null);
+}
+
+export async function listGeneratedRecords(limit = 240): Promise<StoredGeneratedRecord[]> {
+  if (!hasFirestoreAdminEnv() && !hasFirestorePublicEnv()) {
+    return [];
+  }
+
+  const payloadRequest = {
+    structuredQuery: {
+      from: [{ collectionId: GENERATED_RECORDS_COLLECTION }],
+      orderBy: [{ field: { fieldPath: "generatedAt" }, direction: "DESCENDING" }],
+      limit
+    }
+  };
+
+  try {
+    if (hasFirestoreAdminEnv()) {
+      const response = await firestoreAdminRequest(":runQuery", {
+        method: "POST",
+        body: JSON.stringify(payloadRequest)
+      });
+      const payload = (await response.json()) as Array<{ document?: FirestoreDocument }>;
+      return payload
+        .map((entry) => (entry.document ? parseStoredGeneratedRecordDocument(entry.document) : null))
+        .filter((entry): entry is StoredGeneratedRecord => entry !== null);
+    }
+  } catch (error) {
+    if (!hasFirestorePublicEnv()) {
+      throw error;
+    }
+  }
+
+  const response = await firestorePublicRequest(":runQuery", {
+    method: "POST",
+    body: JSON.stringify(payloadRequest)
+  });
+  const payload = (await response.json()) as Array<{ document?: FirestoreDocument }>;
+  return payload
+    .map((entry) => (entry.document ? parseStoredGeneratedRecordDocument(entry.document) : null))
+    .filter((entry): entry is StoredGeneratedRecord => entry !== null);
 }
 
 async function patchFirestoreDocument(

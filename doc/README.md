@@ -1,66 +1,48 @@
-# 로또 번호 생성기 v1
+# Documentation Index
 
-Next.js 14 App Router 기반의 로또 번호 생성기 초기 구현이다. 현재 버전은 정적 시드 데이터로 동작하며, 번호 생성기 중심의 최소 MVP를 제공한다.
+이 폴더는 제품 문서의 기준 위치입니다. 문서는 역할별로 나눠서 관리합니다.
 
-## 포함 기능
+## Structure
 
-* 홈
-* 번호 생성기
-* 최근 회차 조회
-* 번호별 출현 빈도 통계
-* Route Handlers 기반 API
-* Prisma/PostgreSQL 전환용 스키마
+- `project/`
+  - 현재 진행 중인 기준 문서
+  - `plan.md`: 현재 제품/기능 방향과 우선순위
+  - `history.md`: 주요 변경 이력
+  - `note.md`: 운영 메모, 실행 명령, 임시 메모
 
-## 실행
+- `specs/`
+  - 살아 있는 사양 문서
+  - `Product_Spec.md`: 제품 범위와 핵심 기능
+  - `Technical_Spec.md`: 구현, 데이터, API 기준
+  - `Design_Guide.md`: 디자인 규칙과 UI 원칙
+  - `Design_Draft_Examples.md`: 시안 예시
 
-```bash
-cmd /c npm install
-cmd /c npm run dev
-```
+- `process/`
+  - 작업 절차 문서
+  - `WORKFLOW.md`: 작업 전후 규칙, 문서 작성 원칙
+  - `check_list.md`: 점검 항목
 
-## 테스트
+- `qa/`
+  - QA 결과와 리포트
 
-```bash
-cmd /c npm test
-```
+- `archive/`
+  - 현재 기준에서 내려온 참고 문서
+  - 더 이상 source of truth는 아니지만, 과거 결정과 설계를 추적할 때 사용
 
-## 저장소 운영 규칙
+## Working Rules
 
-* 작업 규칙 문서: `doc/process/WORKFLOW.md`
-* 작업 기록 파일: `doc/project/history.md`
-* 범위 기준 문서: `doc/project/plan.md`
-* 제품 기획 문서: `doc/specs/Product_Spec.md`
-* 디자인 기준 문서: `doc/specs/Design_Guide.md`
-* 기술 기준 문서: `doc/specs/Technical_Spec.md`
+1. 작업 시작 전에는 `doc/project/plan.md`를 먼저 확인합니다.
+2. 구현 변경이 있으면 `doc/project/history.md`도 같이 갱신합니다.
+3. 새로운 기준 문서는 `project/`, `specs/`, `process/`, `qa/` 중 역할에 맞는 위치에 둡니다.
+4. 임시 메모나 개인용 조사 결과는 루트에 두지 말고 `doc/project/note.md` 또는 `.codex-temp/`에 둡니다.
+5. 더 이상 기준이 아닌 문서는 `archive/`로 이동합니다.
 
-기본 흐름은 다음과 같다.
+## Related Folders Outside `doc/`
 
-1. 범위 변경이 있으면 먼저 `doc/project/plan.md`를 갱신한다.
-2. 코드 작업 후 `doc/project/history.md`에 변경 내역과 검증 결과를 기록한다.
-3. 관련 테스트 또는 최소 실행 확인을 수행한다.
-4. 검증이 통과하면 커밋 후 `main` 브랜치에 푸시한다.
+- `scripts/`
+  - 실행 가능한 운영/디버그 스크립트
+  - 동기화, 배포 보조, 점검 스크립트는 여기 둡니다.
 
-## 주요 경로
-
-* `src/app`: App Router 페이지와 API
-* `src/components`: 화면 컴포넌트
-* `src/lib`: 시드 데이터, 저장소, 생성 로직, 통계 계산
-* `src/types`: 도메인 타입
-* `prisma`: 스키마
-* `tests`: 단위 및 API 테스트
-
-## 문서 구조
-
-* `project/`: 현재 작업 기준 문서
-* `project/plan.md`: 최상위 범위와 우선순위
-* `project/history.md`: 실제 작업 로그
-* `project/note.md`: 운영 메모, 로컬 실행, 배포/환경 정리
-* `specs/`: 제품, 디자인, 기술 기준 문서
-* `specs/Product_Spec.md`: 사용자, 기능, 화면, 상태 기획
-* `specs/Design_Guide.md`: UI, 반응형, 상태 표현 기준
-* `specs/Technical_Spec.md`: 생성 로직, API, 데이터, 테스트 기준
-* `process/`: 작업 절차와 체크리스트
-* `process/WORKFLOW.md`: 역할, 작업 순서, 기록, 커밋/푸시 규칙
-* `process/check_list.md`: 현재 완성도, 남은 항목, 다음 우선순위
-* `qa/`: QA 보고서와 검토 기록
-* `archive/`: 통합 전 상세 문서 보관
+- `.codex-temp/`
+  - 일회성 조사, 로그, 임시 산출물
+  - Git 추적 대상이 아닙니다.

@@ -63,7 +63,7 @@ service cloud.firestore {
           "sumMax",
           "allowConsecutive"
         ])
-        && isValidOptionalNumberList(filters.fixedNumbers, 5)
+        && isValidOptionalNumberList(filters.fixedNumbers, 6)
         && isValidOptionalNumberList(filters.excludedNumbers, 35)
         && filters.oddEven in ["any", "balanced", "odd-heavy", "even-heavy"]
         && (filters.sumMin == null || filters.sumMin is int)
