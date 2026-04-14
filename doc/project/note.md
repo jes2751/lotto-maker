@@ -192,8 +192,9 @@ https://lotto-maker.cloud
   - 콘솔에 다음과 같이 7개의 값을 입력하여 직접 수동 주입합니다.
   - 사용법: `npm run sync:manual <회차> <날짜> <당첨번호6개> <보너스> <총상금> <1등상금> <1등당첨자수>`
   - 예시: `npm run sync:manual 1220 2026-04-18 "5,10,15,20,30,40" 45 10000000000 2000000000 5`
+  - 위 명령어를 실행하면 **로컬 파일 업데이트 + Firestore 백엔드 푸시 + 생성 번호 당첨 평가 마감(Settle)** 작업이 단 한 번에 자동 처리됩니다.
   
-- **반영 방법**: 위 방법으로 갱신 후 반드시 `npm run firestore:draws:seed` 를 실행해 서버DB에 밀어넣고, 로컬 변경사항(`local-draws.ts` 등)은 **Git Commit & Push** 합니다.
+- **반영 방법**: 갱신 후 변경된 로컬 파일(`local-draws.ts` 등)만 **Git Commit & Push** 하시면 됩니다.
 ### 트랙 2. 생성 통계 정산 및 내부 DB (백엔드 - 자동 배치)
 사용자들이 생성했던 번호들이 몇 등 당첨되었는지 마감(Settle) 처리하는 작업은 자동화되어 있습니다.
 - **자동 마감**: 매주 일요일 오전 10시(KST) Cloudflare Worker(Cron)가 `lotto-maker-draw-sync` 스크립트를 자동 실행합니다.

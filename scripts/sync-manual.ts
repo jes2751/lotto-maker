@@ -3,7 +3,8 @@ import path from "node:path";
 import { mergeDraws, serializeDrawsModule } from "../src/lib/data/draw-sync";
 import { localDraws } from "../src/lib/data/local-draws";
 import type { Draw } from "../src/types/lotto";
-
+import { loadScriptEnv } from "../src/lib/env/load-script-env";
+import { settleGeneratedRecordsForDraw, upsertLottoDrawRecords } from "../src/lib/firebase/admin";
 async function main() {
   const args = process.argv.slice(2);
   
@@ -40,9 +41,30 @@ async function main() {
   
   const targetPath = path.join(process.cwd(), "src", "lib", "data", "local-draws.ts");
   await writeFile(targetPath, serializeDrawsModule(descending, "localDraws"), "utf8");
-  
   console.log(`✅ Successfully injected manual draw data for round ${round} into local-draws.ts!`);
-  console.log(`Next Step: Run 'npm run firestore:draws:seed' to push this data to Firestore.`);
+  
+  console.log("==> Starting Firestore Sync & Settling...");
+  loadScriptEnv();
+  
+  // 1. Push draw to Firestore
+  try {
+    await upsertLottoDrawRecords([incomingDraw]);
+    console.log(`✅ Successfully pushed draw ${round} to Firestore.`);
+  } catch (error) {
+    console.error("❌ Failed to push draw to Firestore. Did you set .env.local credentials?", error);
+    process.exit(1);
+  }
+
+  // 2. Settle Generated Records
+  try {
+    const settleResult = await settleGeneratedRecordsForDraw(incomingDraw);
+    console.log(`✅ Successfully settled ${settleResult.settled} records for round ${round}!`);
+  } catch (error) {
+    console.error("❌ Failed to settle generated records.", error);
+    process.exit(1);
+  }
+
+  console.log(`\n🎉 All done! Next step: Commit the modified local-draws.ts to Git.`);
 }
 
 main().catch((error) => {
