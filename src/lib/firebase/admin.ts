@@ -1,5 +1,5 @@
 import type { StoredGeneratedRecord } from "@/lib/generated-stats/shared";
-import type { Draw } from "@/types/lotto";
+import type { Draw, GenerationStrategy } from "@/types/lotto";
 
 const GOOGLE_OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const FIRESTORE_SCOPE = "https://www.googleapis.com/auth/datastore";
@@ -516,7 +516,7 @@ function parseStoredGeneratedRecordDocument(document: FirestoreDocument): Stored
   return {
     id: document.name.split("/").at(-1) ?? "",
     anonymousId: typeof fields.anonymousId === "string" ? fields.anonymousId : "",
-    strategy: typeof fields.strategy === "string" ? fields.strategy : "mixed",
+    strategy: (typeof fields.strategy === "string" ? fields.strategy : "mixed") as GenerationStrategy,
     numbers: toNumberList(fields.numbers),
     bonus: toNumberOrNull(fields.bonus),
     reason: typeof fields.reason === "string" ? fields.reason : "",
