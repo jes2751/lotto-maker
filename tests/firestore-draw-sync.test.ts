@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getLottoDrawDocumentId, toLottoDrawRecord } from "../src/lib/firebase/admin";
+import {
+  getLottoDrawDocumentId,
+  hasFirestoreAdminEnv,
+  hasFirestorePublicEnv,
+  toLottoDrawRecord
+} from "../src/lib/firebase/admin";
 import { getDrawsToSyncFromOfficial } from "../src/lib/data/firestore-draw-sync";
 import { evaluateGeneratedRecord } from "../src/lib/generated-stats/shared";
 
@@ -123,4 +128,38 @@ test("evaluateGeneratedRecord uses persisted settlement when record is already c
   assert.equal(evaluated.matchCount, 4);
   assert.equal(evaluated.bonusMatched, true);
   assert.equal(evaluated.matchedRound, 1170);
+});
+
+test("firestore env checks infer project id from service account email", () => {
+  const originalAdminProjectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
+  const originalPublicProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const originalServiceEmail = process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+  const originalPrivateKey = process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+  const originalApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+
+  delete process.env.FIREBASE_ADMIN_PROJECT_ID;
+  delete process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL = "firebase-adminsdk-fbsvc@lotto-maker-lab.iam.gserviceaccount.com";
+  process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY = "test-private-key";
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "test-public-key";
+
+  try {
+    assert.equal(hasFirestoreAdminEnv(), true);
+    assert.equal(hasFirestorePublicEnv(), true);
+  } finally {
+    if (originalAdminProjectId === undefined) delete process.env.FIREBASE_ADMIN_PROJECT_ID;
+    else process.env.FIREBASE_ADMIN_PROJECT_ID = originalAdminProjectId;
+
+    if (originalPublicProjectId === undefined) delete process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    else process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = originalPublicProjectId;
+
+    if (originalServiceEmail === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+    else process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL = originalServiceEmail;
+
+    if (originalPrivateKey === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+    else process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY = originalPrivateKey;
+
+    if (originalApiKey === undefined) delete process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    else process.env.NEXT_PUBLIC_FIREBASE_API_KEY = originalApiKey;
+  }
 });

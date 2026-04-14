@@ -84,24 +84,40 @@ function getEnv(name: string): string {
   return value;
 }
 
+function inferProjectIdFromServiceAccountEmail(email?: string) {
+  if (!email) {
+    return undefined;
+  }
+
+  const match = email.match(/@([^.]+)\.iam\.gserviceaccount\.com$/);
+  return match?.[1];
+}
+
+function getConfiguredFirestoreProjectId() {
+  return (
+    getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") ||
+    getOptionalEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID") ||
+    inferProjectIdFromServiceAccountEmail(getOptionalEnv("FIREBASE_SERVICE_ACCOUNT_EMAIL"))
+  );
+}
+
 export function hasFirestoreAdminEnv() {
   return Boolean(
     getOptionalEnv("FIREBASE_SERVICE_ACCOUNT_EMAIL") &&
       getOptionalEnv("FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY") &&
-      (getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getOptionalEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"))
+      getConfiguredFirestoreProjectId()
   );
 }
 
 export function hasFirestorePublicEnv() {
   return Boolean(
-    (getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getOptionalEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID")) &&
-      getOptionalEnv("NEXT_PUBLIC_FIREBASE_API_KEY")
+    getConfiguredFirestoreProjectId() && getOptionalEnv("NEXT_PUBLIC_FIREBASE_API_KEY")
   );
 }
 
 function getFirestoreAdminConfig() {
   return {
-    projectId: getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
+    projectId: getConfiguredFirestoreProjectId() || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
     clientEmail: getEnv("FIREBASE_SERVICE_ACCOUNT_EMAIL"),
     privateKey: getEnv("FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY").replace(/\\n/g, "\n")
   };
@@ -339,7 +355,7 @@ function parseDrawDocument(document: FirestoreDocument): LottoDrawRecord {
 }
 
 async function firestorePublicRequest(path: string, init: RequestInit = {}) {
-  const projectId = getOptionalEnv("FIREBASE_ADMIN_PROJECT_ID") || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  const projectId = getConfiguredFirestoreProjectId() || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
   const apiKey = getEnv("NEXT_PUBLIC_FIREBASE_API_KEY");
   const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}?key=${apiKey}`, {
     ...init,
