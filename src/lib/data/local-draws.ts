@@ -2,6 +2,23 @@ import type { Draw } from "@/types/lotto";
 
 export const localDraws: Draw[] = [
   {
+    "id": 1219,
+    "round": 1219,
+    "drawDate": "2026-04-11",
+    "numbers": [
+      1,
+      2,
+      15,
+      28,
+      39,
+      45
+    ],
+    "bonus": 31,
+    "totalPrize": 120945801000,
+    "firstPrize": 2508354782,
+    "winnerCount": 12
+  },
+  {
     "id": 1218,
     "round": 1218,
     "drawDate": "2026-04-04",
