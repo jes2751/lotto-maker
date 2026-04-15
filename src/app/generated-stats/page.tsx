@@ -4,6 +4,7 @@ import Link from "next/link";
 import { GeneratedStatsDashboard } from "@/components/generated-stats/generated-stats-dashboard";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getGeneratedStatsSnapshot } from "@/lib/generated-stats/server";
+import { buildGeneratedStatsViewModel, type GeneratedStatsSnapshot } from "@/lib/generated-stats/shared";
 import { drawRepository } from "@/lib/lotto";
 import { getRequestPreferences } from "@/lib/server-preferences";
 import { createPageMetadata, getSiteUrl, siteConfig } from "@/lib/site";
@@ -82,8 +83,20 @@ export default async function GeneratedStatsPage() {
   const { locale } = await getRequestPreferences();
   const copy = content[locale];
   const siteUrl = getSiteUrl();
-  const latestDraw = await drawRepository.getLatest();
-  const snapshot = await getGeneratedStatsSnapshot(latestDraw);
+  let latestDraw = null;
+  let snapshot: GeneratedStatsSnapshot = {
+    source: "empty" as const,
+    computedAt: null,
+    sourceRecordCount: 0,
+    view: buildGeneratedStatsViewModel([], null)
+  };
+
+  try {
+    latestDraw = await drawRepository.getLatest();
+    snapshot = await getGeneratedStatsSnapshot(latestDraw);
+  } catch (error) {
+    console.error("[generated-stats] failed to load snapshot", error);
+  }
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
@@ -107,6 +120,11 @@ export default async function GeneratedStatsPage() {
           <p className="eyebrow">{copy.eyebrow}</p>
           <h1 className="section-title mt-4 max-w-4xl text-gradient-silver">{copy.title}</h1>
           <p className="body-large mt-5 max-w-3xl text-slate-300">{copy.description}</p>
+          {snapshot.source === "empty" ? (
+            <p className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+              집계 데이터를 불러오지 못해 임시 빈 상태를 보여줍니다. 새로고침해도 같으면 서버 집계 또는 Firestore 연결을 확인해야 합니다.
+            </p>
+          ) : null}
           <div className="mt-5 flex flex-wrap gap-2 md:mt-6 md:gap-2.5">
             {copy.pills.map((item, index) => (
               <span key={item} className={index > 1 ? "spark-pill hidden sm:inline-flex" : "spark-pill"}>
