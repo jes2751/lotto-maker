@@ -1,11 +1,13 @@
-import type { StoredGeneratedRecord } from "@/lib/generated-stats/shared";
-import type { Draw, GenerationStrategy } from "@/types/lotto";
+import type { GeneratedStatsSnapshot, GeneratedStatsViewModel, StoredGeneratedRecord } from "@/lib/generated-stats/shared";
+import type { Draw, GeneratedSet, GenerationStrategy } from "@/types/lotto";
 
 const GOOGLE_OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const FIRESTORE_SCOPE = "https://www.googleapis.com/auth/datastore";
 const FIRESTORE_BASE_URL = "https://firestore.googleapis.com/v1";
 const LOTTO_DRAWS_COLLECTION = "lotto_draws";
 const GENERATED_RECORDS_COLLECTION = "generated_records";
+const GENERATED_REQUESTS_COLLECTION = "generated_requests";
+const GENERATED_ROUND_STATS_COLLECTION = "generated_round_stats";
 
 type FirestorePrimitive =
   | string
@@ -298,10 +300,10 @@ function fromFirestoreValue(value?: FirestoreValue): FirestorePrimitive {
   return null;
 }
 
-async function firestoreAdminRequest(path: string, init: RequestInit = {}) {
+async function firestoreAdminFetch(path: string, init: RequestInit = {}) {
   const { projectId } = getFirestoreAdminConfig();
   const accessToken = await getFirestoreAdminAccessToken();
-  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}`, {
+  return fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}`, {
     ...init,
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -309,6 +311,10 @@ async function firestoreAdminRequest(path: string, init: RequestInit = {}) {
       ...(init.headers ?? {})
     }
   });
+}
+
+async function firestoreAdminRequest(path: string, init: RequestInit = {}) {
+  const response = await firestoreAdminFetch(path, init);
 
   if (!response.ok) {
     throw new Error(`Firestore admin request failed with status ${response.status}.`);
@@ -354,16 +360,20 @@ function parseDrawDocument(document: FirestoreDocument): LottoDrawRecord {
   };
 }
 
-async function firestorePublicRequest(path: string, init: RequestInit = {}) {
+async function firestorePublicFetch(path: string, init: RequestInit = {}) {
   const projectId = getConfiguredFirestoreProjectId() || getEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
   const apiKey = getEnv("NEXT_PUBLIC_FIREBASE_API_KEY");
-  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}?key=${apiKey}`, {
+  return fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents${path}?key=${apiKey}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
       ...(init.headers ?? {})
     }
   });
+}
+
+async function firestorePublicRequest(path: string, init: RequestInit = {}) {
+  const response = await firestorePublicFetch(path, init);
 
   if (!response.ok) {
     throw new Error(`Firestore public request failed with status ${response.status}.`);
@@ -546,6 +556,147 @@ function parseStoredGeneratedRecordDocument(document: FirestoreDocument): Stored
   };
 }
 
+function toObjectMap(value: FirestorePrimitive | undefined) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, FirestorePrimitive>)
+    : {};
+}
+
+function toStringValue(value: FirestorePrimitive | undefined, fallback = "") {
+  return typeof value === "string" ? value : fallback;
+}
+
+function toBooleanValue(value: FirestorePrimitive | undefined, fallback = false) {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function toStoredGeneratedRecordList(value: FirestorePrimitive | undefined): StoredGeneratedRecord[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map<StoredGeneratedRecord | null>((entry) => {
+      const record = toObjectMap(entry);
+
+      if (!record.anonymousId || !record.strategy || !record.generatedAt) {
+        return null;
+      }
+
+      return {
+        id: toStringValue(record.id),
+        anonymousId: toStringValue(record.anonymousId),
+        strategy: toStringValue(record.strategy, "mixed") as GenerationStrategy,
+        numbers: toNumberList(record.numbers),
+        bonus: toNumberOrNull(record.bonus),
+        reason: toStringValue(record.reason),
+        generatedAt: toStringValue(record.generatedAt),
+        targetRound: toNumberOrNull(record.targetRound),
+        matchedRound: toNumberOrNull(record.matchedRound),
+        matchCount: toNumberOrNull(record.matchCount),
+        bonusMatched: toBooleanValue(record.bonusMatched),
+        settledAt: typeof record.settledAt === "string" ? record.settledAt : null,
+        filters: toFiltersMap(record.filters)
+      } satisfies StoredGeneratedRecord;
+    })
+    .filter((entry): entry is StoredGeneratedRecord => entry !== null);
+}
+
+function toCurrentStrategyTotals(value: FirestorePrimitive | undefined): GeneratedStatsViewModel["currentStrategyTotals"] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((entry) => {
+      const item = toObjectMap(entry);
+
+      return {
+        strategy: toStringValue(item.strategy, "mixed") as GenerationStrategy,
+        totalGenerated: toNumberOrNull(item.totalGenerated) ?? 0,
+        sharePercentage: toNumberOrNull(item.sharePercentage) ?? 0
+      };
+    })
+    .filter((entry) => entry.totalGenerated > 0);
+}
+
+function toStrategyBoard(value: FirestorePrimitive | undefined): GeneratedStatsViewModel["strategyBoard"] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((entry) => {
+    const item = toObjectMap(entry);
+
+    return {
+      strategy: toStringValue(item.strategy, "mixed") as GenerationStrategy,
+      totalGenerated: toNumberOrNull(item.totalGenerated) ?? 0,
+      bestMatch: toNumberOrNull(item.bestMatch) ?? 0,
+      threePlusHits: toNumberOrNull(item.threePlusHits) ?? 0,
+      fourPlusHits: toNumberOrNull(item.fourPlusHits) ?? 0,
+      bonusHits: toNumberOrNull(item.bonusHits) ?? 0,
+      averageMatch: toNumberOrNull(item.averageMatch) ?? 0,
+      sharePercentage: toNumberOrNull(item.sharePercentage) ?? 0
+    };
+  });
+}
+
+function toNumberUsageSummaryList(value: FirestorePrimitive | undefined): GeneratedStatsViewModel["currentTopNumbers"] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((entry) => {
+    const item = toObjectMap(entry);
+
+    return {
+      number: toNumberOrNull(item.number) ?? 0,
+      count: toNumberOrNull(item.count) ?? 0,
+      percentage: toNumberOrNull(item.percentage) ?? 0
+    };
+  });
+}
+
+function toMatchDistributionList(value: FirestorePrimitive | undefined): GeneratedStatsViewModel["matchDistribution"] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((entry) => {
+    const item = toObjectMap(entry);
+
+    return {
+      label: toStringValue(item.label),
+      count: toNumberOrNull(item.count) ?? 0,
+      percentage: toNumberOrNull(item.percentage) ?? 0
+    };
+  });
+}
+
+function parseGeneratedRoundStatsDocument(document: FirestoreDocument): GeneratedStatsSnapshot {
+  const fields = Object.fromEntries(
+    Object.entries(document.fields ?? {}).map(([key, value]) => [key, fromFirestoreValue(value)])
+  ) as Record<string, FirestorePrimitive>;
+  const view = toObjectMap(fields.view);
+
+  return {
+    source: "aggregate",
+    computedAt: typeof fields.computedAt === "string" ? fields.computedAt : null,
+    sourceRecordCount: toNumberOrNull(fields.sourceRecordCount) ?? 0,
+    view: {
+      currentTargetRound: toNumberOrNull(view.currentTargetRound),
+      latestEvaluatedRound: toNumberOrNull(view.latestEvaluatedRound),
+      currentTotalGenerated: toNumberOrNull(view.currentTotalGenerated) ?? 0,
+      threePlusHitCount: toNumberOrNull(view.threePlusHitCount) ?? 0,
+      strategyBoard: toStrategyBoard(view.strategyBoard),
+      currentStrategyTotals: toCurrentStrategyTotals(view.currentStrategyTotals),
+      currentTopNumbers: toNumberUsageSummaryList(view.currentTopNumbers),
+      matchDistribution: toMatchDistributionList(view.matchDistribution),
+      recentRecords: toStoredGeneratedRecordList(view.recentRecords)
+    }
+  };
+}
+
 export async function listUnsettledGeneratedRecordsForRound(round: number) {
   const response = await firestoreAdminRequest(":runQuery", {
     method: "POST",
@@ -587,14 +738,16 @@ export async function listGeneratedRecords(limit = 240): Promise<StoredGenerated
     return [];
   }
 
-  const payloadRequest = {
+  return runGeneratedRecordsQuery({
     structuredQuery: {
       from: [{ collectionId: GENERATED_RECORDS_COLLECTION }],
       orderBy: [{ field: { fieldPath: "generatedAt" }, direction: "DESCENDING" }],
       limit
     }
-  };
+  });
+}
 
+async function runGeneratedRecordsQuery(payloadRequest: Record<string, unknown>) {
   try {
     if (hasFirestoreAdminEnv()) {
       const response = await firestoreAdminRequest(":runQuery", {
@@ -612,6 +765,10 @@ export async function listGeneratedRecords(limit = 240): Promise<StoredGenerated
     }
   }
 
+  if (!hasFirestorePublicEnv()) {
+    return [];
+  }
+
   const response = await firestorePublicRequest(":runQuery", {
     method: "POST",
     body: JSON.stringify(payloadRequest)
@@ -620,6 +777,78 @@ export async function listGeneratedRecords(limit = 240): Promise<StoredGenerated
   return payload
     .map((entry) => (entry.document ? parseStoredGeneratedRecordDocument(entry.document) : null))
     .filter((entry): entry is StoredGeneratedRecord => entry !== null);
+}
+
+export async function listGeneratedRecordsForRound(round: number, limit?: number): Promise<StoredGeneratedRecord[]> {
+  if (!Number.isInteger(round) || round < 1) {
+    return [];
+  }
+
+  const structuredQuery: Record<string, unknown> = {
+    from: [{ collectionId: GENERATED_RECORDS_COLLECTION }],
+    where: {
+      fieldFilter: {
+        field: { fieldPath: "targetRound" },
+        op: "EQUAL",
+        value: { integerValue: String(round) }
+      }
+    },
+    orderBy: [{ field: { fieldPath: "generatedAt" }, direction: "DESCENDING" }]
+  };
+
+  if (typeof limit === "number") {
+    structuredQuery.limit = limit;
+  }
+
+  return runGeneratedRecordsQuery({ structuredQuery });
+}
+
+export async function getGeneratedRoundStats(round: number): Promise<GeneratedStatsSnapshot | null> {
+  if (!Number.isInteger(round) || round < 1) {
+    return null;
+  }
+
+  if (!hasFirestoreAdminEnv() && !hasFirestorePublicEnv()) {
+    return null;
+  }
+
+  const path = `/${GENERATED_ROUND_STATS_COLLECTION}/${encodeURIComponent(String(round))}`;
+
+  try {
+    if (hasFirestoreAdminEnv()) {
+      const response = await firestoreAdminFetch(path, { method: "GET" });
+
+      if (response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Firestore generated round stats lookup failed with status ${response.status}.`);
+      }
+
+      return parseGeneratedRoundStatsDocument((await response.json()) as FirestoreDocument);
+    }
+  } catch (error) {
+    if (!hasFirestorePublicEnv()) {
+      throw error;
+    }
+  }
+
+  if (!hasFirestorePublicEnv()) {
+    return null;
+  }
+
+  const response = await firestorePublicFetch(path, { method: "GET" });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Firestore generated round stats public lookup failed with status ${response.status}.`);
+  }
+
+  return parseGeneratedRoundStatsDocument((await response.json()) as FirestoreDocument);
 }
 
 async function patchFirestoreDocument(
@@ -688,17 +917,110 @@ export interface CreateGeneratedRecordInput {
   filters: Record<string, FirestorePrimitive>;
 }
 
+export interface SaveGeneratedRecordsInput {
+  requestId: string;
+  records: CreateGeneratedRecordInput[];
+  responseSets: GeneratedSet[];
+}
+
 interface PreparedGeneratedRecordWrite {
   recordId: string;
   fields: Record<string, FirestorePrimitive>;
 }
 
-function buildGeneratedRecordWrites(records: CreateGeneratedRecordInput[], createdAt: string): PreparedGeneratedRecordWrite[] {
-  return records.map((record) => ({
-    recordId:
-      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : Math.random().toString(36).slice(2),
+export interface StoredGeneratedRequest {
+  requestId: string;
+  anonymousId: string;
+  strategy: GenerationStrategy;
+  targetRound: number | null;
+  setCount: number;
+  recordIds: string[];
+  responseSets: GeneratedSet[];
+  status: string;
+  createdAt: string;
+  committedAt: string | null;
+}
+
+export interface SaveGeneratedRecordsResult {
+  requestId: string;
+  written: number;
+  cached: boolean;
+  targetRound: number | null;
+  recordIds: string[];
+  responseSets: GeneratedSet[];
+}
+
+function buildGeneratedRecordId(requestId: string, setIndex: number) {
+  return `${requestId}:${setIndex}`;
+}
+
+function toGeneratedSetList(value: FirestorePrimitive | undefined): GeneratedSet[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((entry) => (entry && typeof entry === "object" && !Array.isArray(entry) ? entry : null))
+    .filter((entry): entry is Record<string, FirestorePrimitive> => entry !== null)
+    .map((entry, index) => ({
+      id: typeof entry.id === "string" ? entry.id : `generated-set-${index}`,
+      strategy: (typeof entry.strategy === "string" ? entry.strategy : "mixed") as GenerationStrategy,
+      numbers: toNumberList(entry.numbers),
+      bonus: toNumberOrNull(entry.bonus) ?? undefined,
+      reason: typeof entry.reason === "string" ? entry.reason : "",
+      generatedAt: typeof entry.generatedAt === "string" ? entry.generatedAt : ""
+    }));
+}
+
+function parseGeneratedRequestDocument(document: FirestoreDocument): StoredGeneratedRequest {
+  const fields = Object.fromEntries(
+    Object.entries(document.fields ?? {}).map(([key, value]) => [key, fromFirestoreValue(value)])
+  ) as Record<string, FirestorePrimitive>;
+
+  return {
+    requestId: typeof fields.requestId === "string" ? fields.requestId : document.name.split("/").at(-1) ?? "",
+    anonymousId: typeof fields.anonymousId === "string" ? fields.anonymousId : "",
+    strategy: (typeof fields.strategy === "string" ? fields.strategy : "mixed") as GenerationStrategy,
+    targetRound: toNumberOrNull(fields.targetRound),
+    setCount: toNumberOrNull(fields.setCount) ?? 0,
+    recordIds: Array.isArray(fields.recordIds)
+      ? fields.recordIds.filter((entry): entry is string => typeof entry === "string")
+      : [],
+    responseSets: toGeneratedSetList(fields.responseSets),
+    status: typeof fields.status === "string" ? fields.status : "committed",
+    createdAt: typeof fields.createdAt === "string" ? fields.createdAt : "",
+    committedAt: typeof fields.committedAt === "string" ? fields.committedAt : null
+  };
+}
+
+export async function getGeneratedRequest(requestId: string): Promise<StoredGeneratedRequest | null> {
+  if (!requestId || !hasFirestoreAdminEnv()) {
+    return null;
+  }
+
+  const response = await firestoreAdminFetch(`/${GENERATED_REQUESTS_COLLECTION}/${encodeURIComponent(requestId)}`, {
+    method: "GET"
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Firestore generated request lookup failed with status ${response.status}.`);
+  }
+
+  const document = (await response.json()) as FirestoreDocument;
+  return parseGeneratedRequestDocument(document);
+}
+
+function buildGeneratedRecordWrites(
+  requestId: string,
+  records: CreateGeneratedRecordInput[],
+  createdAt: string
+): PreparedGeneratedRecordWrite[] {
+  return records.map((record, index) => ({
+    recordId: buildGeneratedRecordId(requestId, index),
     fields: {
       ...record,
       createdAt,
@@ -711,9 +1033,50 @@ function buildGeneratedRecordWrites(records: CreateGeneratedRecordInput[], creat
   }));
 }
 
-async function saveGeneratedRecordsWithAdmin(writes: PreparedGeneratedRecordWrite[]) {
+function buildGeneratedRequestFields(input: SaveGeneratedRecordsInput, recordIds: string[], committedAt: string) {
+  const firstRecord = input.records[0];
+
+  return {
+    requestId: input.requestId,
+    anonymousId: firstRecord?.anonymousId ?? "",
+    strategy: firstRecord?.strategy ?? "mixed",
+    targetRound: firstRecord?.targetRound ?? null,
+    setCount: input.responseSets.length,
+    recordIds,
+    responseSets: input.responseSets.map((set) => ({
+      id: set.id,
+      strategy: set.strategy,
+      numbers: set.numbers,
+      bonus: set.bonus ?? null,
+      reason: set.reason,
+      generatedAt: set.generatedAt
+    })),
+    status: "committed",
+    createdAt: committedAt,
+    committedAt
+  };
+}
+
+function toSaveGeneratedRecordsResult(storedRequest: StoredGeneratedRequest, cached: boolean): SaveGeneratedRecordsResult {
+  return {
+    requestId: storedRequest.requestId,
+    written: storedRequest.recordIds.length,
+    cached,
+    targetRound: storedRequest.targetRound,
+    recordIds: storedRequest.recordIds,
+    responseSets: storedRequest.responseSets
+  };
+}
+
+async function saveGeneratedRecordsWithAdmin(
+  input: SaveGeneratedRecordsInput,
+  writes: PreparedGeneratedRecordWrite[],
+  committedAt: string
+) {
   const { projectId } = getFirestoreAdminConfig();
   const accessToken = await getFirestoreAdminAccessToken();
+  const recordIds = writes.map((write) => write.recordId);
+  const requestFields = buildGeneratedRequestFields(input, recordIds, committedAt);
 
   const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents:commit`, {
     method: "POST",
@@ -722,57 +1085,84 @@ async function saveGeneratedRecordsWithAdmin(writes: PreparedGeneratedRecordWrit
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      writes: writes.map(({ recordId, fields }) => ({
-        update: {
-          name: `projects/${projectId}/databases/(default)/documents/${GENERATED_RECORDS_COLLECTION}/${recordId}`,
-          fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
-        }
-      }))
+      writes: [
+        {
+          update: {
+            name: `projects/${projectId}/databases/(default)/documents/${GENERATED_REQUESTS_COLLECTION}/${input.requestId}`,
+            fields: Object.fromEntries(
+              Object.entries(requestFields).map(([key, value]) => [key, toFirestoreValue(value)])
+            )
+          },
+          currentDocument: {
+            exists: false
+          }
+        },
+        ...writes.map(({ recordId, fields }) => ({
+          update: {
+            name: `projects/${projectId}/databases/(default)/documents/${GENERATED_RECORDS_COLLECTION}/${recordId}`,
+            fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
+          },
+          currentDocument: {
+            exists: false
+          }
+        }))
+      ]
     })
   });
 
   if (!response.ok) {
     throw new Error(`Firestore generated records save failed with status ${response.status}: ${await response.text()}`);
   }
+
+  return {
+    requestId: input.requestId,
+    recordIds,
+    targetRound: input.records[0]?.targetRound ?? null
+  };
 }
 
-async function saveGeneratedRecordsWithPublic(writes: PreparedGeneratedRecordWrite[]) {
-  await Promise.all(
-    writes.map(({ recordId, fields }) =>
-      firestorePublicRequest(`/${GENERATED_RECORDS_COLLECTION}?documentId=${encodeURIComponent(recordId)}`, {
-        method: "POST",
-        body: JSON.stringify({
-          fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
-        })
-      })
-    )
-  );
-}
-
-export async function saveGeneratedRecords(records: CreateGeneratedRecordInput[]) {
-  if (records.length === 0) {
-    return { written: 0 };
+export async function saveGeneratedRecords(input: SaveGeneratedRecordsInput): Promise<SaveGeneratedRecordsResult> {
+  if (input.records.length === 0) {
+    return {
+      requestId: input.requestId,
+      written: 0,
+      cached: false,
+      targetRound: null,
+      recordIds: [],
+      responseSets: input.responseSets
+    };
   }
 
-  const createdAt = new Date().toISOString();
-  const writes = buildGeneratedRecordWrites(records, createdAt);
+  if (!hasFirestoreAdminEnv()) {
+    throw new Error("Firestore generated records save requires admin credentials.");
+  }
+
+  const existing = await getGeneratedRequest(input.requestId);
+
+  if (existing) {
+    return toSaveGeneratedRecordsResult(existing, true);
+  }
+
+  const committedAt = new Date().toISOString();
+  const writes = buildGeneratedRecordWrites(input.requestId, input.records, committedAt);
 
   try {
-    if (hasFirestoreAdminEnv()) {
-      await saveGeneratedRecordsWithAdmin(writes);
-      return { written: records.length };
-    }
+    const saved = await saveGeneratedRecordsWithAdmin(input, writes, committedAt);
+    return {
+      requestId: saved.requestId,
+      written: saved.recordIds.length,
+      cached: false,
+      targetRound: saved.targetRound,
+      recordIds: saved.recordIds,
+      responseSets: input.responseSets
+    };
   } catch (error) {
-    if (!hasFirestorePublicEnv()) {
-      throw error;
+    const duplicate = await getGeneratedRequest(input.requestId);
+
+    if (duplicate) {
+      return toSaveGeneratedRecordsResult(duplicate, true);
     }
+
+    throw error;
   }
-
-  if (!hasFirestorePublicEnv()) {
-    throw new Error("Firestore generated records save requires either admin credentials or public Firebase config.");
-  }
-
-  await saveGeneratedRecordsWithPublic(writes);
-
-  return { written: records.length };
 }

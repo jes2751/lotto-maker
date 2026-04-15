@@ -1,5 +1,31 @@
 # History
 
+## v1.56 (2026-04-14)
+- **Docs(구현 작업 분할)**: 생성 통계 개편안을 실제 PR/트랙 단위로 쪼개서 후속 구현 순서를 고정
+  - [x] `write 경로 안전화 -> aggregate read 전환 -> crowd comparison -> UI 재사용 -> 정산/backfill` 순서 명시
+  - [x] Track 1~7 작업 범위, 완료 조건, 권장 PR 묶음, 병렬화 lane 추가
+
+## v1.55 (2026-04-14)
+- **Docs(CEO scope 구현 메서드 구체화)**: `plan.md`에 CEO Review에서 수용한 2개 scope의 실제 구현 경로를 파일/데이터 흐름 수준으로 추가
+  - [x] `신뢰 계약 UI`의 SSR 데이터 소스, dashboard props, fallback UX, trust bar 렌더 위치 명시
+  - [x] `내 번호 vs 사람들 선택`의 generate API 응답 계약, crowd comparison 계산 규칙, localStorage 재사용 흐름 명시
+  - [x] 실제 수정 대상 파일 범위를 `route.ts`, `admin.ts`, `shared.ts`, `client.ts`, `generator-panel.tsx`, `generated-stats` page/dashboard로 고정
+
+## v1.54 (2026-04-14)
+- **Docs(생성 통계 설계 보강)**: `사람들 선택` 집계 구조 개편안에 리뷰에서 지적된 실행 계약을 추가로 반영
+  - [x] `generated_requests/{requestId}` idempotency ledger 추가
+  - [x] raw + aggregate + request ledger를 atomic commit/transaction으로 묶는 write 원칙 명시
+  - [x] 브라우저 direct Firestore write 제거와 `/api/v1/generate` 단일 write 경로 명시
+  - [x] aggregate doc 미존재 시 `240개 샘플` fallback 금지, server-side full recompute 또는 `집계 준비 중` fallback 명시
+  - [x] `schemaVersion`, `sourceRecordCount`, `computedAt` 필드와 backfill/settle 순차 처리 원칙 명시
+
+## v1.53 (2026-04-14)
+- **Plan(생성 통계 집계 구조 재설계)**: `사람들 선택`이 최근 샘플이 아니라 이번 회차 전체 생성 흐름을 반영하도록 회차 집계 문서 구조를 설계
+  - [x] `doc/project/plan.md`에 `generated_round_stats/{targetRound}` + `generated_round_results/{round}` 구조와 마이그레이션 순서 추가
+  - [x] `doc/specs/Technical_Spec.md`에 집계 컬렉션, 쓰기 경로, 읽기 경로, 정산 경로를 구체화
+  - [x] `doc/specs/Product_Spec.md`에 `사람들 선택`의 데이터 의미를 `이번 회차 전체 집계` 기준으로 명시
+  - [x] `doc/project/note.md`에 구현 메모와 인수인계용 설계 요약 추가
+
 ## v1.34 (2026-04-08)
 - **UI(생성기 히어로 축소)**: 생성기 첫 화면의 중복 설명을 덜어내고 바로 선택하게 만드는 구조로 정리
   - [x] 우측 `오늘의 스타트` 패널 제거
@@ -373,3 +399,13 @@
   - `generated_records` 기반 생성 통계 허브 구현
   - Firestore `lotto_draws` 전체 회차 seed 구조 구현
   - 주간 draw sync Worker와 내부 sync API 연결
+## v1.52 (2026-04-14)
+- **Fix(생성 통계 저장 복구)**: 운영 런타임에서 Firestore 서비스 계정은 살아 있었지만 `projectId` env 누락으로 생성 통계 저장이 실패하던 문제를 복구
+  - [x] `src/lib/firebase/admin.ts`에서 `FIREBASE_ADMIN_PROJECT_ID` / `NEXT_PUBLIC_FIREBASE_PROJECT_ID`가 비어 있을 때 서비스 계정 이메일에서 project id를 추론하도록 보강
+  - [x] `tests/firestore-draw-sync.test.ts`에 서비스 계정 이메일만으로 admin/public Firestore 경로가 살아나는 회귀 테스트 추가
+  - [x] 운영 디버그 엔드포인트로 `hasAdminEnv=false`, `hasPublicEnv=false`, `hasProjectId=false` 상태를 확인해 원인 분리
+- **Chore(의존성 보안 업데이트)**: 생성 통계 수정과 함께 현재 감사 이슈가 남아 있던 런타임/린트 의존성을 정리
+  - [x] `firebase`, `next`, `eslint`, `eslint-config-next` 업데이트
+  - [x] `npm audit` 기준 high 취약점 4건을 0건으로 정리
+  - [x] `npm test`, `npm run build` 재검증 후 `main`에 반영
+  - [x] 작업 인수인계를 위해 문서 기록 추가

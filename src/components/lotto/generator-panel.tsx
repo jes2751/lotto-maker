@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ShareCard } from "@/components/lotto/share-card";
 
 import { NumberSet } from "@/components/lotto/number-set";
-import { getAnonymousId, recordGeneratedSets } from "@/lib/generated-stats/client";
+import { createRequestId, getAnonymousId } from "@/lib/generated-stats/client";
 import type {
   GeneratedSet,
   GenerationFilters,
@@ -202,12 +202,14 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     setError(null);
     setRecordStatus("idle");
     const anonymousId = getAnonymousId();
+    const requestId = createRequestId();
 
     try {
       const response = await fetch("/api/v1/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          request_id: requestId,
           strategy,
           count,
           anonymous_id: anonymousId,
@@ -230,26 +232,10 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
 
       const nextSets = payload.data.sets as GeneratedSet[];
       const recordedByApi = payload.data.statsRecorded === true;
-      const effectiveTargetRound =
-        typeof payload.data.targetRound === "number" ? (payload.data.targetRound as number) : targetRound;
       setSets(nextSets);
       setCopiedId(null);
       setSavedId(null);
-
-      if (recordedByApi) {
-        setRecordStatus("recorded");
-      } else {
-        setRecordStatus("recording");
-
-        void recordGeneratedSets({
-          strategy,
-          sets: nextSets,
-          filters,
-          targetRound: effectiveTargetRound
-        })
-          .then(() => setRecordStatus("recorded"))
-          .catch(() => setRecordStatus("failed"));
-      }
+      setRecordStatus(recordedByApi ? "recorded" : "failed");
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "번호 생성에 실패했습니다.");
     } finally {

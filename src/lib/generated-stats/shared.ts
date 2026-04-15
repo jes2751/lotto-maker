@@ -67,6 +67,29 @@ export interface GeneratedStatsSummary {
   matchDistribution: MatchDistributionItem[];
 }
 
+export interface GeneratedStatsViewModel {
+  currentTargetRound: number | null;
+  latestEvaluatedRound: number | null;
+  currentTotalGenerated: number;
+  threePlusHitCount: number;
+  strategyBoard: StrategyPerformance[];
+  currentStrategyTotals: Array<{
+    strategy: GenerationStrategy;
+    totalGenerated: number;
+    sharePercentage: number;
+  }>;
+  currentTopNumbers: NumberUsageSummary[];
+  matchDistribution: MatchDistributionItem[];
+  recentRecords: StoredGeneratedRecord[];
+}
+
+export interface GeneratedStatsSnapshot {
+  view: GeneratedStatsViewModel;
+  source: "aggregate" | "recomputed" | "empty";
+  computedAt: string | null;
+  sourceRecordCount: number;
+}
+
 const strategyOrder: GenerationStrategy[] = ["mixed", "frequency", "filter", "random"];
 
 export function getStrategyLabel(strategy: GenerationStrategy) {
@@ -225,5 +248,25 @@ export function buildGeneratedStatsSummary(
     currentStrategyTotals,
     currentTopNumbers: buildCurrentTopNumbers(currentRecords),
     matchDistribution: buildMatchDistribution(evaluatedRecords)
+  };
+}
+
+export function buildGeneratedStatsViewModel(
+  records: StoredGeneratedRecord[],
+  latestDraw: Draw | null,
+  recentRecords?: StoredGeneratedRecord[]
+): GeneratedStatsViewModel {
+  const summary = buildGeneratedStatsSummary(records, latestDraw);
+
+  return {
+    currentTargetRound: summary.currentTargetRound,
+    latestEvaluatedRound: summary.latestEvaluatedRound,
+    currentTotalGenerated: summary.currentRecords.length,
+    threePlusHitCount: summary.evaluatedRecords.filter((record) => record.matchCount >= 3).length,
+    strategyBoard: summary.strategyBoard,
+    currentStrategyTotals: summary.currentStrategyTotals,
+    currentTopNumbers: summary.currentTopNumbers,
+    matchDistribution: summary.matchDistribution,
+    recentRecords: recentRecords ?? summary.currentRecords.slice(0, 4)
   };
 }

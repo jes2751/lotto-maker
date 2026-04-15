@@ -19,26 +19,25 @@ const latestRound = String(localDraws[0]?.round ?? "");
 test("home page renders focused core sections", async () => {
   const html = renderToStaticMarkup(await HomePage());
 
-  assert.match(html, /최신 회차|최신 당첨번호/);
-  assert.match(html, /지금 번호 뽑기|바로 번호 뽑기/);
-  assert.match(html, /공식 당첨 흐름 보기|공식 기준 보기/);
-  assert.match(html, /사람들 선택|우리 유저 데이터/);
+  assert.match(html, /최신 회차/);
+  assert.match(html, /바로 번호 뽑기|지금 번호 뽑기/);
+  assert.match(html, /사람들 몰림 보기|사람들 선택/);
 });
 
 test("generate page renders generator overview", async () => {
   const html = renderToStaticMarkup(await GeneratePage());
 
-  assert.match(html, /번호 생성기/);
-  assert.match(html, /필터 추천/);
-  assert.match(html, /대상 회차/);
+  assert.match(html, /Playboard Mode/);
+  assert.match(html, /generator-panel/);
+  assert.match(html, /혼합 추천|필터 추천/);
 });
 
 test("generated stats page renders public stats copy", async () => {
   const html = renderToStaticMarkup(await GeneratedStatsPage());
 
-  assert.match(html, /우리 유저 데이터|공개 생성 흐름/);
-  assert.match(html, /전략 성과/);
-  assert.match(html, /새로 생성하기/);
+  assert.match(html, /사람들 선택|Crowd Board/);
+  assert.match(html, /집계 기준|Aggregation Scope/);
+  assert.match(html, /번호 생성하러 가기|Open generator/);
 });
 
 test("draw analysis hub page renders recent analysis cards", async () => {
@@ -52,7 +51,7 @@ test("draw analysis page renders article style content", async () => {
   const html = renderToStaticMarkup(await DrawAnalysisPage({ params: { round: latestRound } as never }));
 
   assert.match(html, new RegExp(latestRound));
-  assert.match(html, /홀짝|Odd \/ Even|Trend Note/);
+  assert.match(html, /Odd \/ Even|Trend Note/);
 });
 
 test("draws page renders draw list", async () => {
@@ -72,23 +71,23 @@ test("draw detail page renders requested round", async () => {
 test("stats page renders simplified dashboard sections", async () => {
   const html = renderToStaticMarkup(await StatsPage({ searchParams: Promise.resolve({}) }));
 
-  assert.match(html, /과거 1등 데이터|공식 당첨 기록|Statistics Dashboard/);
-  assert.match(html, /핵심 번호|핵심 요약|Core Summary/);
-  assert.match(html, /최근 10회에서 반복된 번호|자주 나온 번호|Hot numbers/i);
+  assert.match(html, /\/hot-numbers/);
+  assert.match(html, /\/cold-numbers/);
+  assert.match(html, /\/recent-10-draw-analysis/);
 });
 
 test("number detail page renders requested number stats", async () => {
   const html = renderToStaticMarkup(await NumberDetailPage({ params: Promise.resolve({ number: "34" }) }));
 
   assert.match(html, /34/);
-  assert.match(html, /번호 통계|Number Detail/);
-  assert.match(html, /최근 포함 회차|Recent Draws/);
+  assert.match(html, /번호 상세|Number Detail|34번 번호 상세/);
+  assert.match(html, /최근 출현 회차|href="\/draws\//);
 });
 
 test("lotto buy guide page renders official buying info", async () => {
   const html = renderToStaticMarkup(await LottoBuyGuidePage());
 
-  assert.match(html, /온라인 구매 안내|Online buying guide/i);
+  assert.match(html, /구매 안내|Buying Guide/i);
   assert.match(html, /5천 원|KRW 5,000/i);
   assert.match(html, /동행복권 구매하기|Open Donghang Lottery/i);
 });

@@ -1,14 +1,15 @@
+import { getGeneratedRequest, saveGeneratedRecords } from "@/lib/firebase/admin";
 import { jsonError, jsonSuccess } from "@/lib/http";
-import { saveGeneratedRecords } from "@/lib/firebase/admin";
 import { generationService } from "@/lib/lotto";
-import { isValidStrategy } from "@/lib/lotto/shared";
 import { drawRepository } from "@/lib/lotto/repository";
+import { isValidStrategy } from "@/lib/lotto/shared";
 import type { GenerationFilters, OddEvenFilter } from "@/types/lotto";
 
 interface GenerateRequestBody {
   strategy?: string;
   count?: number;
   anonymous_id?: string;
+  request_id?: string;
   filters?: {
     fixed_numbers?: number[];
     excluded_numbers?: number[];
@@ -19,7 +20,29 @@ interface GenerateRequestBody {
   };
 }
 
+interface RateLimitEntry {
+  count: number;
+  resetAt: number;
+}
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 50;
+const rateLimitCache = new Map<string, RateLimitEntry>();
 const validOddEvenFilters: OddEvenFilter[] = ["any", "balanced", "odd-heavy", "even-heavy"];
+
+function normalizeRequestId(value: unknown) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim();
+
+  if (normalized.length === 0 || normalized.length > 128) {
+    return null;
+  }
+
+  return normalized;
+}
 
 function normalizeNumberList(value: unknown) {
   if (!Array.isArray(value)) {
@@ -41,15 +64,6 @@ function normalizeFilters(body: GenerateRequestBody["filters"]): GenerationFilte
     allowConsecutive: typeof body?.allow_consecutive === "boolean" ? body.allow_consecutive : true
   };
 }
-
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
-
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 50;
-const rateLimitCache = new Map<string, RateLimitEntry>();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -81,7 +95,7 @@ export async function POST(request: Request) {
   const ip = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
   if (isRateLimited(ip)) {
-    return jsonError("RATE_LIMIT_EXCEEDED", "생성 한도를 초과했습니다. 잠시 후 다시 시도해주세요.", 429);
+    return jsonError("RATE_LIMIT_EXCEEDED", "Too many generate requests.", 429);
   }
 
   let body: GenerateRequestBody;
@@ -89,7 +103,7 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as GenerateRequestBody;
   } catch {
-    return jsonError("VALIDATION_ERROR", "JSON 본문을 읽을 수 없습니다.");
+    return jsonError("VALIDATION_ERROR", "Invalid JSON payload.");
   }
 
   const strategy = body.strategy ?? "mixed";
@@ -97,42 +111,55 @@ export async function POST(request: Request) {
   const filters = normalizeFilters(body.filters);
 
   if (!isValidStrategy(strategy)) {
-    return jsonError("VALIDATION_ERROR", "지원하지 않는 생성 전략입니다.");
+    return jsonError("VALIDATION_ERROR", "Invalid generation strategy.");
   }
 
   if (!Number.isInteger(count) || count < 1 || count > 5) {
-    return jsonError("VALIDATION_ERROR", "count는 1 이상 5 이하여야 합니다.");
+    return jsonError("VALIDATION_ERROR", "count must be between 1 and 5.");
   }
 
   if ((filters.fixedNumbers?.length ?? 0) > 5) {
-    return jsonError("VALIDATION_ERROR", "고정수는 최대 5개까지 선택할 수 있습니다.");
+    return jsonError("VALIDATION_ERROR", "You can pin up to 5 fixed numbers.");
   }
 
   if ((filters.excludedNumbers?.length ?? 0) > 35) {
-    return jsonError("VALIDATION_ERROR", "제외수는 최대 35개까지 선택할 수 있습니다.");
+    return jsonError("VALIDATION_ERROR", "You can exclude up to 35 numbers.");
   }
 
   if ((filters.fixedNumbers ?? []).some((value) => (filters.excludedNumbers ?? []).includes(value))) {
-    return jsonError("VALIDATION_ERROR", "고정수와 제외수에는 같은 번호를 넣을 수 없습니다.");
+    return jsonError("VALIDATION_ERROR", "Fixed numbers and excluded numbers cannot overlap.");
   }
 
   if (typeof filters.sumMin === "number" && typeof filters.sumMax === "number" && filters.sumMin > filters.sumMax) {
-    return jsonError("VALIDATION_ERROR", "합계 최소값은 최대값보다 클 수 없습니다.");
+    return jsonError("VALIDATION_ERROR", "sum_min cannot be greater than sum_max.");
   }
 
   try {
+    const anonymousId = typeof body.anonymous_id === "string" ? body.anonymous_id.trim() : "";
+    const requestId = normalizeRequestId(body.request_id);
+    const latestDraw = await drawRepository.getLatest();
+    const targetRound = latestDraw ? latestDraw.round + 1 : null;
+
+    if (anonymousId && requestId) {
+      const existingRequest = await getGeneratedRequest(requestId);
+
+      if (existingRequest) {
+        return jsonSuccess({
+          sets: existingRequest.responseSets,
+          statsRecorded: true,
+          targetRound: existingRequest.targetRound,
+          requestId
+        });
+      }
+    }
+
     const sets = await generationService.generate({
       strategy,
       count,
       filters
     });
 
-    const anonymousId = typeof body.anonymous_id === "string" ? body.anonymous_id.trim() : "";
-    const latestDraw = await drawRepository.getLatest();
-    const targetRound = latestDraw ? latestDraw.round + 1 : null;
-    let statsRecorded = false;
-
-    if (anonymousId) {
+    if (anonymousId && requestId) {
       const recordFilters = {
         fixedNumbers: filters.fixedNumbers ?? [],
         excludedNumbers: filters.excludedNumbers ?? [],
@@ -143,8 +170,10 @@ export async function POST(request: Request) {
       };
 
       try {
-        await saveGeneratedRecords(
-          sets.map((set) => ({
+        const saveResult = await saveGeneratedRecords({
+          requestId,
+          responseSets: sets,
+          records: sets.map((set) => ({
             anonymousId,
             strategy,
             numbers: set.numbers,
@@ -154,15 +183,24 @@ export async function POST(request: Request) {
             targetRound,
             filters: recordFilters
           }))
-        );
-        statsRecorded = true;
+        });
+
+        return jsonSuccess({
+          sets: saveResult.responseSets,
+          statsRecorded: true,
+          targetRound: saveResult.targetRound,
+          requestId
+        });
       } catch (recordError) {
         console.error("Failed to record generated stats during generate route:", recordError);
       }
     }
 
-    return jsonSuccess({ sets, statsRecorded, targetRound });
+    return jsonSuccess({ sets, statsRecorded: false, targetRound, requestId });
   } catch (error) {
-    return jsonError("GENERATION_ERROR", error instanceof Error ? error.message : "추천 번호를 생성하지 못했습니다.");
+    return jsonError(
+      "GENERATION_ERROR",
+      error instanceof Error ? error.message : "Failed to generate lottery numbers."
+    );
   }
 }

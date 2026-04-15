@@ -339,14 +339,543 @@
 - 스토리형 선택기
   - 짧은 질문/분위기 선택으로 진입하되 결과는 기존 생성 전략과 통계로 연결
 
+## 2026-04-14 생성 통계 집계 구조 개편안
+
+### 목표
+- `사람들 선택`은 `최근 240개 샘플`이 아니라 `이번 회차 전체 생성 흐름`을 반영해야 한다.
+- 화면은 `원본 기록 전체 조회` 대신 `회차 집계 문서`를 읽어 비용과 실시간 구독 부담을 낮춘다.
+- `현재 회차 군중 흐름`과 `직전 회차 성과 평가`를 데이터 모델 차원에서 분리한다.
+- `번호는 생성됐지만 통계 저장은 실패` 같은 부분 성공 상태를 구조적으로 막는다.
+- 사용자가 이 페이지를 믿을 수 있도록 `이번 회차 전체 기준`, `마지막 집계 시각`, `참여 세트 수`를 화면의 1급 정보로 노출한다.
+- 사용자가 자신의 번호를 군중 흐름과 바로 비교할 수 있도록 `내 번호 vs 사람들 선택` 비교 경험을 추가한다.
+
+### 결정
+- `주간 문서` 대신 `회차 문서`를 기준으로 한다.
+- 원본 기록은 계속 `generated_records`에 저장한다.
+- 집계 문서는 아래 2층 구조로 분리한다.
+  - `generated_round_stats/{targetRound}`: 이번 회차 군중 흐름 전용
+  - `generated_round_results/{round}`: 당첨 후 성과 평가 전용
+- 중복 집계 방지를 위해 `generated_requests/{requestId}` idempotency ledger를 추가한다.
+- 생성 통계 write는 `클라이언트 직접 Firestore write 금지`, `서버 전용 write`로 고정한다.
+
+### 왜 240개 샘플 방식이 제품 의미와 안 맞는가
+- 사용자가 `사람들 선택`에서 기대하는 것은 `이번 회차 전체 군중 흐름`이지 `최근 일부 공개 기록 추정치`가 아니다.
+- 지금 방식은 [generated-stats-dashboard.tsx](/C:/Users/jes27/OneDrive/code/lotto_v2/src/components/generated-stats/generated-stats-dashboard.tsx:20) 와 [admin.ts](/C:/Users/jes27/OneDrive/code/lotto_v2/src/lib/firebase/admin.ts:585) 에서 최근 `240`건만 읽기 때문에, 기록이 누적되면 같은 회차라도 오래된 생성이 통계에서 탈락한다.
+- 제품 카피는 전체 의미를 말하고 있는데 구현은 샘플링이라서, 수치가 틀리지 않아도 사용자 기대와 어긋난다.
+
+### 왜 주간 문서가 아니라 회차 문서인가
+- 서비스 언어가 `이번 주`보다 `1219회`, `1220회` 기준으로 움직인다.
+- 생성 기록도 이미 `targetRound`를 가지고 있다.
+- 당첨 결과 정산도 회차 단위로 닫힌다.
+- `/generated-stats` 화면의 KPI와 카피도 회차 기준이 더 자연스럽다.
+
+### What Already Exists
+- 서버 생성 경로는 이미 있다.
+  - `/api/v1/generate`에서 번호 생성 후 raw record 저장을 시도한다.
+- `/generated-stats` SSR + 클라이언트 구독 화면도 이미 있다.
+  - 현재는 raw record 최근 240건을 가져와 브라우저에서 요약한다.
+- 정산 경로도 이미 있다.
+  - draw sync가 `generated_records`를 평가해 `matchedRound`, `matchCount`, `bonusMatched`, `settledAt`를 기록한다.
+- 즉 이번 설계는 `새 기능을 처음 만드는 것`이 아니라, `기존 raw log 중심 구조 위에 안정적인 aggregate 계층을 얹는 것`이다.
+
+### 데이터 모델
+- idempotency ledger:
+  - `generated_requests/{requestId}`
+  - 역할:
+    - 동일 생성 요청 재시도 시 중복 집계 방지
+    - 서버 응답 재사용 기준
+  - 필수 필드:
+    - `requestId`
+    - `anonymousId`
+    - `targetRound`
+    - `setCount`
+    - `status` (`pending` | `committed` | `failed`)
+    - `recordIds`
+    - `createdAt`
+    - `committedAt`
+- raw log:
+  - `generated_records/{recordId}`
+  - 역할:
+    - 생성된 개별 번호 세트 원본 기록
+    - 최근 공개 카드 source
+    - 정산 source of truth
+    - backfill source
+- current round aggregate:
+  - `generated_round_stats/{targetRound}`
+  - 필수 필드:
+    - `schemaVersion`
+    - `targetRound`
+    - `sourceRecordCount`
+    - `totalGenerated`
+    - `strategyCounts`
+    - `numberCounts`
+    - `topNumbers`
+    - `updatedAt`
+    - `computedAt`
+    - `latestGeneratedAt`
+    - `lastHealthySnapshotAt`
+  - 선택 필드:
+    - `oddEvenCounts`
+    - `sumRangeCounts`
+    - `pairCountsTopN`
+    - `allowConsecutiveCounts`
+    - `lastCommittedRequestId`
+    - `topColdNumbers`
+    - `medianOverlapScore`
+- evaluated round aggregate:
+  - `generated_round_results/{round}`
+  - 필수 필드:
+    - `schemaVersion`
+    - `round`
+    - `sourceRecordCount`
+    - `computedAt`
+    - `settledAt`
+    - `totalEvaluated`
+    - `matchDistribution`
+    - `strategyPerformance`
+    - `threePlusHits`
+    - `fourPlusHits`
+    - `bonusHits`
+
+- local client state:
+  - `recentGeneratedComparison`
+  - 역할:
+    - 로그인 없이도 가장 최근 생성한 세트와 crowd aggregate를 비교
+    - `/generate` 결과 화면과 `/generated-stats`에서 동일 카드 재사용
+  - 저장 기준:
+    - `anonymousId`
+    - `requestId`
+    - `targetRound`
+    - `sets`
+    - `savedAt`
+
+### 생성 write 경로
+- 클라이언트는 버튼 클릭마다 `requestId`를 한 번 생성해 `/api/v1/generate`로 보낸다.
+- 클라이언트는 더 이상 Firestore에 `generated_records`를 직접 쓰지 않는다.
+- 서버는 `recordId = ${requestId}:${setIndex}` 규칙으로 안정적인 문서 id를 만든다.
+- 서버는 아래 흐름을 `하나의 원자적 commit/transaction`으로 처리한다.
+
+```text
+client click
+  -> POST /api/v1/generate(requestId)
+  -> server validates + generates sets
+  -> check generated_requests/{requestId}
+     -> exists: return cached result, do not re-aggregate
+     -> missing: continue
+  -> atomic commit
+     -> create generated_requests/{requestId} (pending -> committed)
+     -> create generated_records/{requestId}:{index} docs
+     -> update generated_round_stats/{targetRound} counters
+  -> compute per-set crowd comparison from updated aggregate
+  -> response(statsRecorded=true, crowdComparison)
+```
+
+- 원자적 commit이 불가능한 구현이라면 rollout하지 않는다.
+  - raw log 저장과 round stats 반영이 분리되면 부분 성공으로 다시 깨진다.
+- `/api/v1/generated-records`는 공개 경로로 계속 쓰지 않는다.
+  - 필요하면 internal backfill/admin 전용으로만 제한한다.
+- 생성 응답에는 최소 1개의 비교 payload를 포함한다.
+  - 예:
+    - `overlapWithTop10`
+    - `hotNumberCount`
+    - `coldNumberCount`
+    - `crowdBiasLabel` (`crowded` | `balanced` | `contrarian`)
+    - `comparedAgainstTotalGenerated`
+
+### 읽기 경로
+- `/generated-stats` SSR:
+  - `generated_round_stats/{currentTargetRound}` 1문서
+  - `generated_round_results/{latestDraw.round}` 1문서
+  - `generated_records where targetRound == currentTargetRound order by generatedAt desc limit 4~12`
+- 클라이언트 실시간 구독:
+  - 기본은 `generated_round_stats/{currentTargetRound}` 1문서
+  - 최근 카드가 필요하면 raw recent query를 별도로 짧게 구독
+- 마이그레이션 중 fallback:
+  - aggregate doc이 없으면 `최근 240개 샘플`로 후퇴하지 않는다.
+  - 서버가 `이번 회차 전체 raw record`를 읽어 on-demand aggregate를 계산하고 self-heal write를 시도한다.
+  - 그마저도 실패하면 `집계 준비 중` 상태를 보여주고 숫자 `0`으로 오해시키지 않는다.
+  - 가능하면 마지막 정상 스냅샷 시각을 함께 보여준다.
+
+### 신뢰 계약 UI
+- `/generated-stats` 상단 KPI 영역에 아래 3개를 고정 노출한다.
+  - `이번 회차 전체 기준`
+  - `마지막 집계 시각`
+  - `참여 세트 수`
+- fallback 상태에서는 문구를 아래처럼 바꾼다.
+  - 정상: `1220회 전체 생성 1,284세트 기준`
+  - 복구 중: `1220회 집계 복구 중, 마지막 정상 스냅샷 11:37`
+- 사용자가 샘플 화면으로 오해하지 않도록 `최근 공개 카드`와 `핵심 KPI`의 정보 출처를 시각적으로 분리한다.
+
+#### 구현 방법
+- 서버 데이터 소스:
+  - `src/lib/firebase/admin.ts`
+    - `getGeneratedRoundStats(targetRound)` 추가
+    - 반환 타입에 `totalGenerated`, `computedAt`, `latestGeneratedAt`, `lastHealthySnapshotAt`, `sourceRecordCount` 포함
+  - `src/app/generated-stats/page.tsx`
+    - 기존 `listGeneratedRecords()` 중심 SSR을 `getGeneratedRoundStats(currentTargetRound)` + recent raw records 조회로 분리
+    - aggregate doc이 없을 때만 `buildRoundStatsFromRecords(records)` 같은 server-side fallback helper 호출
+- 클라이언트 렌더:
+  - `src/components/generated-stats/generated-stats-dashboard.tsx`
+    - props에 `roundStats`, `roundResults`, `recentComparison` 추가
+    - 상단 첫 패널을 `trust bar + KPI grid` 구조로 재배치
+  - 새 표시 규칙:
+    - `전체 기준`: `roundStats.targetRound` + `roundStats.totalGenerated`
+    - `마지막 집계 시각`: `roundStats.computedAt`
+    - `참여 세트 수`: `roundStats.sourceRecordCount`
+    - fallback 시 `roundStats === null`이 아니라 `status: "recovering"` 상태를 명시적으로 렌더
+- 타입/포맷 helper:
+  - `src/lib/generated-stats/shared.ts`
+    - `GeneratedRoundStatsSnapshot` 타입 추가
+    - `formatAggregateTimestamp()` 같은 표시용 helper 추가
+- 복구 중 UX:
+  - `status === "recovering"`이면 숫자 칸을 비우지 말고 마지막 정상 스냅샷 시각과 함께 별도 배지 노출
+  - `status === "ready"`와 시각적으로 다른 tone을 사용해 “오류”와 “복구 중”을 구분
+
+```text
+generated-stats page SSR
+  -> read latest draw
+  -> read round stats doc
+     -> exists: pass trust snapshot to dashboard
+     -> missing: recompute from full round raw records
+         -> if success: write self-heal doc and pass recovering snapshot
+         -> if fail: pass recovering snapshot without fake zeroes
+  -> read recent cards
+  -> render trust bar + crowd board
+```
+
+### 내 번호 vs 사람들 선택
+- 생성 직후 `/generate` 결과 화면에서 각 세트에 crowd comparison badge를 붙인다.
+  - 예: `사람들이 많이 겹친 조합`, `균형형`, `역배형`
+- `/generated-stats`에서도 사용자가 가장 최근 생성한 세트를 다시 불러와 같은 비교 카드를 보여준다.
+- 이 비교는 로그인 기능을 추가하지 않고 `anonymousId + recentGeneratedComparison` local state로 처리한다.
+- 비교 로직은 현재 회차 aggregate 기준으로 계산한다.
+  - `top 10 인기 번호와 겹친 개수`
+  - `상위 과열 번호 포함 수`
+  - `비인기 번호 포함 수`
+  - 필요하면 단순 점수 하나로 요약
+- 목표는 예측 정확도 주장이 아니라 `내 세트가 군중과 얼마나 비슷한가`를 바로 이해하게 만드는 것이다.
+
+#### 구현 방법
+- 응답 계약:
+  - `src/app/api/v1/generate/route.ts`
+    - 응답 payload에 `requestId`, `crowdComparison`, `statsSnapshot` 추가
+    - `crowdComparison`은 세트별 배열로 반환
+  - 세트별 비교 구조 예시:
+    - `setId`
+    - `overlapWithTop10`
+    - `hotNumberCount`
+    - `coldNumberCount`
+    - `crowdBiasLabel`
+    - `comparedAgainstTotalGenerated`
+- 서버 계산:
+  - `src/lib/generated-stats/shared.ts`
+    - `computeCrowdComparison(set, roundStats)` helper 추가
+    - 기준 규칙:
+      - `overlapWithTop10 >= 4`면 `crowded`
+      - `hotNumberCount`와 `coldNumberCount`가 비슷하면 `balanced`
+      - `coldNumberCount >= 3` 또는 `overlapWithTop10 <= 1`이면 `contrarian`
+    - 비교 로직은 숫자 count 기반의 단순 규칙으로 시작하고, 모델 점수화는 후순위
+- 생성 직후 표시:
+  - `src/components/lotto/generator-panel.tsx`
+    - 현재 `payload.data.sets`만 쓰는 흐름에 `payload.data.crowdComparison` 매핑 추가
+    - 각 결과 카드 하단에 comparison badge와 한 줄 설명 추가
+    - `recordGeneratedSets` fallback 호출은 제거 대상이므로, comparison 저장도 여기서 함께 처리
+- 최근 비교 상태 저장:
+  - `src/lib/generated-stats/client.ts`
+    - direct Firestore write 로직 대신 `recentGeneratedComparison` localStorage helper로 역할 축소
+    - 새 storage key 예시: `lotto-lab-recent-generated-comparison`
+    - 저장 payload:
+      - `anonymousId`
+      - `requestId`
+      - `targetRound`
+      - `sets`
+      - `crowdComparison`
+      - `savedAt`
+- generated-stats 재사용:
+  - `src/app/generated-stats/page.tsx`
+    - SSR에서는 비교 카드를 만들지 않고, 클라이언트가 localStorage에서 최근 비교 상태를 읽어 dashboard에 주입
+  - `src/components/generated-stats/generated-stats-dashboard.tsx`
+    - `recentComparison`이 현재 회차와 같을 때만 `내 번호 vs 사람들 선택` 카드 렌더
+    - 회차가 다르면 조용히 숨김
+
+```text
+generate flow
+  -> POST /api/v1/generate
+  -> receive sets + crowdComparison + statsSnapshot
+  -> render result cards with comparison badges
+  -> persist recentGeneratedComparison to localStorage
+
+generated-stats flow
+  -> SSR renders trust snapshot + crowd board
+  -> client loads recentGeneratedComparison from localStorage
+  -> if targetRound matches current round
+       -> render "내 번호 vs 사람들 선택"
+     else
+       -> hide card
+```
+
+#### 파일 단위 작업 범위
+- `src/app/api/v1/generate/route.ts`
+  - requestId 입력, comparison payload 응답
+- `src/lib/firebase/admin.ts`
+  - round stats fetch / self-heal read helper
+- `src/lib/generated-stats/shared.ts`
+  - aggregate snapshot 타입, comparison 계산 helper
+- `src/lib/generated-stats/client.ts`
+  - recent comparison localStorage helper로 축소
+- `src/components/lotto/generator-panel.tsx`
+  - 생성 직후 비교 badge 렌더
+- `src/app/generated-stats/page.tsx`
+  - aggregate-first SSR 데이터 주입
+- `src/components/generated-stats/generated-stats-dashboard.tsx`
+  - trust bar, recent comparison card 렌더
+
+### 구현 작업 분할
+
+#### Track 1. 쓰기 경로 안전화
+- 목표:
+  - 생성 기록 저장 경로를 `/api/v1/generate` 단일 경로로 고정
+  - `requestId`와 atomic commit 기반으로 중복 집계/부분 성공 제거
+- 수정 범위:
+  - `src/app/api/v1/generate/route.ts`
+  - `src/lib/firebase/admin.ts`
+  - `src/lib/generated-stats/client.ts`
+  - 관련 API 테스트
+- 산출물:
+  - `generated_requests/{requestId}` ledger
+  - deterministic `recordId`
+  - 브라우저 direct Firestore write 제거
+- 완료 조건:
+  - 같은 `requestId` 재시도 시 raw/aggregate 증가가 1회로 유지
+  - write 실패 시 partial state 없음
+
+#### Track 2. aggregate read 전환
+- 목표:
+  - `/generated-stats`를 raw sample 기반이 아니라 aggregate-first 구조로 전환
+  - aggregate doc 미존재 시 `집계 준비 중` 또는 self-heal fallback 적용
+- 수정 범위:
+  - `src/app/generated-stats/page.tsx`
+  - `src/lib/firebase/admin.ts`
+  - `src/lib/generated-stats/shared.ts`
+  - `src/components/generated-stats/generated-stats-dashboard.tsx`
+  - 페이지 렌더 테스트
+- 산출물:
+  - `getGeneratedRoundStats(targetRound)`
+  - server-side fallback recompute helper
+  - raw recent cards와 KPI source 분리
+- 완료 조건:
+  - aggregate doc 존재 시 전체 회차 수치 노출
+  - aggregate doc 미존재 시 `0건` 오해 없음
+
+#### Track 3. 신뢰 계약 UI
+- 목표:
+  - 사용자가 첫 화면에서 “전체 기준인지, 언제 갱신됐는지” 바로 이해
+- 수정 범위:
+  - `src/components/generated-stats/generated-stats-dashboard.tsx`
+  - `src/lib/generated-stats/shared.ts`
+  - `src/app/generated-stats/page.tsx`
+  - 페이지 렌더 테스트
+- 산출물:
+  - trust bar
+  - `전체 기준 / 마지막 집계 시각 / 참여 세트 수`
+  - fallback 시 마지막 정상 스냅샷 표시
+- 완료 조건:
+  - 첫 화면 3초 이해 기준 충족
+  - 정상/복구중 상태 시각 구분 가능
+
+#### Track 4. crowd comparison 계산/응답
+- 목표:
+  - 생성 직후 각 세트에 crowd comparison 값을 서버가 계산해 내려줌
+- 수정 범위:
+  - `src/lib/generated-stats/shared.ts`
+  - `src/app/api/v1/generate/route.ts`
+  - 생성 API 테스트
+- 산출물:
+  - `computeCrowdComparison(set, roundStats)`
+  - `crowdComparison` response contract
+  - `crowded / balanced / contrarian` label 규칙
+- 완료 조건:
+  - 생성 응답에 세트별 비교 payload 포함
+  - 비교 규칙이 현재 회차 aggregate 기준으로 고정
+
+#### Track 5. 생성 화면 비교 카드
+- 목표:
+  - `/generate` 결과 화면에서 내 세트가 군중형인지 바로 보이게 함
+- 수정 범위:
+  - `src/components/lotto/generator-panel.tsx`
+  - 필요 시 결과 카드 관련 컴포넌트
+  - UI 렌더 테스트
+- 산출물:
+  - comparison badge
+  - 한 줄 설명
+  - `recentGeneratedComparison` localStorage 저장
+- 완료 조건:
+  - 생성 직후 모든 세트에 비교 결과 표시
+  - 새로고침 후에도 최신 비교 상태 복구 가능
+
+#### Track 6. generated-stats 재사용 카드
+- 목표:
+  - `/generated-stats`에서 최근 내 세트와 crowd board를 다시 비교
+- 수정 범위:
+  - `src/lib/generated-stats/client.ts`
+  - `src/components/generated-stats/generated-stats-dashboard.tsx`
+  - `src/app/generated-stats/page.tsx`
+  - UI 테스트
+- 산출물:
+  - localStorage read helper
+  - `내 번호 vs 사람들 선택` 카드
+  - 회차 mismatch 시 숨김 규칙
+- 완료 조건:
+  - 현재 회차와 local comparison 회차가 같을 때만 카드 노출
+  - 회차가 다르면 조용히 숨김
+
+#### Track 7. 정산/백필 정리
+- 목표:
+  - 결과 집계를 회차 단위로 순차 재계산하고 운영 복구 경로 확보
+- 수정 범위:
+  - `src/lib/data/firestore-draw-sync.ts`
+  - `src/lib/firebase/admin.ts`
+  - backfill script
+  - draw sync 테스트
+- 산출물:
+  - `generated_round_results/{round}` full recompute
+  - backfill script
+  - single writer 원칙
+- 완료 조건:
+  - draw sync 후 raw settled count와 results aggregate 총량 일치
+  - backfill 이후 화면 수치와 aggregate 일치
+
+### 권장 실행 순서
+1. Track 1, 쓰기 경로 안전화
+2. Track 2, aggregate read 전환
+3. Track 4, crowd comparison 계산/응답
+4. Track 3, 신뢰 계약 UI
+5. Track 5, 생성 화면 비교 카드
+6. Track 6, generated-stats 재사용 카드
+7. Track 7, 정산/백필 정리
+
+### PR 단위 제안
+- PR 1:
+  - Track 1
+  - 이유: 가장 위험한 write 경로부터 잠근다
+- PR 2:
+  - Track 2 + Track 3
+  - 이유: aggregate-first read와 trust bar는 같은 화면 변경으로 묶는 편이 자연스럽다
+- PR 3:
+  - Track 4 + Track 5
+  - 이유: crowd comparison 계산과 생성 직후 표시가 한 흐름이다
+- PR 4:
+  - Track 6 + Track 7
+  - 이유: generated-stats 재사용 카드와 장기 운영 복구 경로를 마무리한다
+
+### 병렬화 전략
+- Lane A:
+  - Track 1 -> Track 2 -> Track 7
+  - 공통으로 `src/lib/firebase/admin.ts`를 만지므로 순차 진행
+- Lane B:
+  - Track 4 -> Track 5
+  - `shared.ts`, `generate/route.ts`, `generator-panel.tsx` 중심
+- Lane C:
+  - Track 3 -> Track 6
+  - `generated-stats` UI 중심
+- 실행 순서:
+  - Lane A를 먼저 시작
+  - Track 1 완료 후 Lane B와 Lane C를 병렬 시작
+  - 마지막에 Track 7로 운영 정산/백필 정리
+
+### 정산 결과 write 경로
+- 일요일 정산 작업은 기존처럼 `lotto_draws`를 갱신한다.
+- 정산 시 `targetRound == latestDraw.round`인 `generated_records`를 평가한다.
+- 개별 raw record의 `matchedRound`, `matchCount`, `bonusMatched`, `settledAt`는 계속 유지한다.
+- 같은 평가 결과를 `generated_round_results/{latestDraw.round}`에 `전체 재계산 후 단일 write`로 저장한다.
+- 정산과 results 집계는 회차 단위로 순차 처리한다.
+  - backfill, sync, settle이 같은 회차 문서를 동시에 갱신하지 않게 한다.
+
+```text
+weekly draw sync
+  -> upsert lotto_draws
+  -> settle raw records for drawn round
+  -> recompute generated_round_results/{round}
+  -> store result aggregate
+```
+
+### 실패 모드와 방어
+- partial write:
+  - 방어: raw + aggregate + request ledger를 하나의 atomic commit으로 묶는다.
+- duplicate retry:
+  - 방어: `generated_requests/{requestId}` + deterministic `recordId`
+- aggregate doc missing right after deploy:
+  - 방어: server-side full recompute fallback 또는 `집계 준비 중` 상태
+- backfill / settle collision:
+  - 방어: 회차별 순차 처리, cutover 기간에는 결과 문서 단일 writer 유지
+- schema drift:
+  - 방어: `schemaVersion`, `sourceRecordCount`, `computedAt` 필수화
+
+### 화면 의미 정리
+- `사람들 선택`
+  - 이번 회차 전체 생성 흐름
+  - 전략 점유율
+  - 많이 선택된 번호
+  - 이번 회차 전체 기준 / 마지막 집계 시각 / 참여 세트 수
+  - 최근 공개 생성 번호
+  - 내 최근 세트와 군중 흐름 비교
+- `전략 성과`
+  - 직전 평가 완료 회차 기준
+  - 어떤 전략이 얼마나 맞았는지
+  - 적중 분포가 어땠는지
+- 즉 `현재 군중 흐름`과 `직전 성과 분석`은 같은 페이지 안에 있어도 원본 데이터 기준은 분리한다.
+
+### 마이그레이션 순서
+1. `generated_requests`, `generated_round_stats`, `generated_round_results` 스키마와 `schemaVersion` 정의 추가
+2. 클라이언트 direct Firestore write 제거, 생성 기록 저장을 `/api/v1/generate` 단일 경로로 모음
+3. `requestId` 계약과 deterministic `recordId` 반영
+4. 서버 생성 경로를 raw log + round stats + request ledger atomic commit으로 전환
+5. aggregate 문서에 `lastHealthySnapshotAt`, `topColdNumbers`, 비교 계산용 필드 추가
+6. 최근 회차에 대해 `generated_records` 기반 full backfill 스크립트 실행
+7. 정산 작업이 `generated_round_results/{round}`를 순차 재계산해서 쓰도록 확장
+8. `/generated-stats`를 aggregate-first + server fallback read로 전환
+9. `/generated-stats` 상단에 신뢰 계약 UI 추가
+10. `/generate`와 `/generated-stats`에 `내 번호 vs 사람들 선택` 비교 카드 추가
+11. 기존 `recent 240 records` 기반 summary 계산 제거
+
+### 테스트 및 검증
+- 생성 API:
+  - 같은 `requestId` 재시도 시 raw record 수와 `totalGenerated`가 한 번만 증가하는지 검증
+  - atomic commit 실패 시 raw/aggregate/ledger가 부분 저장되지 않는지 검증
+  - 생성 응답에 crowd comparison payload가 안정적으로 포함되는지 검증
+- generated-stats page:
+  - aggregate doc 존재 시 raw 240 sample과 무관하게 전체 회차 수치가 보이는지 검증
+  - aggregate doc 미존재 시 `0` 대신 self-heal 또는 `집계 준비 중`이 노출되는지 검증
+  - 상단에 `전체 기준`, `마지막 집계 시각`, `참여 세트 수`가 노출되는지 검증
+  - 최근 로컬 세트가 있으면 `내 번호 vs 사람들 선택` 카드가 다시 렌더되는지 검증
+- settle path:
+  - 같은 회차 정산을 다시 돌려도 `generated_round_results/{round}`가 안정적으로 같은 값으로 유지되는지 검증
+- backfill:
+  - 기존 raw records로 round stats/results를 복구한 뒤 화면 수치와 일치하는지 검증
+
+### 성공 기준
+- `사람들 선택`의 상단 KPI와 전략 점유율이 이번 회차 전체 기록과 일치한다.
+- 원본 기록이 수천 건 이상 쌓여도 `/generated-stats` 첫 화면 read 수와 렌더 비용이 크게 늘지 않는다.
+- 동일 `requestId` 재시도 시 집계가 두 번 올라가지 않는다.
+- aggregate doc이 아직 없거나 재생성 중이어도 화면이 `0건`으로 오해되지 않는다.
+- draw sync 이후 `generated_round_results/{round}`와 raw settled records의 총량이 일치한다.
+- 사용자가 `/generated-stats` 첫 화면에서 `이 숫자가 전체 기준인지, 언제 갱신됐는지`를 3초 안에 이해할 수 있다.
+- 사용자가 생성 직후 자신의 세트가 군중형인지 역배형인지 바로 이해할 수 있다.
+
+### NOT in scope
+- 전체 역사 기반 장기 랭킹/리더보드
+- 로그인 사용자 프로필 기반 개인화 분석
+- abuse 탐지 고도화
+- 군중 데이터 서사 카드 자동 생성
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `/plan-ceo-review` | Scope & strategy | 2 | DONE | 디자인 관점에서 코어는 `신뢰형 로또 컨트롤룸`으로 유지하고, 감성 증폭은 공유 카드 중심으로 제한하기로 정리. |
-| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
-| Eng Review | `/review` | Architecture & tests (required) | 2 | DONE | 생성기 확률 편향, 캐시 싱글톤 메모리 누수, 클라이언트 DB 프록시 보안(API 라우트 신설) 3대 구조 버그 수정 및 검증 완료. |
-| Design Review | `/plan-design-review` | UI/UX gaps | 1 | DONE | score: 6/10 → 8/10, 8 decisions. 단일 히어로, 카드 밀도 축소, 보조 텍스트 대비 상향, 헤더 축소, 색 역할 고정 반영. |
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | PLAN UPDATED | 3 scope proposals 중 2개 수용, 신뢰 계약 UI와 `내 번호 vs 사람들 선택` 비교를 계획에 반영함. |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | NOT RUN | - |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | PLAN UPDATED | 원자적 write, requestId 계약, migration fallback, schemaVersion, failure mode를 계획에 반영함. |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | NOT RUN | - |
 
-**UNRESOLVED:** 0
-**VERDICT:** 비즈니스/데이터 무결성 결함 완전 해소 및 ALL CLEARED. V1 런칭 대기 완료.
+- **UNRESOLVED:** 1
+- **VERDICT:** ENG + CEO 주요 제안 반영 완료, 군중 서사 카드 1건만 후순위 보류

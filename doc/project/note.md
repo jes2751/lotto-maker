@@ -1,5 +1,35 @@
 # Note
 
+## 2026-04-14 generated stats aggregate design
+- 목표: `사람들 선택`이 이번 회차 전체 생성 흐름을 반영하도록 집계 문서 구조로 전환
+- 권장 구조:
+  - idempotency ledger: `generated_requests/{requestId}`
+  - raw log: `generated_records`
+  - current round aggregate: `generated_round_stats/{targetRound}`
+  - evaluated round aggregate: `generated_round_results/{round}`
+- 결정 이유:
+  - 주간 문서보다 회차 문서가 제품 언어와 데이터 모델에 더 잘 맞음
+  - 화면 핵심 지표를 raw record 전체 조회에서 분리하면 읽기 비용과 구독 부담이 크게 줄어듦
+  - 현재 군중 흐름과 직전 성과 평가를 의미적으로 분리할 수 있음
+- 구현 메모:
+  - 생성 API는 `requestId` 기반 안정적 `recordId = ${requestId}:${setIndex}` 필요
+  - `generated_requests/{requestId}`로 중복 재시도와 부분 성공 write를 차단
+  - 집계 반영은 서버 경로에서만 처리, 브라우저 direct Firestore write 제거
+  - `/generated-stats`는 집계 문서 + 최근 raw record 몇 건만 읽도록 전환
+  - aggregate doc이 없을 때는 `240개 샘플` fallback 대신 서버 full recompute 또는 `집계 준비 중` 상태 사용
+  - 정산 job은 `generated_round_results/{round}` 문서를 회차별 순차 재계산으로 작성
+  - CEO review 반영 구현 범위:
+    - `generated-stats` 상단에 `전체 기준 / 마지막 집계 시각 / 참여 세트 수` trust bar 추가
+    - `/api/v1/generate` 응답에 `crowdComparison` payload 추가
+    - `/generate` 결과 카드와 `/generated-stats`에서 `내 번호 vs 사람들 선택` 비교 카드 재사용
+    - 브라우저 저장은 Firestore가 아니라 `recentGeneratedComparison` localStorage helper로 축소
+  - 권장 구현 순서:
+    - 1차: write 경로 안전화
+    - 2차: aggregate-first read + trust bar
+    - 3차: crowd comparison 계산 + generate 결과 카드
+    - 4차: generated-stats 재사용 카드 + 정산/backfill 정리
+
+
 ## 2026-04-02 운영 브리핑
 
 - 공식 도메인: `https://lotto-maker.cloud`
@@ -199,3 +229,10 @@ https://lotto-maker.cloud
 사용자들이 생성했던 번호들이 몇 등 당첨되었는지 마감(Settle) 처리하는 작업은 자동화되어 있습니다.
 - **자동 마감**: 매주 일요일 오전 10시(KST) Cloudflare Worker(Cron)가 `lotto-maker-draw-sync` 스크립트를 자동 실행합니다.
 - **동작 내용**: 서버 내부 API를 통해 Firestore의 `lotto_draws`에 당첨번호를 보관하고, `generated_records`를 순회하며 당첨 결과를 대조하고 마감(settled) 처리합니다.
+## 2026-04-14 generated stats handoff
+- 운영 증상: 번호 생성은 성공했지만 생성 통계 기록은 실패 메시지가 노출됨
+- 원인: 배포 런타임에서 `FIREBASE_SERVICE_ACCOUNT_EMAIL`, `FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY`는 있었지만 `FIREBASE_ADMIN_PROJECT_ID` / `NEXT_PUBLIC_FIREBASE_PROJECT_ID`가 비어 있어 Firestore project id를 못 찾고 있었음
+- 코드 조치: `src/lib/firebase/admin.ts`에서 서비스 계정 이메일(`firebase-adminsdk-fbsvc@lotto-maker-lab.iam.gserviceaccount.com`)로부터 project id를 추론하도록 보강
+- 검증: 운영 디버그 엔드포인트에서 수정 전 `hasAdminEnv=false`, `hasPublicEnv=false`, `hasProjectId=false` 상태를 확인했고, 로컬에서는 `npm test`, `npm run build` 통과
+- 관련 테스트: `tests/firestore-draw-sync.test.ts`
+- 함께 반영한 의존성: `firebase`, `next`, `eslint`, `eslint-config-next`
