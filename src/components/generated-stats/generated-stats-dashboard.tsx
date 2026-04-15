@@ -22,37 +22,100 @@ function formatGeneratedAt(value: string) {
   });
 }
 
+function formatSnapshotTime(value: string | null) {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toLocaleString("ko-KR", {
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function getSourceLabel(source: GeneratedStatsSnapshot["source"]) {
+  switch (source) {
+    case "aggregate":
+      return "집계 문서";
+    case "recomputed":
+      return "서버 재계산";
+    default:
+      return "데이터 없음";
+  }
+}
+
+function getSourceTone(source: GeneratedStatsSnapshot["source"]) {
+  switch (source) {
+    case "aggregate":
+      return "border-teal/30 bg-teal/10 text-teal-200";
+    case "recomputed":
+      return "border-amber-400/30 bg-amber-400/10 text-amber-100";
+    default:
+      return "border-white/10 bg-white/5 text-slate-200";
+  }
+}
+
 export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardProps) {
   const view = snapshot.view;
+  const sourceLabel = getSourceLabel(snapshot.source);
 
   return (
     <div className="grid gap-6">
       <section className="panel">
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          <article className="kpi-cell">
-            <p className="text-base text-slate-300">현재 대상 회차</p>
-            <p className="mt-3 text-3xl font-semibold text-white">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="eyebrow">신뢰 계약</p>
+            <h2 className="section-subtitle mt-3 text-white">지금 보이는 값은 이번 회차 전체 기준입니다</h2>
+          </div>
+          <span className={`rounded-full border px-4 py-2 text-sm font-medium ${getSourceTone(snapshot.source)}`}>
+            {sourceLabel}
+          </span>
+        </div>
+
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          <div className="kpi-cell">
+            <p className="text-sm text-slate-400">기준 회차</p>
+            <p className="mt-2 text-2xl font-semibold text-white">
               {view.currentTargetRound ? `${view.currentTargetRound}회` : "-"}
             </p>
-            <p className="mt-2 text-sm text-slate-400">사람들 선택은 이 회차를 기준으로 집계됩니다.</p>
-          </article>
-          <article className="kpi-cell">
-            <p className="text-base text-slate-300">이번 회차 생성 수</p>
-            <p className="mt-3 text-3xl font-semibold text-white">{view.currentTotalGenerated}</p>
-            <p className="mt-2 text-sm text-slate-400">최근 샘플이 아니라 현재 회차 전체 생성 기록 기준입니다.</p>
-          </article>
-          <article className="kpi-cell">
-            <p className="text-base text-slate-300">직전 평가 회차</p>
-            <p className="mt-3 text-3xl font-semibold text-white">
-              {view.latestEvaluatedRound ? `${view.latestEvaluatedRound}회` : "-"}
-            </p>
-            <p className="mt-2 text-sm text-slate-400">지난 회차 대상으로 생성됐던 기록의 성과를 평가합니다.</p>
-          </article>
-          <article className="kpi-cell">
-            <p className="text-base text-slate-300">3개 이상 적중</p>
-            <p className="mt-3 text-3xl font-semibold text-white">{view.threePlusHitCount}</p>
-            <p className="mt-2 text-sm text-slate-400">직전 평가 회차 기준 3개 이상 맞춘 세트 수입니다.</p>
-          </article>
+          </div>
+          <div className="kpi-cell">
+            <p className="text-sm text-slate-400">참여 세트 수</p>
+            <p className="mt-2 text-2xl font-semibold text-white">{view.currentTotalGenerated}</p>
+          </div>
+          <div className="kpi-cell">
+            <p className="text-sm text-slate-400">마지막 계산</p>
+            <p className="mt-2 text-2xl font-semibold text-white">{formatSnapshotTime(snapshot.computedAt)}</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <div className="signal-row">
+            <span className="signal-row-dot" />
+            <span>집계 출처: {sourceLabel}</span>
+          </div>
+          <div className="signal-row">
+            <span className="signal-row-dot" />
+            <span>집계 소스 레코드: {snapshot.sourceRecordCount}개</span>
+          </div>
+          <div className="signal-row">
+            <span className="signal-row-dot" />
+            <span>
+              {snapshot.source === "aggregate"
+                ? "저장된 회차 집계를 우선 보여주고, 없을 때만 서버에서 다시 계산합니다."
+                : snapshot.source === "recomputed"
+                  ? "집계 문서가 없어 서버가 현재 회차 전체 기록을 다시 계산했습니다."
+                  : "이번 회차 집계 데이터가 아직 없습니다."}
+            </span>
+          </div>
         </div>
       </section>
 
@@ -61,7 +124,7 @@ export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardPro
           <p className="eyebrow">전략 성과</p>
           <h2 className="section-subtitle mt-3 text-white">직전 평가 회차에서 전략별 결과를 비교합니다</h2>
           <p className="body-small mt-3 text-slate-300">
-            현재 회차의 군중 흐름과 별도로, 지난 회차 대상 생성 기록이 실제로 얼마나 맞았는지 전략별로 정리합니다.
+            지난 회차 대상 생성 기록이 실제로 얼마나 맞았는지 전략별로 정리합니다.
           </p>
 
           {view.strategyBoard.length > 0 ? (
@@ -126,7 +189,7 @@ export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardPro
           <p className="eyebrow">사람들 선택</p>
           <h2 className="section-subtitle mt-3 text-white">이번 회차 전체 생성 기록에서 나온 선택 흐름입니다</h2>
           <div className="mt-4 flex flex-wrap gap-2">
-            {["이번 회차 전체", "전략 점유율", "많이 선택된 번호", "최근 공개 세트"].map((item, index) => (
+            {["이번 회차 전체", "전략 점유율", "번호 집중도", "최근 공개 세트"].map((item, index) => (
               <span key={item} className={index > 1 ? "spark-pill hidden md:inline-flex" : "spark-pill"}>
                 {item}
               </span>

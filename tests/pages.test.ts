@@ -36,7 +36,8 @@ test("generated stats page renders public stats copy", async () => {
   const html = renderToStaticMarkup(await GeneratedStatsPage());
 
   assert.match(html, /사람들 선택|Crowd Board/);
-  assert.match(html, /집계 기준|Aggregation Scope/);
+  assert.match(html, /신뢰 계약|Aggregation Scope/);
+  assert.match(html, /집계 출처|Source/);
   assert.match(html, /번호 생성하러 가기|Open generator/);
 });
 
