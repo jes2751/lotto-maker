@@ -5,6 +5,7 @@ import {
   getLottoDrawDocumentId,
   hasFirestoreAdminEnv,
   hasFirestorePublicEnv,
+  listGeneratedRecordsForRound,
   toLottoDrawRecord
 } from "../src/lib/firebase/admin";
 import { getDrawsToSyncFromOfficial } from "../src/lib/data/firestore-draw-sync";
@@ -147,6 +148,136 @@ test("firestore env checks infer project id from service account email", () => {
     assert.equal(hasFirestoreAdminEnv(), true);
     assert.equal(hasFirestorePublicEnv(), true);
   } finally {
+    if (originalAdminProjectId === undefined) delete process.env.FIREBASE_ADMIN_PROJECT_ID;
+    else process.env.FIREBASE_ADMIN_PROJECT_ID = originalAdminProjectId;
+
+    if (originalPublicProjectId === undefined) delete process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    else process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = originalPublicProjectId;
+
+    if (originalServiceEmail === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+    else process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL = originalServiceEmail;
+
+    if (originalPrivateKey === undefined) delete process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+    else process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY = originalPrivateKey;
+
+    if (originalApiKey === undefined) delete process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    else process.env.NEXT_PUBLIC_FIREBASE_API_KEY = originalApiKey;
+  }
+});
+
+test("listGeneratedRecordsForRound sorts records without requiring firestore orderBy", async () => {
+  const originalFetch = global.fetch;
+  const originalAdminProjectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
+  const originalPublicProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const originalServiceEmail = process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+  const originalPrivateKey = process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+  const originalApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+
+  delete process.env.FIREBASE_ADMIN_PROJECT_ID;
+  delete process.env.FIREBASE_SERVICE_ACCOUNT_EMAIL;
+  delete process.env.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY;
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = "lotto-maker-lab";
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "test-public-key";
+
+  global.fetch = async (input, init) => {
+    const url = String(input);
+
+    if (url.includes(":runQuery")) {
+      const body = JSON.parse(String(init?.body ?? "{}")) as {
+        structuredQuery?: {
+          orderBy?: unknown;
+          where?: unknown;
+        };
+      };
+
+      assert.equal(body.structuredQuery?.orderBy, undefined);
+      assert.ok(body.structuredQuery?.where);
+
+      return new Response(
+        JSON.stringify([
+          {
+            document: {
+              name: "projects/lotto-maker-lab/databases/(default)/documents/generated_records/old",
+              fields: {
+                id: { stringValue: "old" },
+                anonymousId: { stringValue: "anon-1" },
+                strategy: { stringValue: "mixed" },
+                numbers: {
+                  arrayValue: {
+                    values: [1, 2, 3, 4, 5, 6].map((value) => ({ integerValue: String(value) }))
+                  }
+                },
+                bonus: { integerValue: "7" },
+                reason: { stringValue: "old" },
+                generatedAt: { stringValue: "2026-04-01T00:00:00.000Z" },
+                targetRound: { integerValue: "1234" },
+                filters: {
+                  mapValue: {
+                    fields: {
+                      fixedNumbers: { arrayValue: { values: [] } },
+                      excludedNumbers: { arrayValue: { values: [] } },
+                      oddEven: { stringValue: "any" },
+                      sumMin: { nullValue: null },
+                      sumMax: { nullValue: null },
+                      allowConsecutive: { booleanValue: true }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            document: {
+              name: "projects/lotto-maker-lab/databases/(default)/documents/generated_records/new",
+              fields: {
+                id: { stringValue: "new" },
+                anonymousId: { stringValue: "anon-2" },
+                strategy: { stringValue: "mixed" },
+                numbers: {
+                  arrayValue: {
+                    values: [7, 8, 9, 10, 11, 12].map((value) => ({ integerValue: String(value) }))
+                  }
+                },
+                bonus: { integerValue: "13" },
+                reason: { stringValue: "new" },
+                generatedAt: { stringValue: "2026-04-02T00:00:00.000Z" },
+                targetRound: { integerValue: "1234" },
+                filters: {
+                  mapValue: {
+                    fields: {
+                      fixedNumbers: { arrayValue: { values: [] } },
+                      excludedNumbers: { arrayValue: { values: [] } },
+                      oddEven: { stringValue: "any" },
+                      sumMin: { nullValue: null },
+                      sumMax: { nullValue: null },
+                      allowConsecutive: { booleanValue: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    throw new Error(`Unexpected fetch url: ${url}`);
+  };
+
+  try {
+    const records = await listGeneratedRecordsForRound(1234);
+    assert.equal(records.length, 2);
+    assert.equal(records[0]?.id, "new");
+    assert.equal(records[1]?.id, "old");
+  } finally {
+    global.fetch = originalFetch;
+
     if (originalAdminProjectId === undefined) delete process.env.FIREBASE_ADMIN_PROJECT_ID;
     else process.env.FIREBASE_ADMIN_PROJECT_ID = originalAdminProjectId;
 

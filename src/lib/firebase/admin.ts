@@ -697,6 +697,15 @@ function parseGeneratedRoundStatsDocument(document: FirestoreDocument): Generate
   };
 }
 
+function sortStoredGeneratedRecordsByGeneratedAtDesc(records: StoredGeneratedRecord[]) {
+  return [...records].sort((left, right) => {
+    const leftTime = new Date(left.generatedAt).getTime();
+    const rightTime = new Date(right.generatedAt).getTime();
+
+    return rightTime - leftTime;
+  });
+}
+
 export async function listUnsettledGeneratedRecordsForRound(round: number) {
   const response = await firestoreAdminRequest(":runQuery", {
     method: "POST",
@@ -792,15 +801,15 @@ export async function listGeneratedRecordsForRound(round: number, limit?: number
         op: "EQUAL",
         value: { integerValue: String(round) }
       }
-    },
-    orderBy: [{ field: { fieldPath: "generatedAt" }, direction: "DESCENDING" }]
+    }
   };
 
-  if (typeof limit === "number") {
-    structuredQuery.limit = limit;
+  if (typeof limit === "number" && limit > 0) {
+    structuredQuery.limit = limit * 4;
   }
 
-  return runGeneratedRecordsQuery({ structuredQuery });
+  const records = sortStoredGeneratedRecordsByGeneratedAtDesc(await runGeneratedRecordsQuery({ structuredQuery }));
+  return typeof limit === "number" && limit > 0 ? records.slice(0, limit) : records;
 }
 
 export async function getGeneratedRoundStats(round: number): Promise<GeneratedStatsSnapshot | null> {

@@ -7,14 +7,24 @@ export async function getGeneratedStatsSnapshot(latestDraw: Draw | null): Promis
 
   if (currentTargetRound) {
     const aggregate = await getGeneratedRoundStats(currentTargetRound);
-    const recentRecords = await listGeneratedRecordsForRound(currentTargetRound, 4);
 
     if (aggregate) {
+      let recentRecords = aggregate.view.recentRecords;
+
+      try {
+        const fetchedRecentRecords = await listGeneratedRecordsForRound(currentTargetRound, 4);
+        if (fetchedRecentRecords.length > 0) {
+          recentRecords = fetchedRecentRecords;
+        }
+      } catch (error) {
+        console.warn("[generated-stats] failed to load recent records for aggregate snapshot", error);
+      }
+
       return {
         ...aggregate,
         view: {
           ...aggregate.view,
-          recentRecords: recentRecords.length > 0 ? recentRecords : aggregate.view.recentRecords
+          recentRecords
         }
       };
     }
