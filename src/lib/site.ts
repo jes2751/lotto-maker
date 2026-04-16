@@ -9,18 +9,21 @@ export const siteConfig = {
   domain: "lotto-maker.cloud",
   defaultUrl: "https://lotto-maker.cloud",
   descriptionKo:
-    "로또 번호 생성기, 당첨번호 조회, 공식 통계, 사람들 선택 비교를 제공하는 한국어 중심 로또 서비스입니다.",
+    "로또 번호 생성기, 로또 당첨번호 조회, 로또 통계, 사람들 선택 비교를 제공하는 한국어 중심 로또 서비스입니다.",
   descriptionEn:
     "Free Lotto web service with historical-data-based recommendations, draw lookup, statistics, and generated stats.",
   keywordsKo: [
     "로또",
+    "로또 번호",
     "로또 번호 생성기",
-    "로또 당첨번호",
+    "번호 생성기",
     "로또 통계",
-    "로또 회차 분석",
+    "로또 당첨번호",
+    "로또 추천",
+    "로또 회차",
     "사람들 선택",
     "한국 로또",
-    "번호 추천"
+    "당첨번호 조회"
   ],
   keywordsEn: [
     "Lotto",

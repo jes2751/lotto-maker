@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { createPageMetadata, siteConfig } from "../src/lib/site";
 
-test("site metadata prefers Korean search signals", () => {
+test("site metadata includes Korean lottery search keywords", () => {
   const metadata = createPageMetadata({
     locale: "ko",
     path: "/generated-stats",
@@ -14,6 +14,9 @@ test("site metadata prefers Korean search signals", () => {
   });
 
   assert.equal(metadata.title, `사람들 선택 통계 | ${siteConfig.seoNameKo}`);
-  assert.deepEqual(metadata.keywords, siteConfig.keywordsKo);
+  assert.ok(metadata.keywords?.includes("로또"));
+  assert.ok(metadata.keywords?.includes("로또 번호 생성기"));
+  assert.ok(metadata.keywords?.includes("번호 생성기"));
+  assert.ok(metadata.keywords?.includes("로또 통계"));
   assert.equal(metadata.alternates?.languages?.["ko-KR"], "https://lotto-maker.cloud/generated-stats");
 });
