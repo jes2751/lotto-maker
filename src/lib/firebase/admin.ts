@@ -1,4 +1,9 @@
-import type { GeneratedStatsSnapshot, GeneratedStatsViewModel, StoredGeneratedRecord } from "@/lib/generated-stats/shared";
+import {
+  buildGeneratedStatsViewModel,
+  type GeneratedStatsSnapshot,
+  type GeneratedStatsViewModel,
+  type StoredGeneratedRecord
+} from "@/lib/generated-stats/shared";
 import type { Draw, GeneratedSet, GenerationStrategy } from "@/types/lotto";
 
 const GOOGLE_OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -930,6 +935,7 @@ export interface SaveGeneratedRecordsInput {
   requestId: string;
   records: CreateGeneratedRecordInput[];
   responseSets: GeneratedSet[];
+  latestDraw?: Draw | null;
 }
 
 interface PreparedGeneratedRecordWrite {
@@ -1066,6 +1072,48 @@ function buildGeneratedRequestFields(input: SaveGeneratedRecordsInput, recordIds
   };
 }
 
+export async function saveGeneratedRoundStatsSnapshot(targetRound: number, snapshot: GeneratedStatsSnapshot) {
+  if (!Number.isInteger(targetRound) || targetRound < 1) {
+    return;
+  }
+
+  if (!hasFirestoreAdminEnv()) {
+    throw new Error("Firestore generated round stats save requires admin credentials.");
+  }
+
+  const { projectId } = getFirestoreAdminConfig();
+  const accessToken = await getFirestoreAdminAccessToken();
+
+  const response = await fetch(`${FIRESTORE_BASE_URL}/projects/${projectId}/databases/(default)/documents:commit`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      writes: [
+        {
+          update: {
+            name: `projects/${projectId}/databases/(default)/documents/${GENERATED_ROUND_STATS_COLLECTION}/${targetRound}`,
+            fields: Object.fromEntries(
+              Object.entries({
+                source: "aggregate",
+                computedAt: snapshot.computedAt ?? new Date().toISOString(),
+                sourceRecordCount: snapshot.sourceRecordCount,
+                view: snapshot.view
+              }).map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
+            )
+          }
+        }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Firestore generated round stats save failed with status ${response.status}: ${await response.text()}`);
+  }
+}
+
 function toSaveGeneratedRecordsResult(storedRequest: StoredGeneratedRequest, cached: boolean): SaveGeneratedRecordsResult {
   return {
     requestId: storedRequest.requestId,
@@ -1130,6 +1178,31 @@ async function saveGeneratedRecordsWithAdmin(
   };
 }
 
+async function refreshGeneratedRoundStatsWithAdmin(
+  targetRound: number,
+  latestDraw: Draw | null,
+  computedAt: string
+) {
+  if (!Number.isInteger(targetRound) || targetRound < 1) {
+    return;
+  }
+
+  const [currentRecords, evaluatedRecords] = await Promise.all([
+    listGeneratedRecordsForRound(targetRound),
+    latestDraw ? listGeneratedRecordsForRound(latestDraw.round) : Promise.resolve([])
+  ]);
+
+  const allRecords = [...currentRecords, ...evaluatedRecords];
+  const snapshot = {
+    source: "aggregate" as const,
+    computedAt,
+    sourceRecordCount: allRecords.length,
+    view: buildGeneratedStatsViewModel(allRecords, latestDraw, currentRecords.slice(0, 4))
+  };
+
+  await saveGeneratedRoundStatsSnapshot(targetRound, snapshot);
+}
+
 export async function saveGeneratedRecords(input: SaveGeneratedRecordsInput): Promise<SaveGeneratedRecordsResult> {
   if (input.records.length === 0) {
     return {
@@ -1157,6 +1230,15 @@ export async function saveGeneratedRecords(input: SaveGeneratedRecordsInput): Pr
 
   try {
     const saved = await saveGeneratedRecordsWithAdmin(input, writes, committedAt);
+
+    if (saved.targetRound && input.latestDraw) {
+      try {
+        await refreshGeneratedRoundStatsWithAdmin(saved.targetRound, input.latestDraw, committedAt);
+      } catch (error) {
+        console.warn("[generated-stats] failed to refresh round aggregate after save", error);
+      }
+    }
+
     return {
       requestId: saved.requestId,
       written: saved.recordIds.length,

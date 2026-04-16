@@ -206,7 +206,7 @@ test("generate api records stats through admin commit with request ledger", asyn
   const originalFetch = global.fetch;
   const restoreEnv = withAdminFirestoreEnv();
 
-  let commitRequestBody: { writes?: Array<{ update?: { name?: string } }> } | null = null;
+  const commitRequestBodies: Array<{ writes?: Array<{ update?: { name?: string } }> }> = [];
   let storedLedgerDocument: { name: string; fields: Record<string, unknown> } | null = null;
 
   global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -230,21 +230,29 @@ test("generate api records stats through admin commit with request ledger", asyn
       });
     }
 
+    if (url.includes(":runQuery")) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     if (url.endsWith("/documents:commit")) {
-      commitRequestBody = JSON.parse(String(init?.body ?? "{}")) as {
+      const commitRequestBody = JSON.parse(String(init?.body ?? "{}")) as {
         writes?: Array<{ update?: { name?: string; fields?: Record<string, unknown> } }>;
       };
+      commitRequestBodies.push(commitRequestBody);
 
       const ledgerWrite = commitRequestBody.writes?.find((write) =>
         write.update?.name?.includes("/generated_requests/req-admin")
       );
 
-      storedLedgerDocument = ledgerWrite?.update
-        ? {
-            name: ledgerWrite.update.name ?? "",
-            fields: ledgerWrite.update.fields ?? {}
-          }
-        : null;
+      if (ledgerWrite?.update) {
+        storedLedgerDocument = {
+          name: ledgerWrite.update.name ?? "",
+          fields: ledgerWrite.update.fields ?? {}
+        };
+      }
 
       return new Response(JSON.stringify({ writeResults: [] }), {
         status: 200,
@@ -274,11 +282,13 @@ test("generate api records stats through admin commit with request ledger", asyn
     assert.equal(payload.data.statsRecorded, true);
     assert.equal(payload.data.requestId, "req-admin");
     assert.equal(payload.data.sets.length, 2);
-    assert.ok(commitRequestBody);
-    assert.equal(commitRequestBody.writes?.length, 3);
-    assert.equal(commitRequestBody.writes?.[0]?.update?.name?.endsWith("/generated_requests/req-admin"), true);
-    assert.equal(commitRequestBody.writes?.[1]?.update?.name?.endsWith("/generated_records/req-admin:0"), true);
-    assert.equal(commitRequestBody.writes?.[2]?.update?.name?.endsWith("/generated_records/req-admin:1"), true);
+    assert.equal(commitRequestBodies.length, 2);
+    assert.equal(commitRequestBodies[0]?.writes?.length, 3);
+    assert.equal(commitRequestBodies[0]?.writes?.[0]?.update?.name?.endsWith("/generated_requests/req-admin"), true);
+    assert.equal(commitRequestBodies[0]?.writes?.[1]?.update?.name?.endsWith("/generated_records/req-admin:0"), true);
+    assert.equal(commitRequestBodies[0]?.writes?.[2]?.update?.name?.endsWith("/generated_records/req-admin:1"), true);
+    assert.equal(commitRequestBodies[1]?.writes?.length, 1);
+    assert.equal(commitRequestBodies[1]?.writes?.[0]?.update?.name?.includes("/generated_round_stats/"), true);
   } finally {
     global.fetch = originalFetch;
     restoreEnv();
@@ -313,6 +323,13 @@ test("generate api replays stored response for duplicate request ids", async () 
       });
     }
 
+    if (url.includes(":runQuery")) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     if (url.endsWith("/documents:commit")) {
       commitCount += 1;
 
@@ -321,12 +338,12 @@ test("generate api replays stored response for duplicate request ids", async () 
       };
       const ledgerWrite = body.writes?.find((write) => write.update?.name?.includes("/generated_requests/req-dup"));
 
-      storedLedgerDocument = ledgerWrite?.update
-        ? {
-            name: ledgerWrite.update.name ?? "",
-            fields: ledgerWrite.update.fields ?? {}
-          }
-        : createGeneratedRequestDocument("req-dup", [], null);
+      if (ledgerWrite?.update) {
+        storedLedgerDocument = {
+          name: ledgerWrite.update.name ?? "",
+          fields: ledgerWrite.update.fields ?? {}
+        };
+      }
 
       return new Response(JSON.stringify({ writeResults: [] }), {
         status: 200,
@@ -374,7 +391,7 @@ test("generate api replays stored response for duplicate request ids", async () 
     assert.equal(secondPayload.data.statsRecorded, true);
     assert.equal(secondPayload.data.requestId, "req-dup");
     assert.deepEqual(secondPayload.data.sets, firstPayload.data.sets);
-    assert.equal(commitCount, 1);
+    assert.equal(commitCount, 2);
   } finally {
     global.fetch = originalFetch;
     restoreEnv();

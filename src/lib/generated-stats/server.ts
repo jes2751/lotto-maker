@@ -1,4 +1,8 @@
-import { getGeneratedRoundStats, listGeneratedRecordsForRound } from "@/lib/firebase/admin";
+import {
+  getGeneratedRoundStats,
+  listGeneratedRecordsForRound,
+  saveGeneratedRoundStatsSnapshot
+} from "@/lib/firebase/admin";
 import { buildGeneratedStatsViewModel, getTargetRound, type GeneratedStatsSnapshot } from "@/lib/generated-stats/shared";
 import type { Draw } from "@/types/lotto";
 
@@ -38,11 +42,27 @@ export async function getGeneratedStatsSnapshot(latestDraw: Draw | null): Promis
   const recentRecords = currentRecords.slice(0, 4);
   const allRecords = [...currentRecords, ...evaluatedRecords];
   const sourceRecordCount = allRecords.length;
-
-  return {
-    source: sourceRecordCount > 0 ? "recomputed" : "empty",
+  const recomputedSnapshot: GeneratedStatsSnapshot = {
+    source: "recomputed",
     computedAt: sourceRecordCount > 0 ? new Date().toISOString() : null,
     sourceRecordCount,
     view: buildGeneratedStatsViewModel(allRecords, latestDraw, recentRecords)
+  };
+
+  if (currentTargetRound && sourceRecordCount > 0) {
+    try {
+      await saveGeneratedRoundStatsSnapshot(currentTargetRound, recomputedSnapshot);
+      return {
+        ...recomputedSnapshot,
+        source: "aggregate"
+      };
+    } catch (error) {
+      console.warn("[generated-stats] failed to backfill aggregate snapshot", error);
+    }
+  }
+
+  return {
+    ...recomputedSnapshot,
+    source: sourceRecordCount > 0 ? "recomputed" : "empty"
   };
 }

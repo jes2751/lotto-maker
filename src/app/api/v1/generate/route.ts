@@ -172,6 +172,7 @@ export async function POST(request: Request) {
       try {
         const saveResult = await saveGeneratedRecords({
           requestId,
+          latestDraw,
           responseSets: sets,
           records: sets.map((set) => ({
             anonymousId,
