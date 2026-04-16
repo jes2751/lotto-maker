@@ -4,6 +4,7 @@ import "./api.test";
 import "./generation.test";
 import "./stats.test";
 import "./pages.test";
+import "./site-metadata.test";
 import "./draw-sync.test";
 import "./firestore-draw-sync.test";
 import "./remote-draws.test";

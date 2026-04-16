@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getRequestPreferences } from "@/lib/server-preferences";
 import { SiteHeader } from "@/components/layout/site-header";
-import { getAbsoluteUrl, getSiteUrl, siteConfig } from "@/lib/site";
+import { getAbsoluteUrl, getSiteDisplayName, getSiteUrl, siteConfig } from "@/lib/site";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -19,22 +19,26 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: siteConfig.name,
+  title: siteConfig.seoNameKo,
   description: siteConfig.descriptionKo,
+  keywords: siteConfig.keywordsKo,
   alternates: {
-    canonical: getAbsoluteUrl("/")
+    canonical: getAbsoluteUrl("/"),
+    languages: {
+      "ko-KR": getAbsoluteUrl("/")
+    }
   },
   openGraph: {
-    title: siteConfig.name,
+    title: siteConfig.seoNameKo,
     description: siteConfig.descriptionKo,
     url: getAbsoluteUrl("/"),
-    siteName: siteConfig.name,
+    siteName: siteConfig.seoNameKo,
     locale: "ko_KR",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.name,
+    title: siteConfig.seoNameKo,
     description: siteConfig.descriptionKo
   },
   verification: {
@@ -47,7 +51,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: siteConfig.name,
+    name: getSiteDisplayName("ko"),
     description: siteConfig.descriptionKo,
     url: siteUrl,
     inLanguage: "ko-KR"
