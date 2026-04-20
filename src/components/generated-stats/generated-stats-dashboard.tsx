@@ -44,7 +44,7 @@ function formatSnapshotTime(value: string | null) {
 function getSourceLabel(source: GeneratedStatsSnapshot["source"]) {
   switch (source) {
     case "aggregate":
-      return "집계 문서";
+      return "저장된 집계";
     case "recomputed":
       return "서버 재계산";
     default:
@@ -97,24 +97,18 @@ export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardPro
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
           <div className="signal-row">
             <span className="signal-row-dot" />
             <span>집계 출처: {sourceLabel}</span>
           </div>
           <div className="signal-row">
             <span className="signal-row-dot" />
-            <span>집계 소스 레코드: {snapshot.sourceRecordCount}개</span>
+            <span>계산에 사용한 기록 수: {snapshot.sourceRecordCount}개</span>
           </div>
           <div className="signal-row">
             <span className="signal-row-dot" />
-            <span>
-              {snapshot.source === "aggregate"
-                ? "저장된 회차 집계를 우선 보여주고, 없을 때만 서버에서 다시 계산합니다."
-                : snapshot.source === "recomputed"
-                  ? "집계 문서가 없어 서버가 현재 회차 전체 기록을 다시 계산했습니다."
-                  : "이번 회차 집계 데이터가 아직 없습니다."}
-            </span>
+            <span>마지막 계산: {formatSnapshotTime(snapshot.computedAt)}</span>
           </div>
         </div>
       </section>
