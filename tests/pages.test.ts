@@ -72,9 +72,9 @@ test("draw detail page renders requested round", async () => {
 test("stats page renders simplified dashboard sections", async () => {
   const html = renderToStaticMarkup(await StatsPage({ searchParams: Promise.resolve({}) }));
 
-  assert.match(html, /\/hot-numbers/);
-  assert.match(html, /\/cold-numbers/);
-  assert.match(html, /\/recent-10-draw-analysis/);
+  assert.match(html, /#hot-numbers/);
+  assert.match(html, /#cold-numbers/);
+  assert.match(html, /#recent-10-draw-analysis/);
 });
 
 test("number detail page renders requested number stats", async () => {

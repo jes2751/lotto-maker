@@ -24,7 +24,7 @@ export async function generateMetadata({
   if (!draw) {
     return createPageMetadata({
       locale: "ko",
-      path: "/latest-lotto-results",
+      path: "/draws",
       titleKo: "회차 분석",
       titleEn: "Draw Analysis",
       descriptionKo:
@@ -35,7 +35,7 @@ export async function generateMetadata({
 
   return createPageMetadata({
     locale: "ko",
-    path: `/draw-analysis/${draw.round}`,
+    path: `/draws/${draw.round}`,
     titleKo: `${draw.round}회 회차 분석`,
     titleEn: `Round ${draw.round} Draw Analysis`,
     descriptionKo: `${draw.round}회 당첨번호의 홀짝, 합계, 저고 분포, 자주 나온 번호 겹침 정도를 정리한 회차 분석 페이지입니다.`,
@@ -67,7 +67,7 @@ export default async function DrawAnalysisPage({
   const older = index >= 0 && index < draws.length - 1 ? draws[index + 1] : null;
   const relatedRounds = draws.filter((item) => item.round !== draw.round).slice(0, 3);
   const siteUrl = getSiteUrl();
-  const pageUrl = `${siteUrl}/draw-analysis/${draw.round}`;
+  const pageUrl = `${siteUrl}/draws/${draw.round}`;
 
   const jsonLd = [
     {
@@ -103,7 +103,7 @@ export default async function DrawAnalysisPage({
           "@type": "ListItem",
           position: 2,
           name: "Latest results",
-          item: `${siteUrl}/latest-lotto-results`
+          item: `${siteUrl}/draws`
         },
         {
           "@type": "ListItem",
@@ -134,7 +134,7 @@ export default async function DrawAnalysisPage({
             <Link href={`/draws/${draw.round}`} className="cta-button">
               회차 상세 보기
             </Link>
-            <Link href="/latest-lotto-results" className="secondary-button">
+            <Link href="/draws" className="secondary-button">
               최신 결과 허브
             </Link>
           </div>
@@ -209,7 +209,7 @@ export default async function DrawAnalysisPage({
               : "겹치는 번호가 많지 않은 회차입니다."}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/hot-numbers" className="secondary-button">
+            <Link href="/stats#hot-numbers" className="secondary-button">
               자주 나온 번호 보기
             </Link>
             <Link href="/stats" className="secondary-button">
@@ -228,10 +228,10 @@ export default async function DrawAnalysisPage({
               : "낮은 빈도 그룹과 겹치는 번호는 크지 않습니다."}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/cold-numbers" className="secondary-button">
+            <Link href="/stats#cold-numbers" className="secondary-button">
               적게 나온 번호 보기
             </Link>
-            <Link href="/recent-10-draw-analysis" className="secondary-button">
+            <Link href="/stats#recent-10-draw-analysis" className="secondary-button">
               최근 10회 분석 보기
             </Link>
           </div>
@@ -254,15 +254,15 @@ export default async function DrawAnalysisPage({
             <p className="text-lg font-semibold text-white">회차 상세</p>
             <p className="mt-2 text-sm leading-7 text-slate-400">당첨금, 당첨자 수, 원시 회차 정보를 다시 확인합니다.</p>
           </Link>
-          <Link href="/odd-even-pattern" className="interactive-card">
+          <Link href="/stats#odd-even-pattern" className="interactive-card">
             <p className="text-lg font-semibold text-white">홀짝 패턴</p>
             <p className="mt-2 text-sm leading-7 text-slate-400">이번 회차의 홀짝 비율이 전체 흐름에서 어떤 위치인지 비교합니다.</p>
           </Link>
-          <Link href="/sum-pattern" className="interactive-card">
+          <Link href="/stats#sum-pattern" className="interactive-card">
             <p className="text-lg font-semibold text-white">합계 패턴</p>
             <p className="mt-2 text-sm leading-7 text-slate-400">이번 회차의 합계가 자주 나오는 구간인지 비교합니다.</p>
           </Link>
-          <Link href="/lotto-number-generator" className="interactive-card">
+          <Link href="/generate" className="interactive-card">
             <p className="text-lg font-semibold text-white">추천기 랜딩</p>
             <p className="mt-2 text-sm leading-7 text-slate-400">회차를 본 뒤 바로 추천 전략을 다시 고를 수 있습니다.</p>
           </Link>
@@ -270,7 +270,7 @@ export default async function DrawAnalysisPage({
 
         <div className="mt-5 flex flex-wrap gap-3">
           {relatedRounds.map((item) => (
-            <Link key={item.round} href={`/draw-analysis/${item.round}`} className="chip-link">
+            <Link key={item.round} href={`/draws/${item.round}`} className="chip-link">
               <span className="font-semibold text-white">{item.round}회 분석</span>
               <span className="text-slate-400">{item.drawDate}</span>
             </Link>
@@ -279,7 +279,7 @@ export default async function DrawAnalysisPage({
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Link
-            href={newer ? `/draw-analysis/${newer.round}` : "#"}
+            href={newer ? `/draws/${newer.round}` : "#"}
             aria-disabled={!newer}
             className={[
               "link-list-item",
@@ -291,7 +291,7 @@ export default async function DrawAnalysisPage({
             {newer ? `더 최신 분석: ${newer.round}회` : "더 최신 분석 없음"}
           </Link>
           <Link
-            href={older ? `/draw-analysis/${older.round}` : "#"}
+            href={older ? `/draws/${older.round}` : "#"}
             aria-disabled={!older}
             className={[
               "link-list-item",

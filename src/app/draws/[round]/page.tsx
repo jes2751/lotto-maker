@@ -84,7 +84,7 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
             <Link href="/draws" className="secondary-button">
               전체 회차 보기
             </Link>
-            <Link href={`/draw-analysis/${draw.round}`} className="cta-button">
+            <Link href="/stats#recent-10-draw-analysis" className="cta-button">
               회차 분석 보기
             </Link>
           </div>
@@ -168,13 +168,13 @@ export default async function DrawDetailPage({ params }: DrawDetailPageProps) {
               번호별 통계, 회차 분석, 최신 결과 허브를 함께 보면 이 회차가 최근 흐름에서 어떤 위치에 있는지 더 잘 읽을 수 있습니다.
             </div>
             <div className="flex flex-wrap gap-3 pt-1">
-              <Link href={`/draw-analysis/${draw.round}`} className="secondary-button">
+              <Link href="/stats#recent-10-draw-analysis" className="secondary-button">
                 회차 분석 보기
               </Link>
-              <Link href="/draw-analysis" className="secondary-button">
+              <Link href="/stats" className="secondary-button">
                 분석 허브
               </Link>
-              <Link href="/latest-lotto-results" className="secondary-button">
+              <Link href="/draws" className="secondary-button">
                 최신 결과 허브
               </Link>
             </div>

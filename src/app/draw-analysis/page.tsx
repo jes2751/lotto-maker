@@ -117,7 +117,7 @@ export default async function DrawAnalysisHubPage() {
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href={`/draw-analysis/${latest.round}`} className="cta-button">
+              <Link href={`/draws/${latest.round}`} className="cta-button">
                 {copy.latestButton}
               </Link>
               <Link href={`/draws/${latest.round}`} className="secondary-button">
@@ -129,7 +129,7 @@ export default async function DrawAnalysisHubPage() {
           <div className="panel">
             <p className="eyebrow">Shortcut</p>
             <div className="mt-4 grid gap-4">
-              <Link href="/latest-lotto-results" className="interactive-card">
+              <Link href="/draws" className="interactive-card">
                 <p className="text-lg font-semibold text-white">{copy.latestResults}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   최신 당첨번호와 최근 회차 목록을 먼저 확인하는 결과 허브입니다.
@@ -141,7 +141,7 @@ export default async function DrawAnalysisHubPage() {
                   번호 빈도와 패턴을 전체 회차 기준으로 넓게 비교할 수 있습니다.
                 </p>
               </Link>
-              <Link href="/recent-10-draw-analysis" className="interactive-card">
+              <Link href="/stats#recent-10-draw-analysis" className="interactive-card">
                 <p className="text-lg font-semibold text-white">{copy.recent10}</p>
                 <p className="mt-3 text-sm leading-7 text-slate-300">
                   최근 구간만 따로 모아 흐름을 빠르게 읽고 싶을 때 적합합니다.
@@ -161,7 +161,7 @@ export default async function DrawAnalysisHubPage() {
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {recentDraws.map((draw) => (
-            <Link key={draw.round} href={`/draw-analysis/${draw.round}`} className="interactive-card">
+            <Link key={draw.round} href={`/draws/${draw.round}`} className="interactive-card">
               <p className="text-2xl font-semibold text-white">{draw.round}회</p>
               <p className="mt-1 text-sm text-slate-400">{draw.drawDate}</p>
               <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-500">{copy.summaryLabel}</p>
@@ -175,7 +175,7 @@ export default async function DrawAnalysisHubPage() {
           ))}
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/latest-lotto-results" className="secondary-button">
+          <Link href="/draws" className="secondary-button">
             {copy.latestResults}
           </Link>
           <Link href="/draws" className="secondary-button">

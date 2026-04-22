@@ -24,12 +24,9 @@ test("sitemap includes seo landing and analysis routes", async () => {
   const result = await sitemap();
   const urls = result.map((entry) => entry.url);
 
-  assert.ok(urls.includes("https://lotto-maker.cloud/odd-even-pattern"));
-  assert.ok(urls.includes("https://lotto-maker.cloud/sum-pattern"));
+  assert.ok(urls.includes("https://lotto-maker.cloud/stats"));
   assert.ok(urls.includes("https://lotto-maker.cloud/generated-stats"));
-  assert.ok(urls.includes("https://lotto-maker.cloud/lotto-buy-guide"));
-  assert.ok(urls.includes("https://lotto-maker.cloud/draw-analysis"));
-  assert.ok(urls.includes("https://lotto-maker.cloud/draw-analysis/1169"));
+  assert.ok(urls.includes("https://lotto-maker.cloud/guides/how-to-buy-lotto-online"));
   assert.ok(urls.includes("https://lotto-maker.cloud/privacy"));
   assert.ok(urls.includes("https://lotto-maker.cloud/terms"));
   assert.ok(urls.includes("https://lotto-maker.cloud/faq"));

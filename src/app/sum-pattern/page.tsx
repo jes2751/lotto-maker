@@ -51,7 +51,7 @@ export default async function SumPatternPage() {
             통계 보기
           </Link>
           <Link
-            href="/latest-lotto-results"
+            href="/draws"
             className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
           >
             최신 결과 보기

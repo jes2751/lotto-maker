@@ -65,7 +65,7 @@ const content = {
     nextTitle: "같이 보면 좋은 페이지",
     nextLinks: [
       { href: "/generate", label: "번호 생성기" },
-      { href: "/latest-lotto-results", label: "최신 당첨번호 보기" },
+      { href: "/draws", label: "최신 당첨번호 보기" },
       { href: "/faq", label: "자주 묻는 질문" }
     ]
   },
@@ -113,7 +113,7 @@ const content = {
     nextTitle: "Related pages",
     nextLinks: [
       { href: "/generate", label: "Generator" },
-      { href: "/latest-lotto-results", label: "Latest results" },
+      { href: "/draws", label: "Latest results" },
       { href: "/faq", label: "FAQ" }
     ]
   }

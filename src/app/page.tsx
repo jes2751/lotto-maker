@@ -300,15 +300,15 @@ export default async function HomePage() {
         <h2 className="section-subtitle mt-4 text-white">공식 당첨 기록으로 먼저 보는 숫자 흐름</h2>
 
         <div className="mt-6 grid gap-3 md:grid-cols-3">
-          <Link href="/sum-pattern" className="kpi-cell transition hover:border-white/20">
+          <Link href="/stats#sum-pattern" className="kpi-cell transition hover:border-white/20">
             <p className="text-sm text-slate-400">평균 합계</p>
             <p className="mt-3 text-4xl font-semibold text-white">{summary.averageSum}</p>
           </Link>
-          <Link href="/recent-10-draw-analysis" className="kpi-cell transition hover:border-white/20">
+          <Link href="/stats#recent-10-draw-analysis" className="kpi-cell transition hover:border-white/20">
             <p className="text-sm text-slate-400">연속번호 비율</p>
             <p className="mt-3 text-4xl font-semibold text-white">{summary.consecutiveSummary.percentage}%</p>
           </Link>
-          <Link href="/odd-even-pattern" className="kpi-cell transition hover:border-white/20">
+          <Link href="/stats#odd-even-pattern" className="kpi-cell transition hover:border-white/20">
             <p className="text-sm text-slate-400">대표 홀짝 비율</p>
             <p className="mt-3 text-4xl font-semibold text-white">{oddEvenLeader}</p>
           </Link>
@@ -388,7 +388,7 @@ export default async function HomePage() {
               {[
                 { href: "/generated-stats", label: "우리 유저 데이터 보기" },
                 { href: "/generate", label: "지금 번호 생성하기" },
-                { href: "/latest-lotto-results", label: "최신 결과 보기" },
+                { href: "/draws", label: "최신 결과 보기" },
                 { href: "/faq", label: "자주 묻는 질문" }
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="link-list-item">

@@ -45,7 +45,7 @@ export default async function OddEvenPatternPage() {
 
       <section className="panel">
         <div className="mt-2 flex flex-wrap gap-3">
-          <Link href="/sum-pattern" className="cta-button">
+          <Link href="/stats#sum-pattern" className="cta-button">
             Sum pattern 보기
           </Link>
           <Link

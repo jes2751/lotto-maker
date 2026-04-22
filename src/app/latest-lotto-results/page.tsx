@@ -120,13 +120,13 @@ export default async function LatestLottoResultsPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href={`/draw-analysis/${latest.round}`} className="secondary-button">
+            <Link href="/stats#recent-10-draw-analysis" className="secondary-button">
               {copy.roundAnalysis}
             </Link>
-            <Link href="/draw-analysis" className="secondary-button">
+            <Link href="/stats" className="secondary-button">
               {copy.analysisHub}
             </Link>
-            <Link href="/recent-10-draw-analysis" className="secondary-button">
+            <Link href="/stats#recent-10-draw-analysis" className="secondary-button">
               {copy.recent10}
             </Link>
           </div>
@@ -156,7 +156,7 @@ export default async function LatestLottoResultsPage() {
                 <Link href={`/draws/${draw.round}`} className="secondary-button !px-4 !py-2 !text-xs">
                   {copy.drawDetail}
                 </Link>
-                <Link href={`/draw-analysis/${draw.round}`} className="secondary-button !px-4 !py-2 !text-xs">
+                <Link href="/stats#recent-10-draw-analysis" className="secondary-button !px-4 !py-2 !text-xs">
                   {copy.drawAnalysis}
                 </Link>
               </div>
@@ -178,7 +178,7 @@ export default async function LatestLottoResultsPage() {
               전체 회차와 최근 구간의 빈도, 패턴, 반복 번호를 한 번에 비교할 수 있습니다.
             </p>
           </Link>
-          <Link href="/draw-analysis" className="interactive-card">
+          <Link href="/stats" className="interactive-card">
             <p className="text-lg font-semibold text-white">
               {locale === "ko" ? "회차 분석 허브" : "Analysis hub"}
             </p>

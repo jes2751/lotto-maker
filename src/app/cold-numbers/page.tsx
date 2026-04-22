@@ -100,7 +100,7 @@ export default async function ColdNumbersPage() {
 
       <section className="panel">
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/hot-numbers" className="cta-button">
+          <Link href="/stats#hot-numbers" className="cta-button">
             {copy.compare}
           </Link>
           <Link

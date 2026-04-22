@@ -42,9 +42,9 @@ function buildStatsHref(period: StatsPeriod, top: number) {
   return `/stats?${params.toString()}`;
 }
 
-function FrequencyCard({ label, stat, href }: { label: string; stat: FrequencyStat; href: string }) {
+function FrequencyCard({ label, stat, href, id }: { label: string; stat: FrequencyStat; href: string; id?: string }) {
   return (
-    <Link href={href} className="soft-card transition hover:border-white/20">
+    <Link id={id} href={href} className="soft-card transition hover:border-white/20">
       <p className="text-base text-slate-300">{label}</p>
       <div className="mt-4 flex items-end justify-between gap-4">
         <p className="text-4xl font-semibold text-white">{stat.number}</p>
@@ -70,31 +70,31 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
   const sumRangeLeader = selectedSummary.sumRangeBreakdown[0]?.label ?? "-";
   const entryCards = [
     {
-      href: "/hot-numbers",
+      href: "/stats#hot-numbers",
       kicker: "핵심 번호",
       title: "자주 나온 번호",
       body: "전체 회차 기준으로 많이 나온 번호를 먼저 확인합니다."
     },
     {
-      href: "/cold-numbers",
+      href: "/stats#cold-numbers",
       kicker: "반대 신호",
       title: "적게 나온 번호",
       body: "상대적으로 조용했던 번호를 따로 모아 비교합니다."
     },
     {
-      href: "/odd-even-pattern",
+      href: "/stats#odd-even-pattern",
       kicker: "패턴 분석 1",
       title: "홀짝 패턴",
       body: "홀짝 비율이 어떤 조합으로 자주 나왔는지 확인합니다."
     },
     {
-      href: "/sum-pattern",
+      href: "/stats#sum-pattern",
       kicker: "패턴 분석 2",
       title: "합계 패턴",
       body: "번호 6개의 합계 구간이 어떻게 분포되는지 파악합니다."
     },
     {
-      href: "/recent-10-draw-analysis",
+      href: "/stats#recent-10-draw-analysis",
       kicker: "단기 변화",
       title: "최근 10회 해석",
       body: "짧은 구간에서 반복되는 흐름을 먼저 보고 싶을 때 유용합니다."
@@ -128,12 +128,12 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
 
       <section className="panel">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <article className="kpi-cell">
+          <article id="odd-even-pattern" className="kpi-cell">
             <p className="text-base text-slate-300">{getPeriodLabel(selectedPeriod)}</p>
             <p className="mt-3 text-3xl font-semibold text-white">{selectedSummary.totalDraws}회</p>
             <p className="mt-2 text-sm text-slate-400">현재 선택 기준으로 비교 중인 회차 수입니다.</p>
           </article>
-          <article className="kpi-cell">
+          <article id="sum-pattern" className="kpi-cell">
             <p className="text-base text-slate-300">평균 합계</p>
             <p className="mt-3 text-3xl font-semibold text-white">{selectedSummary.averageSum}</p>
             <p className="mt-2 text-sm text-slate-400">6개 번호 합계의 평균값입니다.</p>
@@ -151,7 +151,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section id="recent-10-draw-analysis" className="grid gap-6 lg:grid-cols-2">
         <div className="panel">
           <p className="eyebrow">핵심 번호</p>
           <h2 className="section-subtitle mt-3 text-white">{getPeriodLabel(selectedPeriod)}에서 먼저 봐야 할 번호</h2>
@@ -159,11 +159,13 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
             <FrequencyCard
               label="가장 자주 나온 번호"
               stat={selectedSummary.topNumber}
+              id="hot-numbers"
               href={`/stats/numbers/${selectedSummary.topNumber.number}`}
             />
             <FrequencyCard
               label="가장 적게 나온 번호"
               stat={selectedSummary.coldNumber}
+              id="cold-numbers"
               href={`/stats/numbers/${selectedSummary.coldNumber.number}`}
             />
           </div>

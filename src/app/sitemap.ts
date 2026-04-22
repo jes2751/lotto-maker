@@ -16,17 +16,9 @@ const staticRoutes: StaticRoute[] = [
   { path: "/draws", changeFrequency: "daily", priority: 0.85 },
   { path: "/stats", changeFrequency: "weekly", priority: 0.8 },
   { path: "/generated-stats", changeFrequency: "daily", priority: 0.75 },
-  { path: "/draw-analysis", changeFrequency: "weekly", priority: 0.75 },
-  { path: "/latest-lotto-results", changeFrequency: "daily", priority: 0.85 },
-  { path: "/lotto-number-generator", changeFrequency: "weekly", priority: 0.7 },
-
-  { path: "/hot-numbers", changeFrequency: "weekly", priority: 0.65 },
-  { path: "/cold-numbers", changeFrequency: "weekly", priority: 0.65 },
-  { path: "/odd-even-pattern", changeFrequency: "weekly", priority: 0.65 },
-  { path: "/sum-pattern", changeFrequency: "weekly", priority: 0.65 },
-  { path: "/recent-10-draw-analysis", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/lotto-buy-guide", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/about", changeFrequency: "monthly", priority: 0.45 },
   { path: "/guides", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/guides/how-to-buy-lotto-online", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/lotto-number-generator-vs-random", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/recent-hot-and-cold-numbers", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/odd-even-pattern-guide", changeFrequency: "monthly", priority: 0.5 },
@@ -63,18 +55,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8
   }));
 
-  const analysisEntries: MetadataRoute.Sitemap = draws.map((draw) => ({
-    url: `${siteUrl}/draw-analysis/${draw.round}`,
-    lastModified: draw.drawDate,
-    changeFrequency: "weekly",
-    priority: 0.75
-  }));
-
   const numberEntries: MetadataRoute.Sitemap = Array.from({ length: 45 }, (_, index) => ({
     url: `${siteUrl}/stats/numbers/${index + 1}`,
     changeFrequency: "weekly",
     priority: 0.6
   }));
 
-  return [...staticEntries, ...drawEntries, ...analysisEntries, ...numberEntries];
+  return [...staticEntries, ...drawEntries, ...numberEntries];
 }

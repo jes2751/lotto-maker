@@ -4,30 +4,31 @@ import { siteConfig } from "@/lib/site";
 
 const content = {
   introLabel: "Lotto Maker Lab",
-  introTitle: "로또 결과 확인, 번호 생성, 통계를 한 곳에서 빠르게 볼 수 있습니다.",
+  introTitle: "결과, 생성, 통계, 가이드를 각각 분리해서 보여주는 로또 서비스",
   introDescription:
-    "최신 당첨번호, 번호 생성기, 통계, 생성 통계를 한국어 기준으로 간단하게 정리한 Lotto Maker Lab입니다.",
-  introNote: "추천 결과는 참고용이며 당첨을 보장하지 않습니다.",
+    "사용자가 먼저 필요한 정보를 보고, 그다음에 설명과 가이드를 천천히 살펴볼 수 있도록 구성했습니다. 제품 페이지와 가이드 페이지는 역할을 나눠서 운영합니다.",
+  introNote:
+    "가이드는 SEO와 AdSense 인벤토리로 유지하되, 정책과 문의 정보는 별도로 분리해 신뢰도를 높입니다.",
   linkGroups: [
     {
       title: "서비스",
       links: [
-        { href: "/generate", label: "번호 생성기" },
-        { href: "/draws", label: "회차 조회" },
+        { href: "/generate", label: "번호 생성" },
+        { href: "/draws", label: "회차 보기" },
         { href: "/stats", label: "통계" },
         { href: "/generated-stats", label: "생성 통계" },
-        { href: "/lotto-buy-guide", label: "온라인 구매 안내" },
-        { href: "/about", label: "서비스 소개" }
+        { href: "/guides", label: "가이드" }
       ]
     },
     {
       title: "정책",
       links: [
+        { href: "/about", label: "About" },
         { href: "/privacy", label: "개인정보처리방침" },
         { href: "/terms", label: "이용약관" },
         { href: "/faq", label: "FAQ" },
-        { href: "/contact", label: "문의 / 운영 안내" },
-        { href: "/policies/ads", label: "광고 안내" }
+        { href: "/contact", label: "문의하기" },
+        { href: "/policies/ads", label: "광고 정책" }
       ]
     }
   ],
