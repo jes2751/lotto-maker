@@ -10,7 +10,8 @@ const primaryNavigation = [
   { href: "/generate", label: "생성기" },
   { href: "/draws", label: "회차" },
   { href: "/stats", label: "공식 통계" },
-  { href: "/generated-stats", label: "사람들 선택" }
+  { href: "/generated-stats", label: "사람들 선택" },
+  { href: "/guides", label: "가이드" }
 ] as const;
 
 export function SiteHeader() {

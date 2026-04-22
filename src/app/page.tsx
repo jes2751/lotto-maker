@@ -353,21 +353,28 @@ export default async function HomePage() {
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
             <p className="eyebrow">가이드</p>
-            <h2 className="section-subtitle mt-4 text-white">자주 보는 로또 가이드</h2>
+            <h2 className="section-subtitle mt-4 text-white">가장 많이 읽는 로또 가이드</h2>
             <p className="mt-3 text-sm leading-7 text-slate-400">
-              처음 보는 사람도 바로 이해할 수 있는 설명형 문서를 우선순위대로 정리했습니다.
+              로또의 수학적 확률부터 세금 계산, 그리고 1등 당첨 시 행동 요령까지 모든 것을 알려드립니다.
             </p>
             <div className="mt-5 grid gap-3">
               {[
-                { href: "/guides/lotto-number-generator-vs-random", label: "생성기 vs 랜덤 추천" },
-                { href: "/guides/recent-20-hot-numbers", label: "최근 20회 자주 나온 번호" },
-                { href: "/guides/odd-even-pattern-guide", label: "홀짝 패턴은 어떻게 읽을까" }
+                { href: "/guides/what-to-do-when-winning-lotto", label: "1등 당첨 시 가장 먼저 해야 할 일" },
+                { href: "/guides/lotto-probability-truth", label: "1등 확률 814만 분의 1과 기댓값" },
+                { href: "/guides/lotto-tax-and-claim-guide", label: "당첨금 세금 및 실수령액 계산법" },
+                { href: "/guides/recent-hot-and-cold-numbers", label: "핫 넘버와 콜드 넘버 통계의 진실" },
+                { href: "/guides/lotto-number-generator-vs-random", label: "생성기를 써야 하는 수학적 이유" }
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="link-list-item">
                   <span>{item.label}</span>
                   <span className="text-slate-500">열기</span>
                 </Link>
               ))}
+            </div>
+            <div className="mt-5">
+              <Link href="/guides" className="text-sm font-semibold tracking-wide text-teal hover:text-white transition-colors">
+                모든 로또 가이드 (8편) 전체 보기 &rarr;
+              </Link>
             </div>
           </div>
 
