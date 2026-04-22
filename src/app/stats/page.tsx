@@ -72,20 +72,32 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
     {
       href: "/hot-numbers",
       kicker: "핵심 번호",
-      title: "지금 강한 번호",
-      body: "가장 자주 나온 번호부터 빠르게 확인합니다."
+      title: "자주 나온 번호",
+      body: "전체 회차 기준으로 많이 나온 번호를 먼저 확인합니다."
     },
     {
       href: "/cold-numbers",
       kicker: "반대 신호",
-      title: "쉬는 번호",
-      body: "적게 나온 번호를 따로 모아 흐름 차이를 봅니다."
+      title: "적게 나온 번호",
+      body: "상대적으로 조용했던 번호를 따로 모아 비교합니다."
+    },
+    {
+      href: "/odd-even-pattern",
+      kicker: "패턴 분석 1",
+      title: "홀짝 패턴",
+      body: "홀짝 비율이 어떤 조합으로 자주 나왔는지 확인합니다."
+    },
+    {
+      href: "/sum-pattern",
+      kicker: "패턴 분석 2",
+      title: "합계 패턴",
+      body: "번호 6개의 합계 구간이 어떻게 분포되는지 파악합니다."
     },
     {
       href: "/recent-10-draw-analysis",
       kicker: "단기 변화",
       title: "최근 10회 해석",
-      body: "지금 막 바뀌는 패턴이 있는지 최근 회차만 따로 봅니다."
+      body: "짧은 구간에서 반복되는 흐름을 먼저 보고 싶을 때 유용합니다."
     }
   ] as const;
 
