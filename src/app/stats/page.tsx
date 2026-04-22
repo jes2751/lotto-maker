@@ -105,11 +105,10 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
       <section className="panel hero-panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
-          <p className="eyebrow">과거 1등 데이터</p>
-          <h1 className="section-title mt-4 text-gradient-silver">실제로 나온 번호 기준으로 먼저 판단하세요</h1>
+          <p className="eyebrow">로또 통계 허브</p>
+          <h1 className="section-title mt-4 text-gradient-silver">공식 당첨 기록으로 흐름을 판단하세요</h1>
           <p className="body-large mt-4 max-w-4xl text-slate-300">
-            이 화면은 공식 당첨 기록만을 기준으로 번호 흐름을 읽는 기준판입니다. 장기 흐름과 최근 흐름을
-            함께 놓고, 실제로 나온 번호를 먼저 판단 근거로 삼게 만듭니다.
+            이 화면은 전체 로또 통계 지표를 한눈에 보여주는 메인 대시보드입니다. 장기 흐름과 최근 10회 흐름을 함께 비교해 보시고, 하단의 주제별 심층 분석 카드를 통해 원하는 패턴으로 즉시 진입하세요.
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5">
             {["공식 당첨 기록", "장기 흐름", "최근 10회", "실제 결과 기준"].map((item) => (

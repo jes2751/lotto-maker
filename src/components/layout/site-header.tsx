@@ -9,7 +9,7 @@ const primaryNavigation = [
   { href: "/generate", label: "생성기" },
   { href: "/check", label: "당첨 확인" },
   { href: "/draws", label: "회차" },
-  { href: "/lotto-statistics", label: "통계 허브" },
+  { href: "/stats", label: "통계 허브" },
   { href: "/generated-stats", label: "유저 통계" },
   { href: "/guides", label: "가이드" }
 ] as const;
