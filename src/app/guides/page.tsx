@@ -148,7 +148,7 @@ export default async function GuidesHubPage() {
       <section className="panel">
         <p className="eyebrow">{copy.next}</p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/lotto-number-generator" className="cta-button">
+          <Link href="/generate" className="cta-button">
             {copy.generator}
           </Link>
           <Link href="/lotto-statistics" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
