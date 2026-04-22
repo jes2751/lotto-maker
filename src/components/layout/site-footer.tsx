@@ -16,7 +16,8 @@ const content = {
         { href: "/draws", label: "회차 조회" },
         { href: "/stats", label: "통계" },
         { href: "/generated-stats", label: "생성 통계" },
-        { href: "/lotto-buy-guide", label: "온라인 구매 안내" }
+        { href: "/lotto-buy-guide", label: "온라인 구매 안내" },
+        { href: "/about", label: "서비스 소개" }
       ]
     },
     {

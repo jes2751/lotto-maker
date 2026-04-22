@@ -81,6 +81,26 @@ export default async function GeneratePage() {
       <div id="generator-panel">
         <GeneratorPanel targetRound={targetRound} />
       </div>
+
+      <section className="panel mt-8">
+        <h2 className="text-2xl font-semibold text-white">생성기 이용 가이드</h2>
+        <div className="mt-4 grid gap-6 text-sm leading-7 text-slate-300 md:grid-cols-2">
+          <div>
+            <h3 className="font-semibold text-white">로또 번호 생성의 통계적 의미</h3>
+            <p className="mt-2">
+              Lotto Maker Lab의 생성기는 과거 1등 당첨 데이터의 흐름과 출현 빈도를 분석하여, 완전히 무작위로 번호를 고르는 것 이상의 판단 기준을 제시합니다. 통계나 패턴을 활용하더라도 모든 번호 조합의 당첨 확률은 수학적으로 동일합니다. 하지만 사람들이 흔히 선호하는 번호 조합을 회피함으로써, 실제 당첨 시 당첨금을 여러 명과 나누게 되는 '분산 리스크'를 줄일 수 있습니다.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-white">전략별 활용 방법</h3>
+            <p className="mt-2">
+              <strong className="text-white">혼합 추천:</strong> 가장 균형 잡힌 로직으로 빠르게 번호를 고르고 싶을 때 사용합니다.<br />
+              <strong className="text-white">빈도 추천:</strong> 최근 자주 출현하거나 오랫동안 나오지 않은 번호의 흐름을 강하게 반영하고 싶을 때 적합합니다.<br />
+              <strong className="text-white">필터 조건:</strong> 홀짝 비율, 연속 번호 등 특정 패턴을 직접 제어하여 남들이 잘 고르지 않을 만한 번호를 만들 때 활용합니다.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

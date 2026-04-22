@@ -283,6 +283,14 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           </div>
         </div>
       </section>
+
+      <section className="panel mt-2">
+        <h2 className="text-xl font-semibold text-white">로또 통계 분석 가이드</h2>
+        <p className="mt-4 text-sm leading-7 text-slate-300">
+          과거의 로또 당첨 번호를 분석하는 것은 단순히 '다음에 확실히 나올 번호'를 예측하는 것이 아닙니다. 매 회차의 추첨은 독립 시행이므로 수학적 확률은 항상 동일합니다. 하지만 누적된 데이터를 통해 사람들이 어떤 번호를 선호하는지, 어떤 패턴(예: 특정 홀짝 비율, 합계 구간)이 평균적으로 자주 발생했는지를 파악할 수 있습니다. 
+          이러한 통계적 접근은 특정 번호 조합에 군중이 몰리는 현상(겹침 현상)을 회피하여, 만약 1등에 당첨되었을 때 수령할 당첨금의 기대 가치를 높이는 전략적인 선택을 돕습니다. '장기 흐름'을 통해 전체적인 출현 빈도를 확인하고, '최근 10회'를 통해 단기적인 번호 출현의 쏠림 현상을 분석해 보세요.
+        </p>
+      </section>
     </div>
   );
 }
