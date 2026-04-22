@@ -108,76 +108,8 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           <p className="eyebrow">로또 통계 허브</p>
           <h1 className="section-title mt-4 text-gradient-silver">공식 당첨 기록으로 흐름을 판단하세요</h1>
           <p className="body-large mt-4 max-w-4xl text-slate-300">
-            이 화면은 전체 로또 통계 지표를 한눈에 보여주는 메인 대시보드입니다. 장기 흐름과 최근 10회 흐름을 함께 비교해 보시고, 하단의 주제별 심층 분석 카드를 통해 원하는 패턴으로 즉시 진입하세요.
+            이 화면은 전체 로또 통계 지표를 한눈에 보여주는 메인 대시보드입니다. 전체적인 데이터 요약을 먼저 확인하시고, 하단의 주제별 심층 분석 카드를 통해 원하는 패턴으로 즉시 진입하세요.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2.5">
-            {["공식 당첨 기록", "장기 흐름", "최근 10회", "실제 결과 기준"].map((item) => (
-              <span key={item} className="spark-pill">
-                {item}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="soft-card border-teal/20 bg-[linear-gradient(180deg,rgba(45,212,191,0.12)_0%,rgba(15,23,42,0.94)_100%)]">
-          <p className="eyebrow">공식 기준판</p>
-          <h2 className="mt-4 text-[1.45rem] font-semibold leading-[1.2] text-white">
-            실제 당첨 기록만 보고 장기 기준과 최근 변화를 같이 잡습니다
-          </h2>
-          <div className="mt-5 flex flex-col gap-6">
-            <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
-              <div>
-                <p className="text-base text-slate-300">조회 기간</p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {(["all", "recent_10"] as StatsPeriod[]).map((period) => (
-                    <Link
-                      key={period}
-                      href={buildStatsHref(period, top)}
-                      className={[
-                        "rounded-full border px-4 py-2 text-sm font-medium transition",
-                        selectedPeriod === period
-                          ? "border-accent bg-accent/10 text-white"
-                          : "border-white/10 text-slate-300 hover:border-white/30"
-                      ].join(" ")}
-                    >
-                      {getPeriodLabel(period)}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-base text-slate-300">표시 개수</p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {[5, 10, 15].map((value) => (
-                    <Link
-                      key={value}
-                      href={buildStatsHref(selectedPeriod, value)}
-                      className={[
-                        "rounded-full border px-4 py-2 text-sm font-medium transition",
-                        top === value
-                          ? "border-accent bg-accent/10 text-white"
-                          : "border-white/10 text-slate-300 hover:border-white/30"
-                      ].join(" ")}
-                    >
-                      상위 {value}개
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="grid gap-3">
-              {[
-                `${getPeriodLabel(selectedPeriod)} 기준으로 가장 먼저 봐야 할 번호는 ${selectedSummary.topNumber.number}번입니다.`,
-                `대표 홀짝은 ${oddEvenLeader}, 대표 합계 구간은 ${sumRangeLeader}입니다.`,
-                "공식 데이터로 기준을 잡은 뒤에만 우리 유저 데이터와 비교해 군중 쏠림을 보는 편이 좋습니다."
-              ].map((item) => (
-                <div key={item} className="signal-row">
-                  <span className="signal-row-dot" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
