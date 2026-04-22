@@ -117,15 +117,6 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
               </span>
             ))}
           </div>
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {entryCards.map((item) => (
-              <Link key={item.title} href={item.href} className="play-card">
-                <span className="play-card-kicker">{item.kicker}</span>
-                <span className="play-card-title">{item.title}</span>
-                <span className="play-card-body">{item.body}</span>
-              </Link>
-            ))}
-          </div>
         </div>
 
         <div className="soft-card border-teal/20 bg-[linear-gradient(180deg,rgba(45,212,191,0.12)_0%,rgba(15,23,42,0.94)_100%)]">
@@ -185,6 +176,19 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="panel mt-2">
+        <h2 className="mb-4 text-xl font-semibold text-white">주제별 심층 분석</h2>
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {entryCards.map((item) => (
+            <Link key={item.title} href={item.href} className="play-card">
+              <span className="play-card-kicker">{item.kicker}</span>
+              <span className="play-card-title">{item.title}</span>
+              <span className="play-card-body">{item.body}</span>
+            </Link>
+          ))}
         </div>
       </section>
 
