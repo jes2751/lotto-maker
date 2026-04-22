@@ -45,6 +45,31 @@ const guideEntries = {
       href: "/guides/lotto-tax-and-claim-guide",
       title: "당첨금 세금 및 실수령액 계산",
       description: "33% 세금 구간 계산법과 농협 본점 방문 절차 등 실제 수령에 필요한 정보를 총망라했습니다."
+    },
+    {
+      href: "/guides/the-truth-of-lotto-hotspots",
+      title: "로또 명당의 수학적 진실",
+      description: "1등 당첨자가 많이 나오는 소위 '로또 명당'의 비밀을 표본 크기와 선택 편향으로 분석합니다."
+    },
+    {
+      href: "/guides/lotto-vs-pension-lottery",
+      title: "로또 6/45 vs 연금복권 720+",
+      description: "일시불과 연금의 차이, 기댓값, 그리고 33%와 22%의 세금 차이를 재무적 관점에서 비교합니다."
+    },
+    {
+      href: "/guides/illegal-overseas-lotto",
+      title: "해외 복권(파워볼) 구매의 불법성",
+      description: "국내 대행사를 통해 미국 복권을 구매하는 행위의 도박죄 처벌 위험과 당첨금 미지급 리스크를 경고합니다."
+    },
+    {
+      href: "/guides/unusual-winning-patterns",
+      title: "역대 가장 기괴했던 패턴 Top 3",
+      description: "연속 번호 4개, 9의 배수 등 실제 당첨되었던 특이한 조합들을 통해 무작위와 기댓값의 진실을 배웁니다."
+    },
+    {
+      href: "/guides/lotto-asset-management",
+      title: "당첨금 15억 자산 관리 전략",
+      description: "1등 실수령액 15억 원을 잃지 않고 지켜내기 위한 파킹통장, 배당주 등 현실적인 재무 가이드입니다."
     }
   ],
   en: [
