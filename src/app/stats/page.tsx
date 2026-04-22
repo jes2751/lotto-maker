@@ -103,7 +103,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
-      <section className="panel hero-panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="panel hero-panel flex flex-col gap-8">
         <div>
           <p className="eyebrow">로또 통계 허브</p>
           <h1 className="section-title mt-4 text-gradient-silver">공식 당첨 기록으로 흐름을 판단하세요</h1>
@@ -124,7 +124,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           <h2 className="mt-4 text-[1.45rem] font-semibold leading-[1.2] text-white">
             실제 당첨 기록만 보고 장기 기준과 최근 변화를 같이 잡습니다
           </h2>
-          <div className="mt-5 grid gap-5">
+          <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_1fr_1.5fr]">
             <div>
               <p className="text-base text-slate-300">조회 기간</p>
               <div className="mt-3 flex flex-wrap gap-3">
