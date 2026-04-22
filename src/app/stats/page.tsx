@@ -124,43 +124,45 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
           <h2 className="mt-4 text-[1.45rem] font-semibold leading-[1.2] text-white">
             실제 당첨 기록만 보고 장기 기준과 최근 변화를 같이 잡습니다
           </h2>
-          <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_1fr_1.5fr]">
-            <div>
-              <p className="text-base text-slate-300">조회 기간</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {(["all", "recent_10"] as StatsPeriod[]).map((period) => (
-                  <Link
-                    key={period}
-                    href={buildStatsHref(period, top)}
-                    className={[
-                      "rounded-full border px-4 py-2 text-sm font-medium transition",
-                      selectedPeriod === period
-                        ? "border-accent bg-accent/10 text-white"
-                        : "border-white/10 text-slate-300 hover:border-white/30"
-                    ].join(" ")}
-                  >
-                    {getPeriodLabel(period)}
-                  </Link>
-                ))}
+          <div className="mt-5 flex flex-col gap-6">
+            <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
+              <div>
+                <p className="text-base text-slate-300">조회 기간</p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {(["all", "recent_10"] as StatsPeriod[]).map((period) => (
+                    <Link
+                      key={period}
+                      href={buildStatsHref(period, top)}
+                      className={[
+                        "rounded-full border px-4 py-2 text-sm font-medium transition",
+                        selectedPeriod === period
+                          ? "border-accent bg-accent/10 text-white"
+                          : "border-white/10 text-slate-300 hover:border-white/30"
+                      ].join(" ")}
+                    >
+                      {getPeriodLabel(period)}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <p className="text-base text-slate-300">표시 개수</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {[5, 10, 15].map((value) => (
-                  <Link
-                    key={value}
-                    href={buildStatsHref(selectedPeriod, value)}
-                    className={[
-                      "rounded-full border px-4 py-2 text-sm font-medium transition",
-                      top === value
-                        ? "border-accent bg-accent/10 text-white"
-                        : "border-white/10 text-slate-300 hover:border-white/30"
-                    ].join(" ")}
-                  >
-                    상위 {value}개
-                  </Link>
-                ))}
+              <div>
+                <p className="text-base text-slate-300">표시 개수</p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {[5, 10, 15].map((value) => (
+                    <Link
+                      key={value}
+                      href={buildStatsHref(selectedPeriod, value)}
+                      className={[
+                        "rounded-full border px-4 py-2 text-sm font-medium transition",
+                        top === value
+                          ? "border-accent bg-accent/10 text-white"
+                          : "border-white/10 text-slate-300 hover:border-white/30"
+                      ].join(" ")}
+                    >
+                      상위 {value}개
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="grid gap-3">
