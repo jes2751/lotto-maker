@@ -49,7 +49,7 @@ export default async function OddEvenPatternPage() {
             Sum pattern 보기
           </Link>
           <Link
-            href="/lotto-statistics"
+            href="/stats"
             className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30"
           >
             통계 허브로 이동

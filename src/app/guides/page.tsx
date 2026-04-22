@@ -151,7 +151,7 @@ export default async function GuidesHubPage() {
           <Link href="/generate" className="cta-button">
             {copy.generator}
           </Link>
-          <Link href="/lotto-statistics" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
+          <Link href="/stats" className="rounded-full border border-white/10 px-5 py-3 text-sm text-slate-200 transition hover:border-white/30">
             {copy.stats}
           </Link>
         </div>

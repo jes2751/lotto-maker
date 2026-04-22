@@ -19,7 +19,7 @@ const staticRoutes: StaticRoute[] = [
   { path: "/draw-analysis", changeFrequency: "weekly", priority: 0.75 },
   { path: "/latest-lotto-results", changeFrequency: "daily", priority: 0.85 },
   { path: "/lotto-number-generator", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/lotto-statistics", changeFrequency: "weekly", priority: 0.7 },
+
   { path: "/hot-numbers", changeFrequency: "weekly", priority: 0.65 },
   { path: "/cold-numbers", changeFrequency: "weekly", priority: 0.65 },
   { path: "/odd-even-pattern", changeFrequency: "weekly", priority: 0.65 },
