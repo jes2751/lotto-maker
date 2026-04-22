@@ -103,7 +103,7 @@ export default async function HotNumbersPage() {
       <section className="panel">
         <p className="eyebrow">{copy.next}</p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/guides/recent-20-hot-numbers" className="cta-button">
+          <Link href="/guides/recent-hot-and-cold-numbers" className="cta-button">
             {copy.recentHot}
           </Link>
           <Link

@@ -33,7 +33,7 @@ const content = {
     links: [
       ["/generate", "추천기 바로 열기", "실제 추천기 화면으로 이동합니다."],
       ["/guides/lotto-number-generator-vs-random", "추천기와 랜덤의 차이", "데이터 기반 추천과 완전 랜덤의 차이를 설명합니다."],
-      ["/guides/recent-20-hot-numbers", "최근 20회 자주 나온 번호", "단기 흐름을 먼저 보고 전략을 고를 수 있습니다."]
+      ["/guides/recent-hot-and-cold-numbers", "최근 자주 나온 번호", "단기 흐름을 먼저 보고 전략을 고를 수 있습니다."]
     ]
   },
   en: {
@@ -52,7 +52,7 @@ const content = {
     links: [
       ["/generate", "Open generator", "Jump into the main recommendation tool."],
       ["/guides/lotto-number-generator-vs-random", "Generator vs random picks", "Explain why a data-based generator and a pure random pick serve different user needs."],
-      ["/guides/recent-20-hot-numbers", "Recent 20 hot numbers", "Use a short-term trend summary before choosing a strategy."]
+      ["/guides/recent-hot-and-cold-numbers", "Recent hot numbers", "Use a short-term trend summary before choosing a strategy."]
     ]
   }
 } as const;
