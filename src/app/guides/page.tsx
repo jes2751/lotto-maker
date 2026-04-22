@@ -9,17 +9,42 @@ const guideEntries = {
     {
       href: "/guides/lotto-number-generator-vs-random",
       title: "생성기 vs 랜덤 추천",
-      description: "완전 랜덤 추천과 과거 당첨 데이터 기반 추천이 어떻게 다른지 설명합니다."
+      description: "로또 번호 생성기를 사용해야 하는 이유를 독립 확률과 겹침 회피 전략 등 수학적 관점에서 분석합니다."
     },
     {
-      href: "/guides/recent-20-hot-numbers",
-      title: "최근 20회 자주 나온 번호",
-      description: "최신 20회에서 많이 나온 번호를 요약하고 통계 페이지와 연결합니다."
+      href: "/guides/lotto-probability-truth",
+      title: "1등 확률과 기댓값의 진실",
+      description: "814만 분의 1 확률의 의미와, 수학적 기댓값을 통해 왜 1,2,3,4,5,6을 찍으면 안 되는지 증명합니다."
     },
     {
       href: "/guides/odd-even-pattern-guide",
-      title: "홀짝 패턴은 어떻게 읽을까",
-      description: "많이 보는 로또 질문을 패턴 분석 페이지와 연결되는 가이드로 정리합니다."
+      title: "홀짝 패턴 완벽 분석",
+      description: "홀짝 3:3이나 4:2가 가장 많이 나오는 이유를 대수의 법칙과 조합론을 통해 설명합니다."
+    },
+    {
+      href: "/guides/lotto-sum-pattern-analysis",
+      title: "당첨 번호 합계 통계의 비밀",
+      description: "6개 번호의 합계가 정규 분포 곡선에 따라 120~160 사이에 집중되는 현상을 수학적으로 파헤칩니다."
+    },
+    {
+      href: "/guides/recent-hot-and-cold-numbers",
+      title: "핫 넘버와 콜드 넘버",
+      description: "자주 나오는 번호와 안 나오는 번호의 통계적 회귀 현상과 군중 심리를 분석합니다."
+    },
+    {
+      href: "/guides/how-to-buy-lotto-online",
+      title: "로또 인터넷 구매 방법",
+      description: "모바일 불가 정책, K뱅크 연동 충전 등 로또 온라인 구매 시 알아야 할 규제와 팁을 정리했습니다."
+    },
+    {
+      href: "/guides/what-to-do-when-winning-lotto",
+      title: "1등 당첨 시 행동 요령 4가지",
+      description: "로또 1등 당첨 시 가장 먼저 해야 할 서명부터 농협 본점 방문까지 현실적인 대처법을 안내합니다."
+    },
+    {
+      href: "/guides/lotto-tax-and-claim-guide",
+      title: "당첨금 세금 및 실수령액 계산",
+      description: "33% 세금 구간 계산법과 농협 본점 방문 절차 등 실제 수령에 필요한 정보를 총망라했습니다."
     }
   ],
   en: [
@@ -29,9 +54,9 @@ const guideEntries = {
       description: "Explain the difference between a pure random pick and a historical-data-based recommendation page."
     },
     {
-      href: "/guides/recent-20-hot-numbers",
-      title: "Recent 20 hot numbers",
-      description: "Summarize the numbers that appeared most often in the latest 20 rounds and connect them to the stats pages."
+      href: "/guides/recent-hot-and-cold-numbers",
+      title: "Hot and Cold numbers",
+      description: "Summarize the numbers that appeared most often in the latest rounds and connect them to the stats pages."
     },
     {
       href: "/guides/odd-even-pattern-guide",
