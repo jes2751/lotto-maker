@@ -66,7 +66,7 @@ export default function OddEvenPatternGuidePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">2. 왜 3:3 과 4:2 / 2:4 가 압도적으로 많을까?</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            로또 1등 당첨 결과를 보면 '홀3:짝3', '홀4:짝2', '홀2:짝4' 비율이 전체 당첨 결과의 무려 **80% 이상**을 차지합니다. 이것은 대수의 법칙이나 마법이 아니라, 단순히 **그렇게 조합될 수 있는 '경우의 수' 자체가 압도적으로 많기 때문**입니다.
+            로또 1등 당첨 결과를 보면 '홀3:짝3', '홀4:짝2', '홀2:짝4' 비율이 전체 당첨 결과의 무려 <strong className="text-white">80% 이상</strong>을 차지합니다. 이것은 대수의 법칙이나 마법이 아니라, 단순히 <strong className="text-white">그렇게 조합될 수 있는 '경우의 수' 자체가 압도적으로 많기 때문</strong>입니다.
           </p>
           <ul className="mt-4 list-inside list-disc space-y-3 text-slate-300 leading-7">
             <li><strong>홀3 짝3:</strong> 23C3 × 22C3 = 1,771 × 1,540 = 2,727,340가지 (약 33.5%)</li>
@@ -81,7 +81,7 @@ export default function OddEvenPatternGuidePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">3. 번호 선택 시 홀짝 비율을 어떻게 활용해야 할까?</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            홀짝 분석은 '다음에 나올 번호'를 예측하는 마법의 지팡이가 아닙니다. 하지만 번호를 조합할 때 **내가 고른 번호가 통계적 주류에 속하는지, 비주류에 속하는지 점검하는 안전벨트** 역할을 할 수 있습니다.
+            홀짝 분석은 '다음에 나올 번호'를 예측하는 마법의 지팡이가 아닙니다. 하지만 번호를 조합할 때 <strong className="text-white">내가 고른 번호가 통계적 주류에 속하는지, 비주류에 속하는지 점검하는 안전벨트</strong> 역할을 할 수 있습니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             만약 자신이 고른 6개의 번호가 우연히 모두 짝수(0:6)라면, 이는 약 0.9% 확률의 바늘구멍을 뚫어야 하는 험난한 베팅입니다. 물론 당첨될 확률 자체는 814만 분의 1로 동일하지만, 장기적인 투자(로또 구매) 관점에서는 81%의 확률 안에 들어가는 안전한 3:3, 4:2, 2:4 패턴으로 번호를 구성하는 것이 정석적인 접근입니다.

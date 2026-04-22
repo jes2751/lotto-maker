@@ -73,7 +73,7 @@ export default function LottoSumPatternAnalysisPage() {
             </p>
           </div>
           <p className="mt-6 leading-8 text-slate-300">
-            실제로 역대 로또 당첨 번호를 전수 분석해 보면, **전체 당첨의 약 70% 이상이 합계 120 ~ 160 구간**에 위치하고 있습니다. 이는 주최 측이 일부러 그렇게 만드는 것이 아니라 수학이 지배하는 자연스러운 현상입니다.
+            실제로 역대 로또 당첨 번호를 전수 분석해 보면, <strong className="text-white">전체 당첨의 약 70% 이상이 합계 120 ~ 160 구간</strong>에 위치하고 있습니다. 이는 주최 측이 일부러 그렇게 만드는 것이 아니라 수학이 지배하는 자연스러운 현상입니다.
           </p>
         </section>
 

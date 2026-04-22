@@ -50,7 +50,7 @@ export default function RecentHotAndColdNumbersGuidePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">1. 핫 넘버(Hot Numbers)의 착시 현상</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            최근 10주 동안 특정 번호(예: 34번)가 4번이나 당첨되었다고 가정해 보겠습니다. 사람들은 이를 '핫 넘버'라 부르며 "흐름을 탔다"고 믿습니다. 하지만 이는 전형적인 **도박사의 오류(Gambler's Fallacy)의 반대 형태인 '뜨거운 손의 오류(Hot Hand Fallacy)'**입니다.
+            최근 10주 동안 특정 번호(예: 34번)가 4번이나 당첨되었다고 가정해 보겠습니다. 사람들은 이를 '핫 넘버'라 부르며 "흐름을 탔다"고 믿습니다. 하지만 이는 전형적인 <strong className="text-white">도박사의 오류(Gambler's Fallacy)의 반대 형태인 '뜨거운 손의 오류(Hot Hand Fallacy)'</strong>입니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             로또 기계는 과거를 기억하지 못합니다. 34번이 최근 자주 나왔다고 해서 다음 추첨에서 기계가 34번을 더 쉽게 뽑아주는 구조적 이유는 전혀 없습니다. 단지 한정된 짧은 기간(표본) 안에서 우연히 발생한 분산(Variance)일 뿐입니다.
@@ -73,7 +73,7 @@ export default function RecentHotAndColdNumbersGuidePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">3. 그렇다면 왜 핫/콜드 번호를 분석해야 할까?</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            당첨 확률이 동일하다면 왜 이런 통계를 제공하고 분석해야 할까요? 해답은 철저하게 **'군중 심리를 역이용하기 위함'**입니다.
+            당첨 확률이 동일하다면 왜 이런 통계를 제공하고 분석해야 할까요? 해답은 철저하게 <strong className="text-white">'군중 심리를 역이용하기 위함'</strong>입니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             사람들은 각종 로또 커뮤니티나 매체를 통해 "최근 34번이 핫하다", "이제 7번이 나올 때가 됐다"는 정보를 공유합니다. 그리고 무의식적으로 그 번호들을 수동 용지에 마킹합니다. 만약 모두가 선택한 핫/콜드 조합이 실제 1등에 당첨된다면 어떻게 될까요? 당첨자가 수십 명 쏟아져 1등 당첨금이 폭락하는 비극이 발생합니다.

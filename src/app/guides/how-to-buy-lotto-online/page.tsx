@@ -50,7 +50,7 @@ export default function HowToBuyLottoOnlinePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">1. 모바일 기기 구매 전면 금지 (PC만 가능)</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            가장 많이 겪는 혼란은 "스마트폰으로 동행복권 홈페이지에 들어갔는데 구매 버튼이 안 눌린다"는 것입니다. 관련 법령(사행산업 과몰입 방지)에 따라 **로또 6/45는 모바일 기기(스마트폰, 태블릿) 브라우저나 앱에서의 구매가 원천적으로 차단**되어 있습니다.
+            가장 많이 겪는 혼란은 "스마트폰으로 동행복권 홈페이지에 들어갔는데 구매 버튼이 안 눌린다"는 것입니다. 관련 법령(사행산업 과몰입 방지)에 따라 <strong className="text-white">로또 6/45는 모바일 기기(스마트폰, 태블릿) 브라우저나 앱에서의 구매가 원천적으로 차단</strong>되어 있습니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             오직 데스크톱(PC)이나 랩탑 컴퓨터 환경의 웹 브라우저에서만 결제창이 활성화됩니다. 예외적으로 연금복권 등은 모바일 구매가 가능하지만, 로또는 무조건 PC 환경이 필요합니다.
@@ -60,7 +60,7 @@ export default function HowToBuyLottoOnlinePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">2. 1회차 1인당 구매 한도: 5,000원</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            오프라인 판매점에서는 한 번에 10만 원어치까지 구매할 수 있지만, 인터넷 구매는 **1주일에 1인당 딱 5,000원(5게임)**까지만 구매가 허용됩니다.
+            오프라인 판매점에서는 한 번에 10만 원어치까지 구매할 수 있지만, 인터넷 구매는 <strong className="text-white">1주일에 1인당 딱 5,000원(5게임)</strong>까지만 구매가 허용됩니다.
           </p>
           <p className="mt-4 font-semibold text-rose-400">
             이 5,000원 한도는 매주 일요일 오전 6시에 리셋됩니다.
@@ -76,7 +76,7 @@ export default function HowToBuyLottoOnlinePage() {
             온라인 로또는 신용카드나 일반 간편결제(삼성페이, 네이버페이 등)로 결제할 수 없습니다. 오직 동행복권 사이트에 '예치금'을 미리 충전해두고 차감하는 방식으로만 구매가 가능합니다.
           </p>
           <ul className="mt-4 list-inside list-disc space-y-3 text-slate-300 leading-7">
-            <li>회원 가입 후 부여받는 **가상계좌(케이뱅크)**로 돈을 이체하여 예치금을 충전합니다.</li>
+            <li>회원 가입 후 부여받는 <strong className="text-white">가상계좌(케이뱅크)</strong>로 돈을 이체하여 예치금을 충전합니다.</li>
             <li>케이뱅크 계좌가 없어도, 다른 은행(국민, 신한, 토스 등)에서 자신의 동행복권 케이뱅크 가상계좌로 이체하는 것은 가능합니다.</li>
             <li>단, 최소 충전 단위가 5,000원 단위로 정해져 있으므로, 필요한 금액만큼만 이체하시기 바랍니다.</li>
           </ul>
@@ -85,7 +85,7 @@ export default function HowToBuyLottoOnlinePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">4. 인터넷 당첨금 수령 방식</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            온라인으로 구매한 로또가 4등(5만 원)이나 5등(5천 원)에 당첨되면, 일요일 오전에 **동행복권 예치금으로 자동 환급(입금)**됩니다. 이 예치금으로 다음 회차를 다시 구매하거나, 원할 경우 자신의 은행 계좌로 출금(이체 수수료 발생 가능)할 수 있어 매우 편리합니다.
+            온라인으로 구매한 로또가 4등(5만 원)이나 5등(5천 원)에 당첨되면, 일요일 오전에 <strong className="text-white">동행복권 예치금으로 자동 환급(입금)</strong>됩니다. 이 예치금으로 다음 회차를 다시 구매하거나, 원할 경우 자신의 은행 계좌로 출금(이체 수수료 발생 가능)할 수 있어 매우 편리합니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             단, 1등~3등 등 고액 당첨의 경우에는 오프라인 구매와 동일하게 신분증 지참 후 농협은행을 직접 방문해야 합니다.

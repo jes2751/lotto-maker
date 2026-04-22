@@ -97,7 +97,7 @@ export default function LottoTaxAndClaimGuidePage() {
             당첨 등수에 따라 당첨금을 수령하는 장소가 엄격하게 구분되어 있습니다. 1등 당첨자는 전국의 일반 은행이나 복권 판매점에서 절대 당첨금을 받을 수 없습니다.
           </p>
           <ul className="mt-4 list-inside list-disc space-y-3 text-slate-300 leading-7">
-            <li><strong>1등:</strong> 오직 **농협은행 본점 (서울 서대문구)** 에서만 수령 가능합니다. (일반 농협 지점 불가)</li>
+            <li><strong>1등:</strong> 오직 <strong className="text-white">농협은행 본점 (서울 서대문구)</strong> 에서만 수령 가능합니다. (일반 농협 지점 불가)</li>
             <li><strong>2등, 3등:</strong> 전국 농협은행 각 지점</li>
             <li><strong>4등, 5등:</strong> 일반 복권 판매점 (보통 현금이나 새 복권으로 교환)</li>
           </ul>

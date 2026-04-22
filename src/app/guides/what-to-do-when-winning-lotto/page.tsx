@@ -50,7 +50,7 @@ export default function WhatToDoWhenWinningLottoPage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">1. 복권 뒷면에 즉시 서명하고 사진 촬영하기</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            가장 중요하고 가장 먼저 해야 할 일입니다. 로또 복권은 법적으로 **'무기명 유가증권'**입니다. 즉, 누가 샀든 상관없이 그 종이를 들고 농협에 가는 사람이 주인이 됩니다.
+            가장 중요하고 가장 먼저 해야 할 일입니다. 로또 복권은 법적으로 <strong className="text-white">'무기명 유가증권'</strong>입니다. 즉, 누가 샀든 상관없이 그 종이를 들고 농협에 가는 사람이 주인이 됩니다.
           </p>
           <ul className="mt-4 list-inside list-disc space-y-3 text-slate-300 leading-7">
             <li><strong>뒷면 서명:</strong> 복권 뒷면의 서명란에 지워지지 않는 펜(네임펜 등)으로 자신의 이름과 주민등록번호 앞자리, 서명을 즉시 기재하세요. 이렇게 하면 분실하거나 도난당하더라도 타인이 당첨금을 수령할 수 없습니다.</li>
@@ -61,7 +61,7 @@ export default function WhatToDoWhenWinningLottoPage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">2. 절대 복권을 훼손하지 않고 안전하게 보관하기</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            당첨 확인을 한다고 형광펜으로 숫자를 진하게 칠하거나, 기뻐서 구기거나, 물에 젖게 해서는 안 됩니다. 농협 창구에서는 **복권 앞면의 바코드**를 기계로 스캔하여 진위 여부를 판별합니다. 바코드가 훼손되면 당첨금 수령 절차가 매우 복잡해지거나 최악의 경우 지급이 거절될 수 있습니다.
+            당첨 확인을 한다고 형광펜으로 숫자를 진하게 칠하거나, 기뻐서 구기거나, 물에 젖게 해서는 안 됩니다. 농협 창구에서는 <strong className="text-white">복권 앞면의 바코드</strong>를 기계로 스캔하여 진위 여부를 판별합니다. 바코드가 훼손되면 당첨금 수령 절차가 매우 복잡해지거나 최악의 경우 지급이 거절될 수 있습니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             복권을 지퍼백이나 클리어 파일에 넣어 구겨지지 않게 보관하고, 평일 아침 농협에 가기 전까지 가장 안전한 곳(금고, 옷장 깊숙한 곳 등)에 보관하세요.
@@ -81,7 +81,7 @@ export default function WhatToDoWhenWinningLottoPage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">4. 농협 본점 방문 시나리오 세우기</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            1등 당첨금은 서울 서대문구에 위치한 **농협은행 본점 (신관 1층 로비 데스크 아님, 전용 창구 안내 받음)**에서만 지급합니다. 월요일 아침은 대기자가 많을 수 있으므로 화요일이나 수요일 방문을 추천하는 경험담이 많습니다.
+            1등 당첨금은 서울 서대문구에 위치한 <strong className="text-white">농협은행 본점 (신관 1층 로비 데스크 아님, 전용 창구 안내 받음)</strong>에서만 지급합니다. 월요일 아침은 대기자가 많을 수 있으므로 화요일이나 수요일 방문을 추천하는 경험담이 많습니다.
           </p>
           <ul className="mt-4 list-inside list-disc space-y-3 text-slate-300 leading-7">
             <li><strong>신분증과 당첨 복권</strong>을 반드시 챙기세요.</li>

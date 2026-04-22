@@ -42,7 +42,7 @@ export default function GeneratorVsRandomGuidePage() {
           자동 추천 vs 생성기: 수학적 관점에서의 완전 분석
         </h1>
         <p className="mt-6 leading-8 text-slate-300">
-          "어차피 로또는 운인데, 굳이 생성기를 써야 하나요?" 이 질문에 대한 가장 수학적이고 이성적인 답변을 드립니다. 단순히 무작위로 번호를 고르는 것과, 통계적 알고리즘이 적용된 생성기를 사용하는 것은 '당첨 확률' 측면에서는 동일하지만, **'당첨금의 기댓값(Expected Value)'** 측면에서는 완전히 다른 결과를 낳습니다.
+          "어차피 로또는 운인데, 굳이 생성기를 써야 하나요?" 이 질문에 대한 가장 수학적이고 이성적인 답변을 드립니다. 단순히 무작위로 번호를 고르는 것과, 통계적 알고리즘이 적용된 생성기를 사용하는 것은 '당첨 확률' 측면에서는 동일하지만, <strong className="text-white">'당첨금의 기댓값(Expected Value)'</strong> 측면에서는 완전히 다른 결과를 낳습니다.
         </p>
       </section>
 
@@ -53,14 +53,14 @@ export default function GeneratorVsRandomGuidePage() {
             로또 추첨은 대표적인 '독립 시행(Independent Trial)'입니다. 지난 주에 1, 2, 3번이 나왔다고 해서 이번 주에 1, 2, 3번이 나올 확률이 낮아지는 것은 아닙니다. 매 추첨마다 45개의 공이 뽑힐 확률은 완벽하게 동일합니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
-            따라서, 어떤 기계나 알고리즘을 사용하더라도 "다음에 확실히 당첨될 번호"를 예측하는 것은 수학적으로 불가능합니다. 완전 무작위 자동(Random)을 선택하든, 통계 기반 생성기를 사용하든 1등 당첨 확률은 **8,145,060분의 1**로 절대 변하지 않습니다.
+            따라서, 어떤 기계나 알고리즘을 사용하더라도 "다음에 확실히 당첨될 번호"를 예측하는 것은 수학적으로 불가능합니다. 완전 무작위 자동(Random)을 선택하든, 통계 기반 생성기를 사용하든 1등 당첨 확률은 <strong className="text-white">8,145,060분의 1</strong>로 절대 변하지 않습니다.
           </p>
         </section>
 
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">2. 왜 생성기를 써야 하는가? '겹침 회피 전략'</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            그렇다면 왜 생성기가 필요할까요? 핵심은 **'당첨되었을 때 얼마를 받을 것인가(당첨금 분배)'**에 있습니다.
+            그렇다면 왜 생성기가 필요할까요? 핵심은 <strong className="text-white">'당첨되었을 때 얼마를 받을 것인가(당첨금 분배)'</strong>에 있습니다.
           </p>
           <div className="mt-6 rounded-2xl bg-slate-900/50 p-6 border border-slate-800">
             <h3 className="text-lg font-semibold text-white">인간의 편향성 (Human Bias)</h3>
@@ -79,7 +79,7 @@ export default function GeneratorVsRandomGuidePage() {
         <section className="panel">
           <h2 className="text-2xl font-semibold text-white">3. 완전 랜덤(Random) 방식의 치명적 단점</h2>
           <p className="mt-4 leading-8 text-slate-300">
-            판매점의 '자동'이나 단순 난수 발생기(Random Number Generator)는 말 그대로 아무런 통제 없이 숫자를 뽑습니다. 이 경우 가끔 5개의 숫자가 모두 10번대 이하로 쏠리거나, 짝수만 6개가 나오는 등 **극단적인 패턴**이 나올 수 있습니다.
+            판매점의 '자동'이나 단순 난수 발생기(Random Number Generator)는 말 그대로 아무런 통제 없이 숫자를 뽑습니다. 이 경우 가끔 5개의 숫자가 모두 10번대 이하로 쏠리거나, 짝수만 6개가 나오는 등 <strong className="text-white">극단적인 패턴</strong>이 나올 수 있습니다.
           </p>
           <p className="mt-4 leading-8 text-slate-300">
             물론 극단적인 패턴도 나올 확률 자체는 동일하지만, 과거 통계적으로 볼 때 홀짝이 3:3이거나 합계가 120~160 사이인 경우가 전체 당첨의 대다수를 차지합니다. 굳이 확률적으로 '장기적인 평균(정규 분포의 중앙)'에서 크게 벗어난 희귀한 패턴에 돈을 걸 필요는 없습니다.
