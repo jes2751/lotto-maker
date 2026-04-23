@@ -147,7 +147,6 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
-  const [sharingId, setSharingId] = useState<string | null>(null);
   const [recordStatus, setRecordStatus] = useState<RecordStatus>("idle");
 
   const fixedNumbers = useMemo(() => parseNumberInput(fixedNumbersInput), [fixedNumbersInput]);
@@ -270,49 +269,6 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
     const nextSavedSets = savedSets.filter((item) => item.id !== id);
     setSavedSets(nextSavedSets);
     persistSavedSets(nextSavedSets);
-  }
-
-  async function shareSet(set: GeneratedSet) {
-    setSharingId(set.id);
-    setError(null);
-    try {
-      const { toBlob } = await import("html-to-image");
-      const element = document.getElementById(`share-card-${set.id}`);
-      if (!element) throw new Error("공유용 이미지를 찾을 수 없습니다.");
-
-      const blob = await toBlob(element, { 
-        cacheBust: true, 
-        pixelRatio: 2,
-        backgroundColor: "#020617", // Ensure background isn't transparent
-      });
-      if (!blob) throw new Error("이미지 생성에 실패했습니다.");
-
-      const file = new File([blob], `lotto-maker-${set.id}.png`, { type: "image/png" });
-
-      if (typeof navigator !== "undefined" && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: "로또 번호 생성 결과",
-          text: formatCopyText(set),
-          files: [file]
-        });
-      } else {
-        // Fallback to PC/legacy download
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-    } catch (caughtError) {
-      if ((caughtError as DOMException)?.name !== "AbortError") {
-        setError(caughtError instanceof Error ? caughtError.message : "이미지 공유에 실패했습니다.");
-      }
-    } finally {
-      setSharingId(null);
-    }
   }
 
   useEffect(() => {
@@ -676,44 +632,33 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                     군중 중복도가 낮습니다. 남들이 안 뽑은 번호 위주라 당첨 시 기댓값이 유리합니다.
                   </div>
                 )}
-                <div className="mt-4 flex flex-wrap gap-3">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Link
                     href={`/draws?number=${set.numbers[0]}`}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                   >
                     관련 회차 보기
                   </Link>
                   <Link
                     href={`/stats/numbers/${set.numbers[0]}`}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                   >
                     번호 통계 보기
                   </Link>
-                  
-                  <div className="ml-auto flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => saveSet(set)}
-                      className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-                    >
-                      {savedId === set.id ? "✓ 저장 완료" : "저장"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void copySet(set)}
-                      className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-                    >
-                      {copiedId === set.id ? "✓ 복사 완료" : "복사"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void shareSet(set)}
-                      disabled={sharingId === set.id}
-                      className="whitespace-nowrap rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-2.5 text-sm font-semibold text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
-                    >
-                      {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => saveSet(set)}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                  >
+                    {savedId === set.id ? "✓ 저장 완료" : "저장"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void copySet(set)}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                  >
+                    {copiedId === set.id ? "✓ 복사 완료" : "복사"}
+                  </button>
                 </div>
               </article>
             ))}
@@ -745,19 +690,11 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => void shareSet(set)}
-                      disabled={sharingId === set.id}
-                      className="hidden sm:inline-block rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
+                      onClick={() => removeSavedSet(set.id)}
+                      className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
                     >
-                      {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
+                      삭제
                     </button>
-                  <button
-                    type="button"
-                    onClick={() => removeSavedSet(set.id)}
-                    className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                  >
-                    삭제
-                  </button>
                   </div>
                 </div>
                 <div className="mt-4">
