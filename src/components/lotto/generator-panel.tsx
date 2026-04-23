@@ -634,12 +634,6 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                 )}
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Link
-                    href={`/draws?number=${set.numbers[0]}`}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-                  >
-                    관련 회차 보기
-                  </Link>
-                  <Link
                     href={`/stats/numbers/${set.numbers[0]}`}
                     className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                   >
