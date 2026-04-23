@@ -29,6 +29,8 @@ export interface GeneratedSet {
   bonus?: number;
   reason: string;
   generatedAt: string;
+  overlapScore?: number;
+  overlapLevel?: "safe" | "warning" | "danger";
 }
 
 export interface FrequencyStat {

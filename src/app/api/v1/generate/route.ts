@@ -1,8 +1,9 @@
-import { getGeneratedRequest, saveGeneratedRecords } from "@/lib/firebase/admin";
+import { getGeneratedRequest, saveGeneratedRecords, getGeneratedRoundStats } from "@/lib/firebase/admin";
 import { jsonError, jsonSuccess } from "@/lib/http";
 import { generationService } from "@/lib/lotto";
 import { drawRepository } from "@/lib/lotto/repository";
 import { isValidStrategy } from "@/lib/lotto/shared";
+import { calculateCrowdOverlap, getOverlapWarning } from "@/lib/lotto/overlap";
 import type { GenerationFilters, OddEvenFilter } from "@/types/lotto";
 
 interface GenerateRequestBody {
@@ -29,6 +30,8 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 50;
 const rateLimitCache = new Map<string, RateLimitEntry>();
 const validOddEvenFilters: OddEvenFilter[] = ["any", "balanced", "odd-heavy", "even-heavy"];
+
+let cachedTopNumbers: { round: number; numbers: any[]; expiresAt: number } | null = null;
 
 function normalizeRequestId(value: unknown) {
   if (typeof value !== "string") {
@@ -153,10 +156,39 @@ export async function POST(request: Request) {
       }
     }
 
-    const sets = await generationService.generate({
+    let topNumbers: any[] = [];
+    if (targetRound) {
+      if (cachedTopNumbers && cachedTopNumbers.round === targetRound && cachedTopNumbers.expiresAt > Date.now()) {
+        topNumbers = cachedTopNumbers.numbers;
+      } else {
+        try {
+          const stats = await getGeneratedRoundStats(targetRound);
+          topNumbers = stats?.view.currentTopNumbers ?? [];
+          cachedTopNumbers = {
+            round: targetRound,
+            numbers: topNumbers,
+            expiresAt: Date.now() + 5 * 60 * 1000 // Cache for 5 minutes
+          };
+        } catch (err) {
+          console.warn("[generated-stats] failed to fetch round stats for overlap calculation", err);
+        }
+      }
+    }
+
+    const rawSets = await generationService.generate({
       strategy,
       count,
       filters
+    });
+
+    const sets = rawSets.map(set => {
+      if (topNumbers.length === 0) return set;
+      const { score, level } = getOverlapWarning(calculateCrowdOverlap(set.numbers, topNumbers));
+      return {
+        ...set,
+        overlapScore: score,
+        overlapLevel: level
+      };
     });
 
     if (anonymousId && requestId) {
