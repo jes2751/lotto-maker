@@ -13,6 +13,8 @@ export interface StoredGeneratedRecord {
   matchCount?: number | null;
   bonusMatched?: boolean;
   settledAt?: string | null;
+  overlapScore?: number;
+  overlapLevel?: "safe" | "warning" | "danger";
   filters: {
     fixedNumbers: number[];
     excludedNumbers: number[];
@@ -44,6 +46,7 @@ export interface NumberUsageSummary {
   number: number;
   count: number;
   percentage: number;
+  expectedPrizeDrop?: number;
 }
 
 export interface MatchDistributionItem {
@@ -65,6 +68,14 @@ export interface GeneratedStatsSummary {
   }>;
   currentTopNumbers: NumberUsageSummary[];
   matchDistribution: MatchDistributionItem[];
+  overlapDistribution: {
+    safe: number;
+    warning: number;
+    danger: number;
+    safePercentage: number;
+    warningPercentage: number;
+    dangerPercentage: number;
+  };
 }
 
 export interface GeneratedStatsViewModel {
@@ -80,6 +91,14 @@ export interface GeneratedStatsViewModel {
   }>;
   currentTopNumbers: NumberUsageSummary[];
   matchDistribution: MatchDistributionItem[];
+  overlapDistribution: {
+    safe: number;
+    warning: number;
+    danger: number;
+    safePercentage: number;
+    warningPercentage: number;
+    dangerPercentage: number;
+  };
   recentRecords: StoredGeneratedRecord[];
 }
 
@@ -145,11 +164,19 @@ function buildCurrentTopNumbers(records: StoredGeneratedRecord[]): NumberUsageSu
   const totalRecords = Math.max(records.length, 1);
 
   return Array.from(counter.entries())
-    .map(([number, count]) => ({
-      number,
-      count,
-      percentage: Number(((count / totalRecords) * 100).toFixed(1))
-    }))
+    .map(([number, count]) => {
+      const percentage = Number(((count / totalRecords) * 100).toFixed(1));
+      // Base probability of any number appearing in a set of 6 from 45 is 6/45 ≈ 13.33%
+      // If percentage > 13.33%, it's over-represented. We map this over-representation to an EV drop penalty.
+      const overRepresentedRatio = Math.max(0, (percentage - 13.33) / 13.33);
+      const expectedPrizeDrop = Math.min(99, Math.round(overRepresentedRatio * 40));
+      return {
+        number,
+        count,
+        percentage,
+        expectedPrizeDrop
+      };
+    })
     .sort((left, right) => {
       if (right.count !== left.count) {
         return right.count - left.count;
@@ -239,6 +266,19 @@ export function buildGeneratedStatsSummary(
       return right.totalGenerated - left.totalGenerated;
     });
 
+  const safeCount = currentRecords.filter(r => r.overlapLevel === "safe").length;
+  const warningCount = currentRecords.filter(r => r.overlapLevel === "warning").length;
+  const dangerCount = currentRecords.filter(r => r.overlapLevel === "danger").length;
+  const overlapTotal = Math.max(currentRecords.length, 1);
+  const overlapDistribution = {
+    safe: safeCount,
+    warning: warningCount,
+    danger: dangerCount,
+    safePercentage: Number(((safeCount / overlapTotal) * 100).toFixed(1)),
+    warningPercentage: Number(((warningCount / overlapTotal) * 100).toFixed(1)),
+    dangerPercentage: Number(((dangerCount / overlapTotal) * 100).toFixed(1))
+  };
+
   return {
     currentTargetRound,
     latestEvaluatedRound: latestDraw?.round ?? null,
@@ -247,7 +287,8 @@ export function buildGeneratedStatsSummary(
     strategyBoard,
     currentStrategyTotals,
     currentTopNumbers: buildCurrentTopNumbers(currentRecords),
-    matchDistribution: buildMatchDistribution(evaluatedRecords)
+    matchDistribution: buildMatchDistribution(evaluatedRecords),
+    overlapDistribution
   };
 }
 
@@ -267,6 +308,7 @@ export function buildGeneratedStatsViewModel(
     currentStrategyTotals: summary.currentStrategyTotals,
     currentTopNumbers: summary.currentTopNumbers,
     matchDistribution: summary.matchDistribution,
+    overlapDistribution: summary.overlapDistribution,
     recentRecords: recentRecords ?? summary.currentRecords.slice(0, 4)
   };
 }

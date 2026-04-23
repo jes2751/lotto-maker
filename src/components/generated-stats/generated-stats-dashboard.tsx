@@ -180,10 +180,10 @@ export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardPro
         </div>
 
         <div className="panel">
-          <p className="eyebrow">사람들 선택</p>
-          <h2 className="section-subtitle mt-3 text-white">이번 회차 전체 생성 기록에서 나온 선택 흐름입니다</h2>
+          <p className="eyebrow text-rose-400">군중 레이더</p>
+          <h2 className="section-subtitle mt-3 text-white">사람들이 몰리는 위험 구역을 실시간으로 추적합니다</h2>
           <div className="mt-4 flex flex-wrap gap-2">
-            {["이번 회차 전체", "전략 점유율", "번호 집중도", "최근 공개 세트"].map((item, index) => (
+            {["위험 구역", "스마트 vs 군중", "전략 점유율", "최근 공개 세트"].map((item, index) => (
               <span key={item} className={index > 1 ? "spark-pill hidden md:inline-flex" : "spark-pill"}>
                 {item}
               </span>
@@ -191,48 +191,87 @@ export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardPro
           </div>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <div className="soft-card">
-              <p className="text-base font-medium text-white">전략 점유율</p>
+            <div className="soft-card border-rose-500/20 bg-rose-500/5">
+              <p className="text-base font-medium text-rose-400">위험 번호 TOP 10 (Danger Zone)</p>
               <p className="mt-2 text-sm leading-7 text-slate-400">
-                현재 회차 전체 생성 기록에서 어떤 전략이 얼마나 사용됐는지 보여줍니다.
+                군중이 가장 많이 선택한 번호입니다. 이 번호를 포함할 경우 기댓값(EV)이 하락할 수 있습니다.
               </p>
-              <div className="mt-4 space-y-4">
-                {view.currentStrategyTotals.length > 0 ? (
-                  view.currentStrategyTotals.map((item) => (
-                    <div key={item.strategy}>
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="text-slate-200">{getStrategyLabel(item.strategy)}</span>
-                        <span className="text-slate-400">
-                          {item.totalGenerated}세트 · {item.sharePercentage}%
-                        </span>
-                      </div>
-                      <div className="progress-track mt-2">
-                        <div className="progress-fill-teal" style={{ width: `${Math.max(item.sharePercentage, 4)}%` }} />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-400">이번 회차 생성 기록이 아직 없습니다.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="soft-card">
-              <p className="text-base font-medium text-white">많이 선택된 번호 TOP 10</p>
-              <p className="mt-2 text-sm leading-7 text-slate-400">
-                현재 회차 전체 생성 기록에서 가장 자주 등장한 번호입니다.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-col gap-3">
                 {view.currentTopNumbers.length > 0 ? (
                   view.currentTopNumbers.map((item) => (
-                    <Link key={item.number} href={`/stats/numbers/${item.number}`} className="chip-link">
-                      <span className="font-semibold text-white">{item.number}</span>
-                      <span className="text-slate-400">{item.count}회</span>
-                    </Link>
+                    <div key={item.number} className="flex items-center justify-between rounded-xl bg-black/40 px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500/20 text-sm font-bold text-rose-300">
+                          {item.number}
+                        </span>
+                        <span className="text-sm text-slate-300">{item.count}회 선택</span>
+                      </div>
+                      {item.expectedPrizeDrop && item.expectedPrizeDrop > 0 ? (
+                        <span className="text-xs font-medium text-rose-400">
+                          예상 당첨금 -{item.expectedPrizeDrop}%
+                        </span>
+                      ) : null}
+                    </div>
                   ))
                 ) : (
                   <p className="text-sm text-slate-400">집계할 번호가 아직 없습니다.</p>
                 )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="soft-card">
+                <p className="text-base font-medium text-emerald-400">스마트 vs 군중</p>
+                <p className="mt-2 text-sm leading-7 text-slate-400">
+                  위험 번호를 피한 스마트 생성(Safe) 비율입니다.
+                </p>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-emerald-400">Safe (스마트)</span>
+                    <span className="text-rose-400">Danger (군중)</span>
+                  </div>
+                  <div className="mt-2 flex h-2 w-full overflow-hidden rounded-full bg-slate-800">
+                    <div 
+                      className="bg-emerald-500" 
+                      style={{ width: `${view.overlapDistribution.safePercentage}%` }} 
+                    />
+                    <div 
+                      className="bg-amber-500" 
+                      style={{ width: `${view.overlapDistribution.warningPercentage || 0}%` }} 
+                    />
+                    <div 
+                      className="bg-rose-500" 
+                      style={{ width: `${view.overlapDistribution.dangerPercentage}%` }} 
+                    />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-3 text-xs text-slate-400">
+                    <span>{view.overlapDistribution.safePercentage}% ({view.overlapDistribution.safe}세트)</span>
+                    <span>{view.overlapDistribution.dangerPercentage}% ({view.overlapDistribution.danger}세트)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="soft-card">
+                <p className="text-base font-medium text-white">전략 점유율</p>
+                <div className="mt-4 space-y-4">
+                  {view.currentStrategyTotals.length > 0 ? (
+                    view.currentStrategyTotals.map((item) => (
+                      <div key={item.strategy}>
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                          <span className="text-slate-200">{getStrategyLabel(item.strategy)}</span>
+                          <span className="text-slate-400">
+                            {item.totalGenerated}세트 · {item.sharePercentage}%
+                          </span>
+                        </div>
+                        <div className="progress-track mt-2">
+                          <div className="progress-fill-teal" style={{ width: `${Math.max(item.sharePercentage, 4)}%` }} />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-400">이번 회차 생성 기록이 아직 없습니다.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

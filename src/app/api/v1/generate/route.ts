@@ -214,6 +214,8 @@ export async function POST(request: Request) {
             reason: set.reason,
             generatedAt: set.generatedAt,
             targetRound,
+            overlapScore: set.overlapScore,
+            overlapLevel: set.overlapLevel,
             filters: recordFilters
           }))
         });

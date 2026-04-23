@@ -657,7 +657,8 @@ function toNumberUsageSummaryList(value: FirestorePrimitive | undefined): Genera
     return {
       number: toNumberOrNull(item.number) ?? 0,
       count: toNumberOrNull(item.count) ?? 0,
-      percentage: toNumberOrNull(item.percentage) ?? 0
+      percentage: toNumberOrNull(item.percentage) ?? 0,
+      expectedPrizeDrop: toNumberOrNull(item.expectedPrizeDrop) ?? undefined
     };
   });
 }
@@ -676,6 +677,19 @@ function toMatchDistributionList(value: FirestorePrimitive | undefined): Generat
       percentage: toNumberOrNull(item.percentage) ?? 0
     };
   });
+}
+
+function toOverlapDistribution(value: FirestorePrimitive | undefined): GeneratedStatsViewModel["overlapDistribution"] {
+  const item = toObjectMap(value);
+
+  return {
+    safe: toNumberOrNull(item.safe) ?? 0,
+    warning: toNumberOrNull(item.warning) ?? 0,
+    danger: toNumberOrNull(item.danger) ?? 0,
+    safePercentage: toNumberOrNull(item.safePercentage) ?? 0,
+    warningPercentage: toNumberOrNull(item.warningPercentage) ?? 0,
+    dangerPercentage: toNumberOrNull(item.dangerPercentage) ?? 0
+  };
 }
 
 function parseGeneratedRoundStatsDocument(document: FirestoreDocument): GeneratedStatsSnapshot {
@@ -697,6 +711,7 @@ function parseGeneratedRoundStatsDocument(document: FirestoreDocument): Generate
       currentStrategyTotals: toCurrentStrategyTotals(view.currentStrategyTotals),
       currentTopNumbers: toNumberUsageSummaryList(view.currentTopNumbers),
       matchDistribution: toMatchDistributionList(view.matchDistribution),
+      overlapDistribution: toOverlapDistribution(view.overlapDistribution),
       recentRecords: toStoredGeneratedRecordList(view.recentRecords)
     }
   };

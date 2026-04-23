@@ -13,12 +13,12 @@ export const dynamic = "force-dynamic";
 
 const content = {
   ko: {
-    eyebrow: "사람들 선택",
-    title: "이번 회차 전체 생성 흐름을 한 화면에서 봅니다",
+    eyebrow: "군중 레이더",
+    title: "사람들이 몰리는 위험 구역을 실시간으로 추적합니다",
     description:
-      "최근 240개 샘플이 아니라 현재 회차 전체 생성 기록과 직전 평가 회차 결과를 함께 보여주는 공개 통계 페이지입니다.",
+      "현재 회차의 전체 생성 기록을 분석해, 많은 사람들이 중복으로 선택하는 위험 번호와 전략 비율을 실시간으로 확인합니다. 번호가 겹칠수록 기댓값(EV)은 하락합니다.",
     links: [
-      { href: "/generate", label: "번호 생성하러 가기", primary: true },
+      { href: "/generate", label: "안전한 번호 생성하기", primary: true },
       { href: "/stats", label: "공식 통계 보기" }
     ],
     compareCards: [
@@ -38,12 +38,12 @@ const content = {
     pills: ["이번 회차 전체", "전략 점유율", "번호 집중도"]
   },
   en: {
-    eyebrow: "Crowd Board",
-    title: "See the full current-round generation flow in one place",
+    eyebrow: "Crowd Radar",
+    title: "Track the danger zones where the crowd is gathering",
     description:
-      "This page shows the full current-round public generation flow and the latest evaluated round instead of relying on a recent sample.",
+      "We analyze the full current-round generation flow to spot dangerous, over-selected numbers. The more people pick the same numbers, the lower your expected value (EV).",
     links: [
-      { href: "/generate", label: "Open generator", primary: true },
+      { href: "/generate", label: "Generate safe numbers", primary: true },
       { href: "/stats", label: "Open stats" }
     ],
     compareCards: [
@@ -70,12 +70,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata({
     locale,
     path: "/generated-stats",
-    titleKo: "사람들 선택 통계",
-    titleEn: "Generated Stats",
+    titleKo: "군중 레이더 - 유저 통계",
+    titleEn: "Crowd Radar - Generated Stats",
     descriptionKo:
-      "이번 회차 전체 생성 수, 전략 점유율, 많이 선택된 번호, 직전 평가 회차 결과를 함께 보여주는 공개 통계 페이지입니다.",
+      "유저들이 가장 많이 선택한 번호(위험 구역)와 기댓값 하락을 실시간으로 확인하고, 군중을 피하는 안전한 전략을 세워보세요.",
     descriptionEn:
-      "A public page for current-round generation volume, strategy share, top numbers, and latest evaluated results."
+      "Track the most over-selected numbers in real-time, see expected value drops, and build safer, crowd-avoiding strategies."
   });
 }
 
