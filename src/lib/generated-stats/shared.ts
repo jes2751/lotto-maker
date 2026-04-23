@@ -67,6 +67,7 @@ export interface GeneratedStatsSummary {
     sharePercentage: number;
   }>;
   currentTopNumbers: NumberUsageSummary[];
+  currentBottomNumbers: NumberUsageSummary[];
   matchDistribution: MatchDistributionItem[];
   overlapDistribution: {
     safe: number;
@@ -90,6 +91,7 @@ export interface GeneratedStatsViewModel {
     sharePercentage: number;
   }>;
   currentTopNumbers: NumberUsageSummary[];
+  currentBottomNumbers: NumberUsageSummary[];
   matchDistribution: MatchDistributionItem[];
   overlapDistribution: {
     safe: number;
@@ -185,6 +187,41 @@ function buildCurrentTopNumbers(records: StoredGeneratedRecord[]): NumberUsageSu
       return left.number - right.number;
     })
     .slice(0, 10);
+}
+
+function buildCurrentBottomNumbers(records: StoredGeneratedRecord[]): NumberUsageSummary[] {
+  const counter = new Map<number, number>();
+  
+  // Initialize all numbers 1-45 with 0
+  for (let i = 1; i <= 45; i++) {
+    counter.set(i, 0);
+  }
+
+  for (const record of records) {
+    for (const number of record.numbers) {
+      counter.set(number, (counter.get(number) ?? 0) + 1);
+    }
+  }
+
+  const totalRecords = Math.max(records.length, 1);
+
+  return Array.from(counter.entries())
+    .map(([number, count]) => {
+      const percentage = Number(((count / totalRecords) * 100).toFixed(1));
+      return {
+        number,
+        count,
+        percentage
+      };
+    })
+    .sort((left, right) => {
+      if (left.count !== right.count) {
+        return left.count - right.count; // Ascending order for bottom numbers
+      }
+
+      return left.number - right.number;
+    })
+    .slice(0, 5); // Return the top 5 safest numbers
 }
 
 function buildMatchDistribution(records: EvaluatedGeneratedRecord[]): MatchDistributionItem[] {
@@ -287,6 +324,7 @@ export function buildGeneratedStatsSummary(
     strategyBoard,
     currentStrategyTotals,
     currentTopNumbers: buildCurrentTopNumbers(currentRecords),
+    currentBottomNumbers: buildCurrentBottomNumbers(currentRecords),
     matchDistribution: buildMatchDistribution(evaluatedRecords),
     overlapDistribution
   };
@@ -307,6 +345,7 @@ export function buildGeneratedStatsViewModel(
     strategyBoard: summary.strategyBoard,
     currentStrategyTotals: summary.currentStrategyTotals,
     currentTopNumbers: summary.currentTopNumbers,
+    currentBottomNumbers: summary.currentBottomNumbers,
     matchDistribution: summary.matchDistribution,
     overlapDistribution: summary.overlapDistribution,
     recentRecords: recentRecords ?? summary.currentRecords.slice(0, 4)

@@ -710,6 +710,7 @@ function parseGeneratedRoundStatsDocument(document: FirestoreDocument): Generate
       strategyBoard: toStrategyBoard(view.strategyBoard),
       currentStrategyTotals: toCurrentStrategyTotals(view.currentStrategyTotals),
       currentTopNumbers: toNumberUsageSummaryList(view.currentTopNumbers),
+      currentBottomNumbers: toNumberUsageSummaryList(view.currentBottomNumbers),
       matchDistribution: toMatchDistributionList(view.matchDistribution),
       overlapDistribution: toOverlapDistribution(view.overlapDistribution),
       recentRecords: toStoredGeneratedRecordList(view.recentRecords)

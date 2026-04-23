@@ -273,6 +273,25 @@ export function GeneratedStatsDashboard({ snapshot }: GeneratedStatsDashboardPro
                   )}
                 </div>
               </div>
+
+              <div className="soft-card border-emerald-500/20 bg-emerald-500/5">
+                <p className="text-base font-medium text-emerald-400">안전 구역 (Safe Zone)</p>
+                <p className="mt-2 text-sm leading-7 text-slate-400">
+                  군중이 가장 적게 선택한 블루오션 번호입니다. 기댓값을 방어하기 좋은 번호들입니다.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {view.currentBottomNumbers && view.currentBottomNumbers.length > 0 ? (
+                    view.currentBottomNumbers.map((item) => (
+                      <div key={item.number} className="flex items-center gap-2 rounded-lg bg-black/40 px-3 py-1.5">
+                        <span className="text-sm font-bold text-emerald-400">{item.number}</span>
+                        <span className="text-xs text-slate-400">{item.count}회</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-400">집계할 번호가 아직 없습니다.</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
