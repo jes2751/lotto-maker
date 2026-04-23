@@ -57,8 +57,8 @@ export function SiteHeader() {
                 aria-current={isActive(item.href) ? "page" : undefined}
                 className={
                   isActive(item.href)
-                    ? "nav-pill nav-pill-primary nav-pill-active whitespace-nowrap px-4"
-                    : "nav-pill nav-pill-primary whitespace-nowrap px-4"
+                    ? "nav-pill nav-pill-primary nav-pill-active whitespace-nowrap px-5 py-2"
+                    : "nav-pill nav-pill-primary whitespace-nowrap px-5 py-2"
                 }
               >
                 {item.label}

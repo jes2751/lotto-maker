@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { NumberSet } from "@/components/lotto/number-set";
 import { computeDashboardSummary, computeFrequencyStats, drawRepository } from "@/lib/lotto";
+import { getGeneratedRoundStats } from "@/lib/firebase/admin";
 import { createPageMetadata } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -26,6 +27,9 @@ export default async function HomePage() {
   const allHotNumbers = computeFrequencyStats(draws, "all").slice(0, 5);
   const recentHotNumbers = computeFrequencyStats(draws, "recent_10").slice(0, 5);
   const oddEvenLeader = summary.oddEvenBreakdown[0]?.label ?? "-";
+  
+  const generatedStats = nextRound ? await getGeneratedRoundStats(nextRound).catch(() => null) : null;
+  const mostPicked = generatedStats?.view.currentTopNumbers[0] ?? null;
   const officialVsCrowd = [
     {
       href: "/stats",
@@ -146,52 +150,40 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-between gap-8">
-          <div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <p className="eyebrow">군중 회피 플레이보드</p>
-              <span className="status-badge">공식 통계 + 사람들 선택</span>
+        <div className="flex flex-col justify-center gap-6 soft-card border-rose-500/20 bg-[linear-gradient(180deg,rgba(244,63,94,0.08)_0%,rgba(15,23,42,0.6)_100%)]">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <p className="eyebrow text-rose-400">군중 회피 전략</p>
+            <span className="status-badge bg-rose-500/10 text-rose-300 border-rose-500/20">어차피 당첨 확률이 같다면</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+            남들이 안 뽑는 번호를 가져가세요.
+          </h1>
+          
+          {mostPicked && (
+            <div className="mt-2 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5">
+              <p className="text-sm font-semibold text-rose-300">이번 주 가장 위험한 번호</p>
+              <div className="mt-3 flex items-end gap-4">
+                <span className="text-5xl font-bold text-white">{mostPicked.number}</span>
+                <span className="mb-1 text-sm text-rose-200">
+                  가장 많은 유저({mostPicked.count}명, {mostPicked.percentage}%)가 선택 중
+                </span>
+              </div>
             </div>
-            <h1 className="section-title mt-4 max-w-3xl text-gradient-silver">
-              로또 번호를 먼저 뽑고, 사람들이 많이 고를 조합인지 바로 확인하세요
-            </h1>
-            <p className="body-large mt-5 max-w-2xl text-slate-300">
-              번호를 먼저 만들고, 공식 당첨 통계와 사람들 선택 흐름을 따로 붙여 더 대중적인 조합인지 바로 판단합니다.
-            </p>
+          )}
 
-            <div className="mt-5 grid gap-3 md:mt-6 md:grid-cols-2 xl:grid-cols-3">
-              {playCards.map((item, index) => (
-                <Link
-                  key={item.title}
-                  href={item.href}
-                  className={[
-                    "rounded-[28px] border px-6 py-5 transition duration-300 md:min-h-[11.5rem]",
-                    index === 0
-                      ? "border-accent/40 bg-[linear-gradient(180deg,rgba(255,143,0,0.16)_0%,rgba(255,143,0,0.05)_100%)]"
-                      : "border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(15,23,42,0.9)_100%)] hover:border-white/20 hover:bg-white/[0.06]"
-                  ].join(" ")}
-                >
-                  <div className="flex h-full flex-col gap-4">
-                    <div className="min-w-0">
-                      <span className="play-card-kicker">{item.kicker}</span>
-                      <span className="play-card-title mt-3 block">{item.title}</span>
-                    </div>
-                    <span className="play-card-body">{item.body}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+          <div className="mt-1 flex items-start gap-3 rounded-xl border border-rose-500/10 bg-rose-500/5 px-4 py-3">
+            <span className="text-xl">💡</span>
+            <p className="text-sm leading-relaxed text-rose-200">
+              <strong className="font-semibold text-rose-300">왜 피해야 할까요?</strong> 로또 당첨금은 파이가 정해져 있습니다. 사람들이 몰리는 번호를 피해야 1등 당첨 시 기댓값(수령액)을 극대화할 수 있습니다.
+            </p>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link href="/generate" className="cta-button w-full sm:w-auto">
               지금 번호 뽑기
             </Link>
-            <Link href="/stats" className="secondary-button w-full sm:w-auto">
-              공식 당첨 흐름 보기
-            </Link>
-            <Link href="/generated-stats" className="secondary-button hidden sm:inline-flex">
-              유저 흐름 보기
+            <Link href="/generated-stats" className="secondary-button w-full sm:w-auto">
+              유저 흐름 상세 보기
             </Link>
           </div>
         </div>

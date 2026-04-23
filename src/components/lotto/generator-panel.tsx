@@ -357,13 +357,13 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                 </div>
                 <span
                   className={[
-                    "rounded-full px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] transition",
+                    "rounded-xl px-3 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.16em] transition",
                     strategy === item.value
-                      ? "bg-accent text-slate-950"
-                      : "border border-white/10 text-slate-500 group-hover:text-slate-300"
+                      ? "bg-accent text-slate-950 shadow-[0_0_12px_rgba(255,143,0,0.4)]"
+                      : "border border-white/10 bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white"
                   ].join(" ")}
                 >
-                  {strategy === item.value ? "현재 선택" : "전략"}
+                  {strategy === item.value ? "선택됨" : "선택하기"}
                 </span>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -638,49 +638,82 @@ export function GeneratorPanel({ targetRound = null }: GeneratorPanelProps) {
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-teal">
                     {set.strategy}
                   </span>
+                  {set.overlapLevel === "danger" && (
+                    <span className="rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-rose-400">
+                      위험 (군중 중복)
+                    </span>
+                  )}
+                  {set.overlapLevel === "warning" && (
+                    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-amber-400">
+                      주의 (일부 중복)
+                    </span>
+                  )}
+                  {set.overlapLevel === "safe" && (
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-emerald-400">
+                      안전 (독식 유리)
+                    </span>
+                  )}
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-slate-500">{new Date(set.generatedAt).toLocaleString("ko-KR")}</span>
-                    <button
-                      type="button"
-                      onClick={() => void shareSet(set)}
-                      disabled={sharingId === set.id}
-                      className="whitespace-nowrap rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs uppercase tracking-widest text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
-                    >
-                      {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void copySet(set)}
-                      className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                    >
-                      {copiedId === set.id ? "복사 완료" : "복사"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => saveSet(set)}
-                      className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
-                    >
-                      {savedId === set.id ? "저장 완료" : "저장"}
-                    </button>
                   </div>
                 </div>
                 <div className="mt-4">
                   <NumberSet numbers={set.numbers} bonus={set.bonus} hrefBuilder={buildStatsHref} />
                 </div>
                 <p className="mt-4 text-sm leading-7 text-slate-400">{set.reason}</p>
+                {set.overlapLevel === "danger" && (
+                  <div className="mt-3 rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-3 text-sm text-rose-200">
+                    이 조합은 이번 주 유저들이 가장 많이 뽑은 번호가 다수 포함되어 있습니다. 독식 확률이 낮아 재생성을 권장합니다.
+                  </div>
+                )}
+                {set.overlapLevel === "warning" && (
+                  <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
+                    유행하는 번호가 일부 포함되어 있습니다. 당첨 시 기댓값이 다소 낮아질 수 있습니다.
+                  </div>
+                )}
+                {set.overlapLevel === "safe" && (
+                  <div className="mt-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-200">
+                    군중 중복도가 낮습니다. 남들이 안 뽑은 번호 위주라 당첨 시 기댓값이 유리합니다.
+                  </div>
+                )}
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href={`/draws?number=${set.numbers[0]}`}
-                    className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                   >
                     관련 회차 보기
                   </Link>
                   <Link
                     href={`/stats/numbers/${set.numbers[0]}`}
-                    className="rounded-full border border-white/10 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-200 transition hover:border-white/30"
+                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                   >
                     번호 통계 보기
                   </Link>
+                  
+                  <div className="ml-auto flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => saveSet(set)}
+                      className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                    >
+                      {savedId === set.id ? "✓ 저장 완료" : "저장"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void copySet(set)}
+                      className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                    >
+                      {copiedId === set.id ? "✓ 복사 완료" : "복사"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void shareSet(set)}
+                      disabled={sharingId === set.id}
+                      className="whitespace-nowrap rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-2.5 text-sm font-semibold text-teal-300 transition hover:bg-teal-500/20 disabled:opacity-50"
+                    >
+                      {sharingId === set.id ? "캡처 중..." : "이미지 배포"}
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

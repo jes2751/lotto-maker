@@ -4,7 +4,7 @@ export type SiteLocale = "ko" | "en";
 
 export const siteConfig = {
   name: "Lotto Maker Lab",
-  logoName: "LOTTO MAKER LAB",
+  logoName: "Lotto Maker Lab",
   seoNameKo: "로또 메이커 랩",
   domain: "lotto-maker.cloud",
   defaultUrl: "https://lotto-maker.cloud",
