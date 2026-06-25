@@ -37,7 +37,7 @@ epLzmpogSaqwlvqyq8h3gTCFPrmVOaXVhsCnZEbM7hCq3ifamzyzV0GbgAiZH87x
 -----END PRIVATE KEY-----`;
 
 function toFirestoreValue(value: unknown): Record<string, unknown> {
-  if (value === null) {
+  if (value === null || value === undefined) {
     return { nullValue: null };
   }
 
@@ -68,7 +68,9 @@ function toFirestoreValue(value: unknown): Record<string, unknown> {
   return {
     mapValue: {
       fields: Object.fromEntries(
-        Object.entries(value as Record<string, unknown>).map(([key, entry]) => [key, toFirestoreValue(entry)])
+        Object.entries(value as Record<string, unknown>)
+          .filter(([_, entry]) => entry !== undefined)
+          .map(([key, entry]) => [key, toFirestoreValue(entry)])
       )
     }
   };
@@ -100,7 +102,9 @@ function createGeneratedRequestDocument(
         status: "committed",
         createdAt: "2026-04-14T00:00:00.000Z",
         committedAt: "2026-04-14T00:00:00.000Z"
-      }).map(([key, value]) => [key, toFirestoreValue(value)])
+      })
+        .filter(([_, value]) => value !== undefined)
+        .map(([key, value]) => [key, toFirestoreValue(value)])
     )
   };
 }

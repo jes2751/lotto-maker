@@ -227,8 +227,8 @@ export async function getFirestoreAdminAccessToken() {
   return payload.access_token;
 }
 
-function toFirestoreValue(value: FirestorePrimitive): FirestoreValue {
-  if (value === null) {
+function toFirestoreValue(value: FirestorePrimitive | undefined): FirestoreValue {
+  if (value === null || value === undefined) {
     return { nullValue: null };
   }
 
@@ -258,7 +258,11 @@ function toFirestoreValue(value: FirestorePrimitive): FirestoreValue {
 
   return {
     mapValue: {
-      fields: Object.fromEntries(Object.entries(value).map(([key, entryValue]) => [key, toFirestoreValue(entryValue)]))
+      fields: Object.fromEntries(
+        Object.entries(value)
+          .filter(([_, entryValue]) => entryValue !== undefined)
+          .map(([key, entryValue]) => [key, toFirestoreValue(entryValue)])
+      )
     }
   };
 }
@@ -342,7 +346,9 @@ export function getLottoDrawDocumentId(round: number) {
 
 function recordToFirestoreFields(record: LottoDrawRecord) {
   return Object.fromEntries(
-    Object.entries(record).map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
+    Object.entries(record)
+      .filter(([_, value]) => value !== undefined)
+      .map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
   );
 }
 
@@ -895,7 +901,11 @@ async function patchFirestoreDocument(
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
+      fields: Object.fromEntries(
+        Object.entries(fields)
+          .filter(([_, value]) => value !== undefined)
+          .map(([key, value]) => [key, toFirestoreValue(value)])
+      )
     })
   });
 
@@ -1117,7 +1127,9 @@ export async function saveGeneratedRoundStatsSnapshot(targetRound: number, snaps
                 computedAt: snapshot.computedAt ?? new Date().toISOString(),
                 sourceRecordCount: snapshot.sourceRecordCount,
                 view: snapshot.view
-              }).map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
+              })
+                .filter(([_, value]) => value !== undefined)
+                .map(([key, value]) => [key, toFirestoreValue(value as FirestorePrimitive)])
             )
           }
         }
@@ -1163,7 +1175,9 @@ async function saveGeneratedRecordsWithAdmin(
           update: {
             name: `projects/${projectId}/databases/(default)/documents/${GENERATED_REQUESTS_COLLECTION}/${input.requestId}`,
             fields: Object.fromEntries(
-              Object.entries(requestFields).map(([key, value]) => [key, toFirestoreValue(value)])
+              Object.entries(requestFields)
+                .filter(([_, value]) => value !== undefined)
+                .map(([key, value]) => [key, toFirestoreValue(value)])
             )
           },
           currentDocument: {
@@ -1173,7 +1187,11 @@ async function saveGeneratedRecordsWithAdmin(
         ...writes.map(({ recordId, fields }) => ({
           update: {
             name: `projects/${projectId}/databases/(default)/documents/${GENERATED_RECORDS_COLLECTION}/${recordId}`,
-            fields: Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, toFirestoreValue(value)]))
+            fields: Object.fromEntries(
+              Object.entries(fields)
+                .filter(([_, value]) => value !== undefined)
+                .map(([key, value]) => [key, toFirestoreValue(value)])
+            )
           },
           currentDocument: {
             exists: false
