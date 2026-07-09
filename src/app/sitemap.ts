@@ -23,7 +23,7 @@ const staticRoutes: StaticRoute[] = [
   { path: "/guides/recent-hot-and-cold-numbers", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/odd-even-pattern-guide", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/lotto-sum-pattern-analysis", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/guides/how-to-buy-lotto-online", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/guides/lotto-probability-truth", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/what-to-do-when-winning-lotto", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/lotto-tax-and-claim-guide", changeFrequency: "monthly", priority: 0.5 },
   { path: "/guides/the-truth-of-lotto-hotspots", changeFrequency: "monthly", priority: 0.5 },

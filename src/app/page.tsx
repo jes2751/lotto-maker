@@ -351,21 +351,48 @@ export default async function HomePage() {
             </p>
             <div className="mt-5 grid gap-3">
               {[
-                { href: "/guides/what-to-do-when-winning-lotto", label: "1등 당첨 시 가장 먼저 해야 할 일" },
-                { href: "/guides/lotto-probability-truth", label: "1등 확률 814만 분의 1과 기댓값" },
-                { href: "/guides/lotto-tax-and-claim-guide", label: "당첨금 세금 및 실수령액 계산법" },
-                { href: "/guides/recent-hot-and-cold-numbers", label: "핫 넘버와 콜드 넘버 통계의 진실" },
-                { href: "/guides/lotto-number-generator-vs-random", label: "생성기를 써야 하는 수학적 이유" }
+                {
+                  href: "/guides/what-to-do-when-winning-lotto",
+                  label: "1등 당첨 시 가장 먼저 해야 할 일",
+                  desc: "농협 본점 방문 시 준비물, 당첨금 수령 절차 및 비밀 유지 요령"
+                },
+                {
+                  href: "/guides/lotto-probability-truth",
+                  label: "1등 확률 814만 분의 1과 기댓값",
+                  desc: "단순한 운을 넘어 수학적 확률로 파헤치는 로또 당첨의 차가운 현실"
+                },
+                {
+                  href: "/guides/lotto-tax-and-claim-guide",
+                  label: "당첨금 세금 및 실수령액 계산법",
+                  desc: "소득세법 기준에 따른 3억 초과 고액 당첨금의 구간별 세율과 실제 수령 금액"
+                },
+                {
+                  href: "/guides/recent-hot-and-cold-numbers",
+                  label: "핫 넘버와 콜드 넘버 통계의 진실",
+                  desc: "자주 나오는 번호와 안 나오는 번호가 다음 추첨에 미치는 영향"
+                },
+                {
+                  href: "/guides/lotto-number-generator-vs-random",
+                  label: "생성기를 써야 하는 수학적 이유",
+                  desc: "인간의 심리적 편향을 제거하고 무작위 난수를 생성해야 하는 까닭"
+                }
               ].map((item) => (
-                <Link key={item.href} href={item.href} className="link-list-item">
-                  <span>{item.label}</span>
-                  <span className="text-slate-500">열기</span>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex flex-col gap-1.5 rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-white/10 hover:bg-white/[0.04]"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-white">{item.label}</span>
+                    <span className="text-xs text-teal">읽기 &rarr;</span>
+                  </div>
+                  <p className="text-xs text-slate-455 leading-relaxed">{item.desc}</p>
                 </Link>
               ))}
             </div>
             <div className="mt-5">
               <Link href="/guides" className="text-sm font-semibold tracking-wide text-teal hover:text-white transition-colors">
-                모든 로또 가이드 (8편) 전체 보기 &rarr;
+                모든 로또 가이드 (13편) 전체 보기 &rarr;
               </Link>
             </div>
           </div>
