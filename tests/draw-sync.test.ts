@@ -6,19 +6,26 @@ import { seedDraws } from "../src/lib/data/seed-draws";
 
 test("normalizeOfficialDraw converts official payload into Draw shape", () => {
   const draw = normalizeOfficialDraw({
-    returnValue: "success",
-    drwNo: 1170,
-    drwNoDate: "2026-04-04",
-    drwtNo1: 1,
-    drwtNo2: 7,
-    drwtNo3: 15,
-    drwtNo4: 22,
-    drwtNo5: 33,
-    drwtNo6: 41,
-    bnusNo: 12,
-    totSellamnt: 1000000000,
-    firstWinamnt: 200000000,
-    firstPrzwnerCo: 5
+    resultCode: null,
+    resultMessage: null,
+    data: {
+      list: [
+        {
+          ltEpsd: 1170,
+          ltRflYmd: "20260404",
+          tm1WnNo: 1,
+          tm2WnNo: 7,
+          tm3WnNo: 15,
+          tm4WnNo: 22,
+          tm5WnNo: 33,
+          tm6WnNo: 41,
+          bnsWnNo: 12,
+          wholEpsdSumNtslAmt: 1000000000,
+          rnk1WnAmt: 200000000,
+          rnk1WnNope: 5
+        }
+      ]
+    }
   });
 
   assert.equal(draw.round, 1170);

@@ -41,41 +41,56 @@ test("getDrawsToSyncFromOfficial returns consecutive new draws until official re
     [
       1170,
       {
-        returnValue: "success",
-        drwNo: 1170,
-        drwNoDate: "2026-04-04",
-        drwtNo1: 1,
-        drwtNo2: 2,
-        drwtNo3: 3,
-        drwtNo4: 4,
-        drwtNo5: 5,
-        drwtNo6: 6,
-        bnusNo: 7
+        resultCode: null,
+        resultMessage: null,
+        data: {
+          list: [
+            {
+              ltEpsd: 1170,
+              ltRflYmd: "20260404",
+              tm1WnNo: 1,
+              tm2WnNo: 2,
+              tm3WnNo: 3,
+              tm4WnNo: 4,
+              tm5WnNo: 5,
+              tm6WnNo: 6,
+              bnsWnNo: 7
+            }
+          ]
+        }
       }
     ],
     [
       1171,
       {
-        returnValue: "success",
-        drwNo: 1171,
-        drwNoDate: "2026-04-11",
-        drwtNo1: 8,
-        drwtNo2: 9,
-        drwtNo3: 10,
-        drwtNo4: 11,
-        drwtNo5: 12,
-        drwtNo6: 13,
-        bnusNo: 14
+        resultCode: null,
+        resultMessage: null,
+        data: {
+          list: [
+            {
+              ltEpsd: 1171,
+              ltRflYmd: "20260411",
+              tm1WnNo: 8,
+              tm2WnNo: 9,
+              tm3WnNo: 10,
+              tm4WnNo: 11,
+              tm5WnNo: 12,
+              tm6WnNo: 13,
+              bnsWnNo: 14
+            }
+          ]
+        }
       }
     ]
   ]);
 
   global.fetch = async (input) => {
     const url = String(input);
-    const round = Number(url.split("drwNo=").at(-1));
+    const param = url.split("srchLtEpsd=").at(-1) ?? "";
+    const round = Number(param.split("&").at(0));
     const payload = payloads.get(round);
 
-    return new Response(JSON.stringify(payload ?? { returnValue: "fail" }), {
+    return new Response(JSON.stringify(payload ?? { resultCode: "fail", data: { list: [] } }), {
       status: 200,
       headers: {
         "Content-Type": "application/json"

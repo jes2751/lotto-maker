@@ -1,21 +1,26 @@
 import type { Draw } from "@/types/lotto";
 
-const OFFICIAL_LOTTO_BASE_URL = "https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=";
+const OFFICIAL_LOTTO_BASE_URL = "https://www.dhlottery.co.kr/lt645/selectPstLt645Info.do?srchLtEpsd=";
 
-interface OfficialLottoDrawResponse {
-  returnValue?: string;
-  drwNo?: number;
-  drwNoDate?: string;
-  drwtNo1?: number;
-  drwtNo2?: number;
-  drwtNo3?: number;
-  drwtNo4?: number;
-  drwtNo5?: number;
-  drwtNo6?: number;
-  bnusNo?: number;
-  totSellamnt?: number;
-  firstWinamnt?: number;
-  firstPrzwnerCo?: number;
+interface NewOfficialLottoDrawResponse {
+  resultCode: string | null;
+  resultMessage: string | null;
+  data?: {
+    list?: Array<{
+      ltEpsd?: number;
+      ltRflYmd?: string;
+      tm1WnNo?: number;
+      tm2WnNo?: number;
+      tm3WnNo?: number;
+      tm4WnNo?: number;
+      tm5WnNo?: number;
+      tm6WnNo?: number;
+      bnsWnNo?: number;
+      wholEpsdSumNtslAmt?: number;
+      rnk1WnAmt?: number;
+      rnk1WnNope?: number;
+    }>;
+  };
 }
 
 function ensureInteger(value: unknown, fieldName: string): number {
@@ -37,7 +42,7 @@ function looksLikeHtmlResponse(body: string): boolean {
   return trimmed.startsWith("<!DOCTYPE") || trimmed.startsWith("<html") || trimmed.startsWith("<");
 }
 
-async function parseOfficialResponse(response: Response): Promise<OfficialLottoDrawResponse | null> {
+async function parseOfficialResponse(response: Response): Promise<NewOfficialLottoDrawResponse | null> {
   const contentType = response.headers.get("content-type") ?? "";
   const body = await response.text();
 
@@ -46,7 +51,7 @@ async function parseOfficialResponse(response: Response): Promise<OfficialLottoD
   }
 
   if (contentType.includes("application/json")) {
-    return JSON.parse(body) as OfficialLottoDrawResponse;
+    return JSON.parse(body) as NewOfficialLottoDrawResponse;
   }
 
   if (looksLikeHtmlResponse(body)) {
@@ -54,7 +59,7 @@ async function parseOfficialResponse(response: Response): Promise<OfficialLottoD
   }
 
   try {
-    return JSON.parse(body) as OfficialLottoDrawResponse;
+    return JSON.parse(body) as NewOfficialLottoDrawResponse;
   } catch {
     return null;
   }
@@ -92,39 +97,48 @@ export function validateDraw(draw: Draw): Draw {
   return draw;
 }
 
-export function normalizeOfficialDraw(payload: OfficialLottoDrawResponse): Draw {
-  if (payload.returnValue !== "success") {
+export function normalizeOfficialDraw(payload: NewOfficialLottoDrawResponse): Draw {
+  const list = payload.data?.list;
+  if (!list || list.length === 0) {
     throw new Error("Official payload does not contain a successful draw.");
   }
 
-  const round = ensureInteger(payload.drwNo, "drwNo");
+  const rawDraw = list[0];
+  const round = ensureInteger(rawDraw.ltEpsd, "ltEpsd");
   const numbers = [
-    ensureInteger(payload.drwtNo1, "drwtNo1"),
-    ensureInteger(payload.drwtNo2, "drwtNo2"),
-    ensureInteger(payload.drwtNo3, "drwtNo3"),
-    ensureInteger(payload.drwtNo4, "drwtNo4"),
-    ensureInteger(payload.drwtNo5, "drwtNo5"),
-    ensureInteger(payload.drwtNo6, "drwtNo6")
+    ensureInteger(rawDraw.tm1WnNo, "tm1WnNo"),
+    ensureInteger(rawDraw.tm2WnNo, "tm2WnNo"),
+    ensureInteger(rawDraw.tm3WnNo, "tm3WnNo"),
+    ensureInteger(rawDraw.tm4WnNo, "tm4WnNo"),
+    ensureInteger(rawDraw.tm5WnNo, "tm5WnNo"),
+    ensureInteger(rawDraw.tm6WnNo, "tm6WnNo")
   ].sort((left, right) => left - right);
+
+  const rawDate = String(rawDraw.ltRflYmd ?? "");
+  const formattedDate = rawDate.length === 8
+    ? rawDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
+    : rawDate;
 
   const draw: Draw = {
     id: round,
     round,
-    drawDate: String(payload.drwNoDate ?? ""),
+    drawDate: formattedDate,
     numbers,
-    bonus: ensureInteger(payload.bnusNo, "bnusNo"),
-    totalPrize: payload.totSellamnt ?? null,
-    firstPrize: payload.firstWinamnt ?? null,
-    winnerCount: payload.firstPrzwnerCo ?? null
+    bonus: ensureInteger(rawDraw.bnsWnNo, "bnsWnNo"),
+    totalPrize: rawDraw.wholEpsdSumNtslAmt ?? null,
+    firstPrize: rawDraw.rnk1WnAmt ?? null,
+    winnerCount: rawDraw.rnk1WnNope ?? null
   };
 
   return validateDraw(draw);
 }
 
 export async function fetchOfficialDraw(round: number): Promise<Draw | null> {
-  const response = await fetch(`${OFFICIAL_LOTTO_BASE_URL}${round}`, {
+  const url = `${OFFICIAL_LOTTO_BASE_URL}${round}&_=${Date.now()}`;
+  const response = await fetch(url, {
     headers: {
-      Accept: "application/json"
+      Accept: "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
   });
 
@@ -134,7 +148,7 @@ export async function fetchOfficialDraw(round: number): Promise<Draw | null> {
 
   const payload = await parseOfficialResponse(response);
 
-  if (!payload || payload.returnValue !== "success") {
+  if (!payload || !payload.data?.list || payload.data.list.length === 0) {
     return null;
   }
 
@@ -155,6 +169,26 @@ export async function fetchLatestOfficialDrawSince(lastKnownRound: number, maxLo
   }
 
   return latestDraw;
+}
+
+export async function fetchNewOfficialDraws(lastKnownRound: number): Promise<Draw[]> {
+  const draws: Draw[] = [];
+  let round = lastKnownRound + 1;
+
+  while (true) {
+    const draw = await fetchOfficialDraw(round);
+
+    if (!draw) {
+      break;
+    }
+
+    draws.push(draw);
+    round += 1;
+    // 과도한 트래픽 차단 방지를 위한 딜레이
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  return draws;
 }
 
 export function mergeDraws(existing: Draw[], incoming: Draw): Draw[] {
