@@ -1,6 +1,7 @@
 import type { Draw } from "@/types/lotto";
 
 export const localDraws: Draw[] = [
+  { id: 1233, round: 1233, drawDate: "2026-07-18", numbers: [2, 7, 20, 25, 37, 40], bonus: 29, totalPrize: 116159776000, firstPrize: 837965396, winnerCount: 31 },
   { id: 1232, round: 1232, drawDate: "2026-07-11", numbers: [12, 15, 19, 22, 24, 36], bonus: 3, totalPrize: 114636304000, firstPrize: 2533260819, winnerCount: 11 },
   { id: 1231, round: 1231, drawDate: "2026-07-04", numbers: [4, 13, 14, 18, 31, 38], bonus: 15, totalPrize: 118084580000, firstPrize: 1652990074, winnerCount: 17 },
   { id: 1230, round: 1230, drawDate: "2026-06-27", numbers: [3, 8, 9, 22, 28, 42], bonus: 45, totalPrize: 120177677000, firstPrize: 1771357196, winnerCount: 16 },
